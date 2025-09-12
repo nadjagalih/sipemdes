@@ -1,0 +1,106 @@
+<?php
+
+// Upload gambar untuk Logo Fav Website
+function FotoPegawai($FUpload_name)
+{
+  //direktori gambar
+  $vdir_upload = "../../Vendor/Media/Pegawai/";
+  $vfile_upload = $vdir_upload . $FUpload_name;
+  $imageType = $_FILES["FUpload"]["type"];
+
+  //Simpan gambar dalam ukuran sebenarnya
+  move_uploaded_file($_FILES["FUpload"]["tmp_name"], $vfile_upload);
+
+  //identitas file asli
+  switch ($imageType) {
+    case "image/gif":
+      $im_src = imagecreatefromgif($vfile_upload);
+      break;
+    case "image/pjpeg":
+    case "image/jpeg":
+    case "image/jpg":
+      $im_src = imagecreatefromjpeg($vfile_upload);
+      break;
+    case "image/PNG":
+    case "image/png":
+    case "image/x-png":
+      $im_src = imagecreatefrompng($vfile_upload);
+      break;
+  }
+
+  $src_width = imageSX($im_src);
+  $src_height = imageSY($im_src);
+
+  //Simpan dalam versi besar 400 pixel
+  //Set ukuran gambar hasil perubahan
+  if ($src_width >= 300) {
+    $dst_width = 300;
+  } else {
+    $dst_width = $src_width;
+  }
+  $dst_height = ($dst_width / $src_width) * $src_height;
+
+  //proses perubahan ukuran
+  $im = imagecreatetruecolor($dst_width, $dst_height);
+  imagecopyresampled($im, $im_src, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
+
+  //Simpan gambar
+  switch ($imageType) {
+    case "image/gif":
+      imagegif($im, $vdir_upload . $FUpload_name);
+      break;
+    case "image/pjpeg":
+    case "image/jpeg":
+    case "image/jpg":
+      imagejpeg($im, $vdir_upload . $FUpload_name);
+      break;
+    case "image/PNG":
+    case "image/png":
+    case "image/x-png":
+      imagepng($im, $vdir_upload . $FUpload_name);
+      break;
+  }
+
+
+  //Simpan dalam versi small 200 pixel
+  //Set ukuran gambar hasil perubahan
+
+  // $dst_width2 = 200;
+  // $dst_height2 = ($dst_width2/$src_width)*$src_height;
+
+  // //proses perubahan ukuran
+  // $im2 = imagecreatetruecolor($dst_width2,$dst_height2);
+  // imagecopyresampled($im2, $im_src, 0, 0, 0, 0, $dst_width2, $dst_height2, $src_width, $src_height);
+
+  // //Simpan gambar
+  // switch($imageType) {
+  //   case "image/gif":
+  //   imagegif($im2,$vdir_upload . "small_" . $FUpload_name);
+  //   break;
+  //   case "image/pjpeg":
+  //   case "image/jpeg":
+  //   case "image/jpg":
+  //   imagejpeg($im2,$vdir_upload . "small_" . $FUpload_name);
+  //   break;
+  //   case "image/PNG":
+  //   case "image/png":
+  //   case "image/x-png":
+  //   imagepng($im2,$vdir_upload . "small_" . $FUpload_name);
+  //   break;
+  // }
+
+  //Hapus gambar di memori komputer
+  imagedestroy($im_src);
+  imagedestroy($im);
+  //imagedestroy($im2);
+};
+
+function FileSK($fupload_name)
+{
+  //direktori file
+  $vdir_upload = "../../Vendor/Media/FileSK/";
+  $vfile_upload = $vdir_upload . $fupload_name;
+
+  //Simpan file
+  move_uploaded_file($_FILES["FUpload"]["tmp_name"], $vfile_upload);
+};

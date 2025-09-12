@@ -1,0 +1,119 @@
+<?php include "../App/Control/FunctionPegawaiEdit.php"; ?>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Data Anak</h2>
+    </div>
+    <div class="col-lg-2"></div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>Form Input Anak</h5>&nbsp;<span style="font-style: italic; color:red">*) Wajib Diisi</span>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#" class="dropdown-item">Config option 1</a>
+                            </li>
+                            <li><a href="#" class="dropdown-item">Config option 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form action="../App/Model/ExcPegawaiAnak?Act=Save" method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <input type="hidden" name="IdPegawaiFK" id="IdPegawaiFK" value="<?php echo $IdPegawaiFK; ?>" class="form-control" readonly>
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">NIK</label>
+                                    <div class="col-lg-8"><input type="text" name="NIK" id="NIK" value="<?php echo $NIK; ?>" class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">Anak Dari</label>
+                                    <div class="col-lg-8"><input type="text" name="Nama" id="Nama" value="<?php echo $Nama; ?>" class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">NIK Anak<span style="font-style: italic; color:red">*</span></label>
+                                    <div class="col-lg-8"><input type="text" name="NIKAnak" id="NIKAnak" class="form-control" placeholder="Masukkan NIK Anak" autocomplete="off" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">Nama Anak<span style="font-style: italic; color:red">*</span></label>
+                                    <div class="col-lg-8"><input type="text" name="NamaAnak" id="NamaAnak" class="form-control" placeholder="Masukkan Nama Anak" autocomplete="off" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">Tempat Lahir<span style="font-style: italic; color:red">*</span></label>
+                                    <div class="col-lg-8"><input type="text" name="TempatLahir" id="TempatLahir" placeholder="Masukkan Tempat Lahir" class="form-control" autocomplete="off" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row" id="TanggalLahir">
+                                    <label class="col-lg-3 col-form-label">Tanggal Lahir<span style="font-style: italic; color:red">*</span></label>
+                                    <div class="col-lg-4">
+                                        <div class="input-group date">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            <input type="text" name="TanggalLahir" id="TanggalLahir" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <span style="font-style: italic; color:black;">Contoh : 16-01-1980</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">Jenis Kelamin<span style="font-style: italic; color:red">*</span></label>
+                                    <div class="col-lg-8">
+                                        <select name="JenKel" id="JenKel" style="width: 100%;" class="select2_jenkel form-control" required>
+                                            <option value="">Pilih Jenis Kelamin</option>
+                                            <?php
+                                            $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel ORDER BY IdJenKel ASC");
+                                            while ($DataJenKel = mysqli_fetch_assoc($QueryJenKel)) {
+                                                $IdJenKel = $DataJenKel['IdJenKel'];
+                                                $JenKel = $DataJenKel['Keterangan'];
+                                            ?>
+                                                <option value="<?php echo $IdJenKel; ?>"><?php echo $JenKel; ?></option>
+                                            <?php }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">Status Hubungan<span style="font-style: italic; color:red">*</span></label>
+                                    <div class="col-lg-8">
+                                        <select name="StatusHubungan" id="StatusHubungan" style="width: 100%;" class="select2_hubungan form-control" required>
+                                            <option value="">Pilih Status Hubungan</option>
+                                            <option value="Anak Kandung">Anak Kandung</option>
+                                            <option value="Anak Angkat">Anak Angkat</option>
+                                            <option value="Anak Tiri">Anak Tiri</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">Pendidikan<span style="font-style: italic; color:red">*</span></label>
+                                    <div class="col-lg-8">
+                                        <?php include "../App/Control/FunctionSelectPendidikan.php"; ?>
+                                    </div>
+                                </div>
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">Pekerjaan</label>
+                                    <div class="col-lg-8"><input type="text" name="Pekerjaan" id="Pekerjaan" placeholder="Masukkan Pekerjaan" class="form-control" autocomplete="off">
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
+                                <a href="?pg=PegawaiViewAnak" class="btn btn-success ">Batal</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

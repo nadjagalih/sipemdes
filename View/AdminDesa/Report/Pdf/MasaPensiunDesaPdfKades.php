@@ -4,19 +4,18 @@ error_reporting(E_ALL ^ E_NOTICE);
 
 include '../../../../Module/Config/Env.php';
 
-$Tanggal_Cetak = date('d-m-Y');
-$Waktu_Cetak = date('H:i:s');
-$DateCetak = $Tanggal_Cetak . "_" . $Waktu_Cetak;
-
+// Setting tanggal dalam format Bahasa Indonesia
+setlocale(LC_TIME, 'id_ID.UTF-8');
+$tanggalTTD = strftime('%d %B %Y');
 
 $IdDesa = $_SESSION['IdDesa'];
 
 $QueryDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa ='$IdDesa' ");
 $DataDesa = mysqli_fetch_assoc($QueryDesa);
 $NamaDesa = $DataDesa['NamaDesa'];
-$Kecamatan = $DataDesa['IdKecamatanFK'];
+$KecamatanId = $DataDesa['IdKecamatanFK'];
 
-$QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan ='$Kecamatan' ");
+$QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan ='$KecamatanId' ");
 $DataKecamatan = mysqli_fetch_assoc($QueryKecamatan);
 $NamaKecamatan = $DataKecamatan['Kecamatan'];
 
@@ -26,204 +25,159 @@ $Kabupaten = $DataProfile['Kabupaten'];
 
 $content =
     '<html>
-            <body>
-            <h4>Data Masa Pensiun Kepala Desa' . " " . $NamaDesa . " " . 'Kecamatan' . " " . $NamaKecamatan . ' Kabupaten ' . $Kabupaten . '<br>Pertanggal ' . $Tanggal_Cetak . ' Pukul ' . $Waktu_Cetak . ' WIB</h4>
-                <table  border="0.3" cellpadding="2" cellspacing="0" width="100%">
-                    <thead>
-                        <tr align="center">
-                            <th><strong><font size="12">No</font></strong></th>
-                            <th><strong><font size="12">Foto</font></strong></th>
-                            <th><strong><font size="12">NIK</font></strong></th>
-                            <th><strong><font size="12">Nama<br>Jabatan<br>Alamat</font></strong></th>
-                            <th><strong><font size="12">Tgl Lahir<br>Jenis Kelamin</font></strong></th>
-                            <th><strong><font size="12">Tgl Mutasi</font></strong></th>
-                            <th><strong><font size="12">Tgl Pensiun<br>Waktu <br>Pensiun</font></strong></th>
-                            <th><strong><font size="12">Keterangan</font></strong></th>
-                            <th><strong><font size="12">Unit Kerja<br>Kecamatan<br>Kabupaten</font></strong></th>
-                        </tr>
-                    </thead>
-                    <tbody>';
+    <body>
+    <h4 style="text-align: center;">Data Masa Pensiun Kepala Desa dan Perangkat Desa ' . " " . $NamaDesa . " " . 'Kecamatan' . " " . $NamaKecamatan . ' Kabupaten ' . " " . $Kabupaten . '</h4>
+
+    <table border="1" style="border-collapse:collapse; width: 100%;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="width: 3%; text-align: center;">No</th>
+                <th style="width: 8%;">Foto</th>
+                <th style="width: 10%;">NIK</th>
+                <th style="width: 17%;">Nama<br>Jabatan<br>Alamat</th>
+                <th style="width: 10%;">Tgl Lahir<br>Jenis Kelamin</th>
+                <th style="width: 8%;">Tgl Mutasi</th>
+                <th style="width: 12%;">Tgl Pensiun<br>Sisa Pensiun</th>
+                <th style="width: 14%;">Keterangan</th>
+                <th style="width: 18%;">Unit Kerja<br>Kecamatan<br>Kabupaten</th>
+            </tr>
+        </thead>
+        <tbody>';
+
 $Nomor = 1;
+// Query GABUNGAN untuk Kades dan Perangkat Desa
 $QueryPegawai = mysqli_query($db, "SELECT
-                                            master_pegawai.IdPegawaiFK,
-                                            master_pegawai.Foto,
-                                            master_pegawai.NIK,
-                                            master_pegawai.Nama,
-                                            master_pegawai.TanggalLahir,
-                                            master_pegawai.JenKel,
-                                            master_pegawai.IdDesaFK,
-                                            master_pegawai.Alamat,
-                                            master_pegawai.RT,
-                                            master_pegawai.RW,
-                                            master_pegawai.Lingkungan,
-                                            master_pegawai.Kecamatan AS Kec,
-                                            master_pegawai.Kabupaten,
-                                            master_pegawai.Setting,
-                                            master_pegawai.TanggalPensiun,
-                                            master_desa.IdDesa,
-                                            master_desa.NamaDesa,
-                                            master_desa.IdKecamatanFK,
-                                            master_kecamatan.IdKecamatan,
-                                            master_kecamatan.Kecamatan,
-                                            master_kecamatan.IdKabupatenFK,
-                                            master_setting_profile_dinas.IdKabupatenProfile,
-                                            master_setting_profile_dinas.Kabupaten,
-                                            main_user.IdPegawai,
-                                            main_user.IdLevelUserFK,
-                                            history_mutasi.IdPegawaiFK,
-                                            history_mutasi.Setting,
-                                            history_mutasi.TanggalMutasi,
-                                            master_jabatan.IdJabatan,
-                                            history_mutasi.IdJabatanFK,
-                                            master_jabatan.Jabatan
-                                        FROM
-                                            master_pegawai
-                                            LEFT JOIN
-                                            master_desa
-                                            ON
-                                                master_pegawai.IdDesaFK = master_desa.IdDesa
-                                            LEFT JOIN
-                                            master_kecamatan
-                                            ON
-                                                master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
-                                            LEFT JOIN
-                                            master_setting_profile_dinas
-                                            ON
-                                                master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile
-                                            INNER JOIN
-                                            main_user
-                                            ON
-                                                main_user.IdPegawai = master_pegawai.IdPegawaiFK
-                                            INNER JOIN
-                                            history_mutasi
-                                            ON
-                                                master_pegawai.IdPegawaiFK = history_mutasi.IdPegawaiFK
-                                            INNER JOIN
-                                            master_jabatan
-                                            ON
-                                                history_mutasi.IdJabatanFK = master_jabatan.IdJabatan
-                                    WHERE
-                                    master_pegawai.Setting = 1 AND
-                                    main_user.IdLevelUserFK <> 1 AND
-                                    main_user.IdLevelUserFK <> 2 AND
-                                    history_mutasi.IdJabatanFK = 1 AND
-                                    master_pegawai.Kecamatan = '$Kecamatan' AND
-                                    master_pegawai.IdDesaFK = '$IdDesa'
-                                    ORDER BY master_pegawai.TanggalPensiun ASC");
+                master_pegawai.*,
+                master_desa.NamaDesa,
+                master_kecamatan.Kecamatan,
+                master_setting_profile_dinas.Kabupaten AS NamaKabupaten,
+                history_mutasi.TanggalMutasi,
+                history_mutasi.IdJabatanFK,
+                master_jabatan.Jabatan
+            FROM master_pegawai
+            LEFT JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
+            LEFT JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
+            LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile
+            INNER JOIN main_user ON main_user.IdPegawai = master_pegawai.IdPegawaiFK
+            INNER JOIN history_mutasi ON master_pegawai.IdPegawaiFK = history_mutasi.IdPegawaiFK
+            INNER JOIN master_jabatan ON history_mutasi.IdJabatanFK = master_jabatan.IdJabatan
+            WHERE
+                master_pegawai.Setting = 1 AND
+                main_user.IdLevelUserFK NOT IN (1, 2) AND
+                history_mutasi.Setting = 1 AND
+                master_pegawai.IdDesaFK = '$IdDesa'
+            ORDER BY
+                CASE WHEN history_mutasi.IdJabatanFK = 1 THEN 0 ELSE 1 END,
+                master_pegawai.TanggalPensiun ASC");
+
 while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
-    $IdPegawaiFK = $DataPegawai['IdPegawaiFK'];
+    $IdJabatanFK = $DataPegawai['IdJabatanFK'];
     $Foto = $DataPegawai['Foto'];
     $NIK = $DataPegawai['NIK'];
     $Nama = $DataPegawai['Nama'];
     $Jabatan = $DataPegawai['Jabatan'];
-
     $TanggalLahir = $DataPegawai['TanggalLahir'];
-    $exp = explode('-', $TanggalLahir);
-    $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
-
-    $TanggalMutasi = $DataPegawai['TanggalMutasi'];
-    $exp1 = explode('-', $TanggalMutasi);
-    $ViewTglMutasi = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
-    // $AddTahun = $exp1[0] + 6;
-
-    $TanggalPensiun = date('Y-m-d', strtotime('+6 year', strtotime($TanggalMutasi)));
-    $ViewTglPensiun = date('d-m-Y', strtotime($TanggalPensiun));
-
-    $TglPensiun = date_create($TanggalPensiun);
-    $TglSekarang = date_create();
-    $Temp = date_diff($TglSekarang, $TglPensiun);
-
-
-    $TglSekarang1 = date('Y-m-d');
-
-    if ($TglSekarang1 >= $TanggalPensiun) {
-        $HasilTahun = 0 . ' Tahun ';
-        $HasilBulan = 0 . ' Bulan ';
-        $HasilHari = 0 . ' Hari ';
-    } elseif ($TglSekarang1 < $TanggalPensiun) {
-        $HasilTahun = $Temp->y . ' Tahun ';
-        $HasilBulan = $Temp->m . ' Bulan ';
-        $HasilHari = $Temp->d + 1 . ' Hari ';
-    }
-    //SELESAI
-
+    $ViewTglLahir = date("d-m-Y", strtotime($TanggalLahir));
     $JenKel = $DataPegawai['JenKel'];
-    $NamaDesa = $DataPegawai['NamaDesa'];
-    $Kecamatan = $DataPegawai['Kecamatan'];
-    $Kabupaten = $DataPegawai['Kabupaten'];
     $Alamat = $DataPegawai['Alamat'];
     $RT = $DataPegawai['RT'];
     $RW = $DataPegawai['RW'];
-
+    $Setting = $DataPegawai['Setting'];
     $Lingkungan = $DataPegawai['Lingkungan'];
-    $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
+
+    $ViewTglMutasi = '-';
+    if ($IdJabatanFK == 1) { // Logika untuk Kepala Desa
+        $TanggalMutasi = $DataPegawai['TanggalMutasi'];
+        $ViewTglMutasi = date("d-m-Y", strtotime($TanggalMutasi));
+        $TanggalPensiun = date('Y-m-d', strtotime('+6 year', strtotime($TanggalMutasi)));
+    } else { // Logika untuk Perangkat Desa
+        $TanggalPensiun = $DataPegawai['TanggalPensiun'];
+    }
+    
+    $ViewTglPensiun = date("d-m-Y", strtotime($TanggalPensiun));
+    
+    $TglPensiun_dt = date_create($TanggalPensiun);
+    $TglSekarang_dt = date_create();
+    $TglSekarang1 = date('Y-m-d');
+    
+    if ($TglSekarang1 >= $TanggalPensiun) {
+        $SisaPensiun = '0 Thn<br>0 Bln<br>0 Hr';
+    } else {
+        $Temp = date_diff($TglSekarang_dt, $TglPensiun_dt);
+        $SisaPensiun = $Temp->y . ' Thn<br>' . $Temp->m . ' Bln<br>' . ($Temp->d + 1) . ' Hr';
+    }
+
+    $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan'");
     $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
     $Komunitas = $LingkunganBPD['NamaDesa'];
 
-    $KecamatanBPD = $DataPegawai['Kec'];
+    $KecamatanBPD = $DataPegawai['Kecamatan'];
     $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
-    $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-    $KomunitasKec = $KecamatanBPD['Kecamatan'];
-
-    $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
-    $Setting = $DataPegawai['Setting'];
+    $KecamatanBPD_data = mysqli_fetch_assoc($AmbilKecamatan);
+    $KomunitasKec = $KecamatanBPD_data['Kecamatan'];
+    $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kec. " . $KomunitasKec;
+    
+    // Path untuk foto
+    $fotoPath = '../../../../Vendor/Media/Pegawai/' . (empty($Foto) ? 'no-image.jpg' : $Foto);
 
     $content .=
         '<tr>
-                    <td width="40" align="center">' . $Nomor . '</td>';
-    if (empty($Foto)) {
-        $content .=
-            '<td width="70" align="center">
-                        <img src="../../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
-                </td>';
-    } else {
-        $content .=
-            '<td width="70" align="center">
-                        <img src="../../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
-                </td>';
-    }
-    $content .= '<td width="140">' . $NIK . '</td>
-                      <td width="250"><strong><font size="12">' . $Nama . '</font></strong><br>' . $Jabatan . '<br><br>' . $Address . '</td>
-                      <td>' . $ViewTglLahir;
+            <td style="text-align: center;">' . $Nomor . '</td>
+            <td style="text-align: center;"><img src="' . $fotoPath . '" style="width: 50px;"></td>
+            <td>' . $NIK . '</td>
+            <td>' . $Nama . '<br><strong>' . $Jabatan . '</strong><br>' . $Address . '</td>
+            <td>' . $ViewTglLahir;
+
     $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
     $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
     $JenisKelamin = $DataJenKel['Keterangan'];
 
     $content .=
         '<br>' . $JenisKelamin . '</td>
-                <td width="90">' . $ViewTglMutasi . '</td>
-                <td width="90">' . $ViewTglPensiun . '<br>' . $HasilTahun . '<br>' . $HasilBulan . '<br>' . $HasilHari . '</td>';
+            <td>' . $ViewTglMutasi . '</td>
+            <td>' . $ViewTglPensiun . '<br>' . $SisaPensiun . '</td>';
 
-    if ($TglSekarang1 >= $TanggalPensiun and $Setting = 1) {
+    if ($TglSekarang1 >= $TanggalPensiun and $Setting == 1) {
         $content .=
-            '<td width="160">PENSIUN BELUM ADA SK</td>';
+            '<td>PENSIUN BELUM ADA SK</td>';
     } elseif ($TglSekarang1 < $TanggalPensiun) {
         $content .=
-            '<td width="160">BELUM PENSIUN</td>';
+            '<td>BELUM PENSIUN</td>';
     }
 
     $content .=
-        '<td width="180">' . $NamaDesa . '<br>' . $Kecamatan . '<br>' . $Kabupaten . '</td>
-            </tr>';
+        '<td>' . $DataPegawai['NamaDesa'] . '<br>' . $DataPegawai['Kecamatan'] . '<br>' . $DataPegawai['NamaKabupaten'] . '</td>
+        </tr>';
     $Nomor++;
 }
 $content .= '</tbody>
-                </table>
-                </body>
-                </html>';
+        </table>';
+
+$content .= '
+    <br><br>
+    <table style="width: 100%; border: none;">
+        <tr>
+            <td style="width: 60%; border: none;"></td>
+            <td style="width: 40%; text-align: center; border: none;">
+                Trenggalek, '.$tanggalTTD.'<br>
+                Kepala Dinas
+                <br><br><br><br>
+                <strong style="text-decoration: underline;">Drs. EKO ANTORO</strong><br>
+                NIP. 19680406 199003 1 013
+            </td>
+        </tr>
+    </table>
+';
+
+$content .='
+        </body>
+        </html>';
 
 require_once('../../../../Vendor/html2pdf/vendor/autoload.php');
 
 use Spipu\Html2Pdf\Html2Pdf;
 
-$content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(15, 15, 15, 15), false);
+$content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(15, 15, 15, 15));
 $content2pdf->writeHTML($content);
-// $html2pdf->output();
-$content2pdf->Output('Data Masa Pensiun Perangkat Desa ' . $NamaDesa . ' Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I');
+$content2pdf->output('Data Pensiun Kepala Desa dan Perangkat Desa ' . $NamaDesa . '.pdf');
 ?>
-
-<!--  KETERANGAN OUTPUT
- “I” mengirim file untuk ditampilkan di browser.
- “D” mengirim file ke browser dan memaksa download file.
- “F” simpan ke file server lokal.
- “S” mengembalikan dokumen sebagai string. -->

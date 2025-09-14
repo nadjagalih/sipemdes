@@ -155,7 +155,9 @@ $_SESSION['start_time'] = time();
             $('.dataTables-kecamatan').DataTable({
                 pageLength: 25,
                 responsive: true,
-                dom: '<"html5buttons"B>lTfgitp',
+                dom: '<"html5buttons"B>tip',
+                searching: false,
+                lengthChange: false,
                 buttons: [{
                         extend: 'copy'
                     },

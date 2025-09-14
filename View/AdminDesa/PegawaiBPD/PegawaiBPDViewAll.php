@@ -88,6 +88,11 @@ if ($_GET['alert'] == 'Cek') {
         <div class="col-lg-12">
             <div class="ibox ">
                 <div class="ibox-content">
+                    <div class="ibox">
+                        <a href="?pg=PegawaiBPDAdd" class="btn btn-primary btn-xl"> 
+                            <i class="fa fa-plus"></i> Add Pegawai BPD
+                        </a>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
                             <thead>
@@ -98,6 +103,7 @@ if ($_GET['alert'] == 'Cek') {
                                     <th>Nama<br>Alamat</th>
                                     <th>Pendidikan</th>   
                                     <th>Tanggal Lahir<br>Jenis Kelamin</th>
+                                    <th>No Telepon</th>
                                     <th>Unit Kerja<br>Kecamatan<br>Kabupaten</th>
                                     <th>Jabatan</th>
                                     <th>Action</th>

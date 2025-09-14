@@ -2,11 +2,11 @@
 date_default_timezone_set('Asia/Jakarta');
 require_once "SqlInjeksi.php";
 
-$host = "localhost:8889";
+$host = "localhost";
 // $username = "sipemdes_pemde5ag4lek";
 // $password = "eH(s_gOj+vz&";
 $username = "root";
-$password = "root";
+$password = "";
 $database = "sipemdes_dbpemd3sa";
 
 

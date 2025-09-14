@@ -15,6 +15,7 @@ master_pegawai_bpd.RW,
 master_pegawai_bpd.Lingkungan,
 master_pegawai_bpd.Kecamatan AS Kec,
 master_pegawai_bpd.Kabupaten,
+master_pegawai_bpd.NoTelp,
 master_desa.IdDesa,
 master_desa.NamaDesa,
 master_desa.IdKecamatanFK,
@@ -46,6 +47,7 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $Alamat = $DataPegawai['Alamat'];
     $RT = $DataPegawai['RT'];
     $RW = $DataPegawai['RW'];
+    $NoTelp = $DataPegawai['NoTelp'];
 
     $Lingkungan = $DataPegawai['Lingkungan'];
     $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
@@ -57,7 +59,11 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
     $KomunitasKec = $KecamatanBPD['Kecamatan'];
 
-    $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec
+    $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
+
+    // Set default values untuk BPD (Badan Permusyawaratan Desa)
+    $Pendidikan = '-'; // Akan diupdate nanti jika ada sistem pendidikan khusus BPD
+    $Jabatan = 'Anggota BPD'; // Default jabatan untuk BPD
 ?>
 
     <tr class="gradeX">
@@ -96,6 +102,9 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
             $JenisKelamin = $DataJenKel['Keterangan'];
             echo $JenisKelamin;
             ?>
+        </td>
+        <td>
+            <?php echo !empty($NoTelp) ? $NoTelp : '-'; ?>
         </td>
         <td>
             <?php echo $NamaDesa; ?><br>
@@ -141,27 +150,6 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
                     <a href="../App/Model/ExcPegawaiBPDAdminDesa?Act=Delete&Kode=<?php echo $IdPegawaiFK; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $Nama; ?> ?');">
                         <button class="btn btn-outline btn-danger btn-xs" data-toggle="tooltip" title="Hapus Data"><i class="fa fa-eraser"></i></button>
                     </a>
-                    <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-cog"></i> Aksi
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        <li>
-                            <a href="?pg=" class="dropdown-item">
-                                <i class="fa fa-graduation-cap"></i> Pendidikan
-                            </a>
-                        </li>
-                        <li>
-                            <a href="?pg=" class="dropdown-item">
-                                <i class="fa fa-exchange"></i> Mutasi
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="?pg=>" class="dropdown-item">
-                                <i class="fa fa-eye"></i> Detail
-                            </a>
-                        </li>
-                    </ul>
                 </div>
             <?php } ?>
         </td>

@@ -179,5 +179,5 @@ use Spipu\Html2Pdf\Html2Pdf;
 
 $content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(15, 15, 15, 15));
 $content2pdf->writeHTML($content);
-$content2pdf->output('Data Pensiun Kepala Desa dan Perangkat Desa ' . $NamaDesa . '.pdf');
+$content2pdf->output('Data Pensiun Kepala Desa dan Perangkat Desa  ' . $NamaDesa . '.pdf');
 ?>

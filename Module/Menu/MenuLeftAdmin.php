@@ -286,6 +286,7 @@ $isDataKeluargaActive = in_array($pg, [
 $isLaporanPensiunActive = in_array($pg, [
     'ViewMasaPensiunAdminDesaKades',
     'ViewMasaPensiunAdminDesa',
+    'ViewAllMasaPensiunAdminDesa',
     'ViewPensiunAdminDesa'
 ]);
 $isRekapDataActive = in_array($pg, [
@@ -429,7 +430,20 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
                 <span class="fa arrow"></span>
             </a>
             <ul class="nav nav-second-level collapse <?= $isLaporanPensiunActive ? 'in' : '' ?>">
+                <li class="<?= $pg == 'ViewAllMasaPensiunAdminDesa' ? 'active' : '' ?>">
+                    <a href="?pg=ViewAllMasaPensiunAdminDesa">
+                        Waktu Pensiun Perangkat Desa
+                        <?php if ($showNotif): ?>
+                            <span class="badge-notif" style="font-size:10px;"><?php echo $notifPensiun > 9 ? '9+' : $notifPensiun; ?></span>
+                        <?php endif; ?>
+                    </a>
+                </li>
+                <!-- Menu Waktu Pensiun Kades - DINONAKTIFKAN -->
+                <!--
                 <li class="<?= $pg == 'ViewMasaPensiunAdminDesaKades' ? 'active' : '' ?>"><a href="?pg=ViewMasaPensiunAdminDesaKades">Waktu Pensiun Kades</a></li>
+                -->
+                <!-- Menu Waktu Pensiun Perangkat Desa - DINONAKTIFKAN -->
+                <!--
                 <li class="<?= $pg == 'ViewMasaPensiunAdminDesa' ? 'active' : '' ?>">
                     <a href="?pg=ViewMasaPensiunAdminDesa">
                         Waktu Pensiun Perangkat Desa
@@ -438,6 +452,7 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
                         <?php endif; ?>
                     </a>
                 </li>
+                -->
                 <li class="<?= $pg == 'ViewPensiunAdminDesa' ? 'active' : '' ?>"><a href="?pg=ViewPensiunAdminDesa">Data Pensiun</a></li>
             </ul>
         </li>

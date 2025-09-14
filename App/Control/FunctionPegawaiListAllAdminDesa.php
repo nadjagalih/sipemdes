@@ -2,20 +2,7 @@
 $IdDesa = $_SESSION['IdDesa'];
 $Nomor = 1;
 $QueryPegawai = mysqli_query($db, "SELECT
-master_pegawai.IdPegawaiFK,
-master_pegawai.Foto,
-master_pegawai.NIK,
-master_pegawai.Nama,
-master_pegawai.TanggalLahir,
-master_pegawai.JenKel,
-master_pegawai.IdDesaFK,
-master_pegawai.Alamat,
-master_pegawai.RT,
-master_pegawai.RW,
-master_pegawai.Lingkungan,
-master_pegawai.Kecamatan AS Kec,
-master_pegawai.Kabupaten,
-master_pegawai.Setting,
+master_pegawai.*,
 master_desa.IdDesa,
 master_desa.NamaDesa,
 master_desa.IdKecamatanFK,
@@ -23,17 +10,25 @@ master_kecamatan.IdKecamatan,
 master_kecamatan.Kecamatan,
 master_kecamatan.IdKabupatenFK,
 master_setting_profile_dinas.IdKabupatenProfile,
-master_setting_profile_dinas.Kabupaten
+master_setting_profile_dinas.Kabupaten,
+history_mutasi.TanggalMutasi,
+history_mutasi.IdJabatanFK,
+master_jabatan.Jabatan
 FROM master_pegawai
 LEFT JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
 LEFT JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
 LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile
+INNER JOIN main_user ON main_user.IdPegawai = master_pegawai.IdPegawaiFK
+INNER JOIN history_mutasi ON master_pegawai.IdPegawaiFK = history_mutasi.IdPegawaiFK
+INNER JOIN master_jabatan ON history_mutasi.IdJabatanFK = master_jabatan.IdJabatan
 WHERE
-master_pegawai.Setting <> 0 AND
-master_desa.IdDesa = '$IdDesa'
+master_pegawai.Setting = 1 AND
+main_user.IdLevelUserFK NOT IN (1, 2) AND
+history_mutasi.Setting = 1 AND
+master_pegawai.IdDesaFK = '$IdDesa'
 ORDER BY
-master_kecamatan.IdKecamatan ASC,
-master_desa.NamaDesa ASC");
+CASE WHEN history_mutasi.IdJabatanFK = 1 THEN 0 ELSE 1 END,
+master_pegawai.Nama ASC");
 
 while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $IdPegawaiFK = $DataPegawai['IdPegawaiFK'];
@@ -58,24 +53,20 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $Alamat = $DataPegawai['Alamat'];
     $RT = $DataPegawai['RT'];
     $RW = $DataPegawai['RW'];
-    // Ambil jabatan aktif terakhir dari history_mutasi yang join master_jabatan
-    $QueryJabatan = mysqli_query($db, "SELECT master_jabatan.Jabatan FROM history_mutasi INNER JOIN master_jabatan ON history_mutasi.IdJabatanFK = master_jabatan.IdJabatan WHERE history_mutasi.IdPegawaiFK = '$IdPegawaiFK' AND history_mutasi.Setting = 1 ORDER BY history_mutasi.TanggalMutasi DESC, history_mutasi.IdHistoryMutasi DESC LIMIT 1");
-    if ($QueryJabatan && mysqli_num_rows($QueryJabatan) > 0) {
-        $DataJabatan = mysqli_fetch_assoc($QueryJabatan);
-        $Jabatan = $DataJabatan['Jabatan'];
-    } else {
-        $Jabatan = '-';
-    }
+    
+    // Ambil jabatan langsung dari query utama (seperti di ViewMasaPensiunKades.php)
+    $Jabatan = $DataPegawai['Jabatan'];
+    $IdJabatanFK = $DataPegawai['IdJabatanFK'];
 
     $Lingkungan = $DataPegawai['Lingkungan'];
     $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
     $LingkunganPeg = mysqli_fetch_assoc($AmbilDesa);
     $Komunitas = $LingkunganPeg['NamaDesa'];
 
-    $KecamatanPeg = $DataPegawai['Kec'];
+    $KecamatanPeg = $DataPegawai['Kecamatan'];
     $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanPeg' ");
-    $KecamatanPeg = mysqli_fetch_assoc($AmbilKecamatan);
-    $KomunitasKec = $KecamatanPeg['Kecamatan'];
+    $KecamatanPegData = mysqli_fetch_assoc($AmbilKecamatan);
+    $KomunitasKec = $KecamatanPegData['Kecamatan'];
 
     $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec
 ?>
@@ -124,7 +115,13 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
         </td>
 
         <td>
-            <?php echo $Jabatan; ?>
+            <?php
+            if ($Jabatan == 'Kepala Desa') {
+                echo '<strong style="color: #006400;">' . $Jabatan . '</strong>';
+            } else {
+                echo '<strong>' . $Jabatan . '</strong>';
+            }
+            ?>
         </td>
         <td>
             <?php if ($IdPegawaiFK == $_SESSION['IdUser']) { ?>

@@ -88,6 +88,11 @@ if ($_GET['alert'] == 'Cek') {
         <div class="col-lg-12">
             <div class="ibox ">
                 <div class="ibox-content">
+                    <div class="ibox">
+                        <a href="?pg=PegawaiAdd" class="btn btn-primary btn-xl"> 
+                            <i class="fa fa-plus"></i> Add Pegawai
+                        </a>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
                             <thead>

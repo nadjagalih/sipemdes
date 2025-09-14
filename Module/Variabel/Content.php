@@ -442,6 +442,9 @@ if ($_GET['pg'] == 'ViewMasaPensiunAdminDesaKades') {
 if ($_GET['pg'] == 'ViewPensiunAdminDesa') {
     include "AdminDesa/Report/Pensiun/ViewPensiun.php";
 }
+if ($_GET['pg'] == 'ViewAllMasaPensiunAdminDesa') {
+    include "AdminDesa/Report/Pensiun/ViewAllMasaPensiunAdminDesa.php";
+}
 //JABATAN TERKINI
 if ($_GET['pg'] == 'JabatanPegawaiTerkiniAdminDesa') {
     include "AdminDesa/Report/Pegawai/JabatanPegawaiTerkini.php";

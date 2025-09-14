@@ -1,159 +1,421 @@
+<?php
+/**
+ * SignIn AuthKecamatan - All in One Style
+ * Menggabungkan form dan proses login dalam satu file seperti AuthKabupaten
+ */
+
+require_once "../Module/Config/Env.php";
+
+$message = '';
+$messageType = '';
+$showForm = true;
+
+// Proses login jika ada POST data
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST)) {
+    $username = sql_injeksi($_POST['NameAkses'] ?? '');
+    $password = sql_injeksi($_POST['NamePassword'] ?? '');
+
+    if (empty(trim($username)) || empty(trim($password))) {
+        $message = 'Username atau password tidak boleh kosong!';
+        $messageType = 'error';
+    } else {
+        // Query database
+        $sql = mysqli_query($db, "SELECT
+            main_user.IdUser,
+            main_user.NameAkses,
+            main_user.NamePassword,
+            main_user.IdLevelUserFK,
+            main_user.Status,
+            main_user.IdPegawai,
+            main_user.StatusLogin,
+            master_pegawai.IdPegawaiFK,
+            master_pegawai.IdDesaFK,
+            master_pegawai.Nama
+            FROM main_user
+            INNER JOIN master_pegawai ON main_user.IdPegawai = master_pegawai.IdPegawaiFK
+            WHERE main_user.NameAkses = '$username'");
+
+        if (mysqli_num_rows($sql) > 0) {
+            $data = mysqli_fetch_assoc($sql);
+
+            if (password_verify($password, $data['NamePassword'])) {
+                if ($data['StatusLogin'] == 0) {
+                    $message = 'User sudah tidak aktif!';
+                    $messageType = 'error';
+                } else {
+                    if ($data['IdLevelUserFK'] == 4) { // Level 3 untuk Kecamatan
+                        // Set session
+                        session_start();
+                        $_SESSION['IdUser'] = $data['IdUser'];
+                        $_SESSION['NameUser'] = $data['NameAkses'];
+                        $_SESSION['PassUser'] = $data['NamePassword'];
+                        $_SESSION['Setting'] = $data['Status'];
+                        $_SESSION['IdLevelUserFK'] = $data['IdLevelUserFK'];
+                        $_SESSION['Status'] = $data['StatusLogin'];
+                        $_SESSION['IdPegawai'] = $data['IdPegawai'];
+                        $_SESSION['IdDesa'] = $data['IdDesaFK'];
+
+                        // Fungsi Logout Automatis
+                        $_SESSION["expires_by"] = time() + 1800; // 30 menit
+
+                        unset($_SESSION['visited_pensiun_sadmin']);
+
+                        // Redirect untuk Kecamatan
+                        header("Location: ../View/v?pg=Dashboard");
+                        exit;
+                    } else {
+                        $message = 'Level user tidak sesuai untuk akses Kecamatan!';
+                        $messageType = 'error';
+                    }
+                }
+            } else {
+                $message = 'Password salah!';
+                $messageType = 'error';
+            }
+        } else {
+            $message = 'Username tidak ditemukan!';
+            $messageType = 'error';
+        }
+    }
+}
+
+?>
 <!DOCTYPE html>
-<html>
-
+<html lang="id">
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>SIPEMDES | Kab. Trenggalek</title>
     <link href="../Vendor/Media/Logo/Pemkab.png" type="image/x-icon" rel="icon">
     <link href="../Vendor/Assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="../Vendor/Assets/font-awesome/css/font-awesome.css" rel="stylesheet">
-
     <link href="../Vendor/Assets/css/animate.css" rel="stylesheet">
     <link href="../Vendor/Assets/css/style.css" rel="stylesheet">
     <link href="../Vendor/Assets/sweetalert/sweetalert.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <script language='Javascript'>
-        (function(window, location) {
-            history.replaceState(null, document.title, location.pathname + "#!/history");
-            history.pushState(null, document.title, location.pathname);
-            window.addEventListener("popstate",
-                function() {
-                    if (location.hash === "#!/history") {
-                        history.replaceState(null, document.title, location.pathname);
-                        setTimeout(function() {
-                            location.replace("SignIn");
-                        }, 0);
-                    }
-                }, false);
-        }(window, location));
-    </script>
-
-    <script language='Javascript'>
-        window.history.forward();
-
-        function noBack() {
-            window.history.forward();
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
         }
-    </script>
 
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            padding: 35px 40px;
+            min-width: 450px;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #f39c12, #e67e22, #fdcb6e, #fd79a8);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-section img {
+            width: 70px;
+            height: auto;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        }
+
+        .title-main {
+            color: #2c3e50;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .title-sub {
+            color: #7f8c8d;
+            font-size: 13px;
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        .title-unit {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-control {
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            font-weight: 400;
+        }
+
+        .form-control:focus {
+            border-color: #f39c12;
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+            background: #fff;
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #95a5a6;
+            font-weight: 400;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bdc3c7;
+            font-size: 18px;
+            z-index: 2;
+        }
+
+        .form-control.with-icon {
+            padding-left: 50px;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(243, 156, 18, 0.3);
+            color: white;
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 25px;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(253, 121, 168, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .button-group {
+            text-align: center;
+        }
+
+        .alert-custom {
+            border: none;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            font-weight: 500;
+            border-left: 4px solid #e84393;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: white;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+        }
+
+        .footer-info {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 15px;
+        }
+
+        .security-badge i {
+            margin-right: 5px;
+            color: #28a745;
+        }
+
+        @media (max-width: 576px) {
+            .login-container {
+                min-width: auto;
+                width: 100%;
+                margin: 10px;
+                padding: 30px 25px;
+            }
+
+            .title-main {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-
-    <div class="loginColumns animated fadeInDown">
-        <div class="row">
-            <!--
-            <div class="col-md-6" style="text-align: center;">
-                <h2 class="font-bold">SIPEMDES</h2>
-
-                <p><br>
-                    <img style="width: 200px; height: auto;" src="../Vendor/Media/Logo/LoginPicture.png">
-                </p>
-                <br>
-                <h3>Sistem Informasi Pemerintahan Desa</h3>
-            </div> -->
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
-                <div class="ibox-content" align="center">
-                    <img style="width: 60px; height: auto" src="../Vendor/Media/Logo/Kabupaten.png"><br><br>
-                    <span style="color:black"><strong>Dinas Pemberdayaan Masyarakat dan Desa</strong></span><br><br>
-                    <span style="color:black; font-size:16px;"><strong>APLIKASI SIPEMDES</strong></span><br>
-                    <span style="color:black"><strong>Sistem Informasi Pemerintahan Desa</strong></span><br><br>
-                    <span style="color:brown; font-size:14px;"><strong>Unit Akses Kecamatan</strong></span>
-                    <form class="m-t" role="form" action="Cek.php" name="SignIn" id="SignIn" method="post">
-                        <div class="form-group">
-                            <span style="color:black"><input type="text" class="form-control" name="NameAkses" placeholder="Masukkan Username" autocomplete="off"></span>
-                        </div>
-                        <div class="form-group">
-                            <span style="color:black"><input type="password" class="form-control" name="NamePassword" placeholder="Masukkan Password" autocomplete="off"></span>
-                        </div>
-                        <button type="submit" class="btn btn-full btn-primary">Login</button>
-                        <a href="../"><button type="button" class="btn btn-full btn-danger">Back</button></a>
-                    </form>
-                </div>
-            </div>
-            <div class="col-md-3"></div>
+    <div class="login-container">
+        <div class="logo-section">
+            <img src="../Vendor/Media/Logo/Kabupaten.png" alt="Logo Kabupaten Trenggalek">
+            <div class="title-main">APLIKASI SIPEMDES</div>
+            <div class="title-sub">Sistem Informasi Pemerintahan Desa</div>
+            <div class="title-sub">Dinas Pemberdayaan Masyarakat dan Desa</div>
+            <div class="title-unit">Unit Akses Kecamatan</div>
         </div>
-        <hr />
+
+        <?php if ($message): ?>
+            <div class="alert-custom alert-<?php echo $messageType; ?>">
+                <i class="fa fa-exclamation-triangle"></i>
+                <?php echo $message; ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" action="" id="loginForm">
+            <div class="form-group">
+                <i class="fa fa-user input-icon"></i>
+                <input type="text"
+                       class="form-control with-icon"
+                       name="NameAkses"
+                       id="username"
+                       placeholder="Masukkan Username"
+                       value="<?php echo isset($_POST['NameAkses']) ? htmlspecialchars($_POST['NameAkses']) : ''; ?>"
+                       autocomplete="off"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <i class="fa fa-lock input-icon"></i>
+                <input type="password"
+                       class="form-control with-icon"
+                       name="NamePassword"
+                       id="password"
+                       placeholder="Masukkan Password"
+                       autocomplete="off"
+                       required>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-login" id="submitBtn">
+                    <i class="fa fa-sign-in"></i> &nbsp; Masuk
+                </button>
+
+                <a href="../" class="btn-back">
+                    <i class="fa fa-arrow-left"></i> &nbsp; Kembali
+                </a>
+            </div>
+        </form>
+
+        <div class="footer-info">
+            <div class="security-badge">
+                <i class="fa fa-shield"></i>
+                Sistem Keamanan Aktif
+            </div>
+            <div style="margin-top: 10px;">
+                © 2025 Pemerintah Kabupaten Trenggalek
+            </div>
+        </div>
     </div>
 
     <script src="../Vendor/Assets/sweetalert/sweetalert.min.js"></script>
 
+    <script>
+        // Form submission dengan loading state sederhana
+        document.getElementById('loginForm').addEventListener('submit', function () {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> &nbsp; Memproses...';
+            submitBtn.disabled = true;
+        });
+
+        // Focus effect untuk input
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function () {
+                this.parentElement.style.transform = 'scale(1.02)';
+                this.parentElement.style.transition = 'transform 0.2s ease';
+            });
+
+            input.addEventListener('blur', function () {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Auto focus pada username
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('username').focus();
+        });
+
+        // SweetAlert untuk error
+        <?php if ($message && $messageType === 'error'): ?>
+        setTimeout(function() {
+            swal({
+                title: 'Login Gagal!',
+                text: '<?php echo addslashes($message); ?>',
+                type: 'error',
+                confirmButtonText: 'Coba Lagi',
+                confirmButtonColor: '#f39c12'
+            });
+        }, 100);
+        <?php endif; ?>
+    </script>
 </body>
-
 </html>
-
-<?php
-if (empty($_GET['alert'])) {
-    echo "";
-} elseif ($_GET['alert'] == 'Kosong') {
-    echo "<script type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'Login Failed',
-                      text:  '',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
-             </script>";
-} elseif ($_GET['alert'] == 'SignOut') {
-    echo "<script type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'Berhasil Logout',
-                      text:  '',
-                      type: 'success',
-                      showConfirmButton: true
-                     });
-                    },10);
-             </script>";
-} elseif ($_GET['alert'] == 'GantiPassword') {
-    echo "<script type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'Berhasil Ganti Password, Silahkan Login Ulang',
-                      text:  '',
-                      type: 'success',
-                      showConfirmButton: true
-                     });
-                    },10);
-             </script>";
-} elseif ($_GET['alert'] == 'Cek') {
-    echo "<script type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'User & Password Salah',
-                      text:  '',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
-             </script>";
-} elseif ($_GET['alert'] == 'SignOutTime') {
-    echo "<script type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'Waktu Login Habis, Silahkan Login Ulang',
-                      text:  '',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
-             </script>";
-} elseif ($_GET['alert'] == 'Status') {
-    echo "<script type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'User Sudah Tidak Aktif',
-                      text:  '',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
-             </script>";
-}
-?>

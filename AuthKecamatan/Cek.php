@@ -1,11 +1,27 @@
 <?php
 require_once "../Module/Config/Env.php";
 
-$username = sql_injeksi($_POST['NameAkses']);
-$password = sql_injeksi($_POST['NamePassword']);
+session_start();
 
-if (!ctype_alnum($username)) {
-	header("Location: SignIn?alert=Kosong");
+// Get credentials from session
+if (isset($_SESSION['temp_username']) && isset($_SESSION['temp_password'])) {
+    $username = sql_injeksi($_SESSION['temp_username']);
+    $password = sql_injeksi($_SESSION['temp_password']);
+
+    // Clear temporary session data
+    unset($_SESSION['temp_username']);
+    unset($_SESSION['temp_password']);
+    unset($_SESSION['temp_unit']);
+} else {
+    $_SESSION['login_error'] = 'Terjadi kesalahan sistem, silakan coba lagi';
+    header("Location: ../main.php");
+    exit;
+}
+
+if (empty($username) || !ctype_alnum($username)) {
+	$_SESSION['login_error'] = 'Username tidak boleh kosong atau mengandung karakter khusus';
+	header("Location: ../main.php");
+	exit;
 } else {
 	$sql = mysqli_query($db, "SELECT
 	main_user_kecamatan.IdUser,
@@ -18,38 +34,49 @@ if (!ctype_alnum($username)) {
 	FROM
 	main_user_kecamatan
 	WHERE main_user_kecamatan.NameAkses = '$username' ");
-	$data = mysqli_fetch_assoc($sql);
 
 	if (mysqli_num_rows($sql) > 0) {
+		$data = mysqli_fetch_assoc($sql);
+
 		if (password_verify($password, $data['NamePassword'])) {
-
-			session_start();
-
-			// Fungsi Logout Automatis
-			login_validate();
-
-			$_SESSION['IdUser'] 		= $data['IdUser'];
-			$_SESSION['NameUser'] 		= $data['NameAkses'];
-			$_SESSION['PassUser'] 		= $data['NamePassword'];
-			$_SESSION['Setting'] 		= $data['Status'];
-			$_SESSION['IdLevelUserFK'] 	= $data['IdLevelUserFK'];
-			$_SESSION['Status'] 		= $data['StatusLogin'];
-			$_SESSION['IdKecamatan']	= $data['IdKecamatanFK'];
-
-			unset($_SESSION['visited_pensiun_kecamatan']);
-
+			// Password correct, check account status
 			if ($data['StatusLogin'] == 0) {
-				header("Location: SignIn?alert=Status");
+				$_SESSION['login_error'] = 'Akun Anda tidak aktif. Hubungi administrator';
+				header("Location: ../main.php");
+				exit;
 			} elseif ($data['StatusLogin'] == 1) {
+				// Login successful, set session
+				login_validate();
+
+				$_SESSION['IdUser'] 		= $data['IdUser'];
+				$_SESSION['NameUser'] 		= $data['NameAkses'];
+				$_SESSION['PassUser'] 		= $data['NamePassword'];
+				$_SESSION['Setting'] 		= $data['Status'];
+				$_SESSION['IdLevelUserFK'] 	= $data['IdLevelUserFK'];
+				$_SESSION['Status'] 		= $data['StatusLogin'];
+				$_SESSION['IdKecamatan']	= $data['IdKecamatanFK'];
+
+				unset($_SESSION['visited_pensiun_kecamatan']);
+
 				if ($data['IdLevelUserFK'] == 4) {
 					header("Location: ../View/v?pg=Kecamatan");
+				} else {
+					$_SESSION['login_error'] = 'Level akses tidak valid';
+					header("Location: ../main.php");
 				}
+				exit;
 			}
 		} else {
-			header("Location: SignIn?alert=Cek");
+			// Password incorrect
+			$_SESSION['login_error'] = 'Username atau password salah';
+			header("Location: ../main.php");
+			exit;
 		}
 	} else {
-		header("Location: SignIn?alert=Cek");
+		// User not found
+		$_SESSION['login_error'] = 'Username atau password salah';
+		header("Location: ../main.php");
+		exit;
 	}
 }
 ?>

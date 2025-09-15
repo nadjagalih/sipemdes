@@ -177,7 +177,7 @@
         <div class="col-lg-8">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>Form Input User</h5>
+                    <h5>Form Input User & Pegawai</h5>
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcUserAdminDesa?Act=Save" method="POST" enctype="multipart/form-data">

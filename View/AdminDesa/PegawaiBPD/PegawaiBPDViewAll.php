@@ -103,7 +103,7 @@ if ($_GET['alert'] == 'Cek') {
                                     <th>No</th>
                                     <th>Foto</th>
                                     <th>NIK</th>
-                                    <th>Nama<br>Alamat</th>
+                                    <th>Nama<br>Alamat</th> 
                                     <th>Tanggal Lahir<br>Jenis Kelamin</th>
                                     <th>No Telepon</th>
                                     <th>Unit Kerja<br>Kecamatan<br>Kabupaten</th>

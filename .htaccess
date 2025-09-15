@@ -1,6 +1,6 @@
 RewriteEngine On
 Options -Indexes
-#IndexIgnore /
+#IndexIgnore */*
 
 #Menghilangkan Extension PHP
 <IfModule mod_rewrite.c>

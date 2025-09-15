@@ -196,12 +196,20 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $NomerSK = sql_injeksi($_POST['NomerSK']);
             $Keterangan = sql_injeksi($_POST['Keterangan']);
             $Jabatan = sql_injeksi($_POST['Jabatan']);
+            $StatusMutasi = sql_injeksi($_POST['StatusMutasi']);
+
+            // Jika StatusMutasi diubah menjadi AKTIF (1), nonaktifkan mutasi lain untuk pegawai yang sama
+            if ($StatusMutasi == 1) {
+                // Nonaktifkan semua mutasi pegawai ini terlebih dahulu
+                $KoreksiMutasi = mysqli_query($db, "UPDATE history_mutasi SET Setting = 0 WHERE IdPegawaiFK = '$IdPegawaiFK'");
+            }
 
             $Edit = mysqli_query($db, "UPDATE history_mutasi SET JenisMutasi = '$JenisMutasi',
                         NomorSK = '$NomerSK',
                         TanggalMutasi = '$TanggalMutasi',
                         IdJabatanFK = '$Jabatan',
-                        KeteranganJabatan = '$Keterangan'
+                        KeteranganJabatan = '$Keterangan',
+                        Setting = '$StatusMutasi'
                         WHERE IdMutasi ='$IdMutasi' ");
 
 

@@ -155,7 +155,7 @@ WHERE hiskel_ortu.IdOrtu = '$IdTemp'");
                                     </div>
                                 </div>
                                 <button class="btn btn-primary" type="submit" name="Edit" id="Edit">Save</button>
-                                <a href="?pg=PegawaiDetailOrtuAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>" class="btn btn-success ">Batal</a>
+                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-4" class="btn btn-success ">Batal</a>
                             </div>
                         </div>
                     </form>

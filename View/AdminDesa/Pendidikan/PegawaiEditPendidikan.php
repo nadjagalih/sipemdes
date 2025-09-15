@@ -128,7 +128,7 @@ master_pendidikan.IdPendidikan ASC");
                                     </div>
                                 </div>
                                 <button class="btn btn-primary" type="submit" name="Edit" id="Edit">Save</button>
-                                <a href="?pg=PegawaiViewPendidikanAdminDesa" class="btn btn-success ">Batal</a>
+                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-1" class="btn btn-success ">Batal</a>
                             </div>
                         </div>
                     </form>

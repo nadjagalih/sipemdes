@@ -35,7 +35,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="form-group row"><label class="col-lg-3 col-form-label">Nama Sekolah</label>
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">Nama Sekolah<span style="font-style: italic; color:red">*</span></label>
                                     <div class="col-lg-8"><input type="text" name="NamaSekolah" id="NamaSekolah" class="form-control" placeholder="Masukkan Nama Sekolah" autocomplete="off" required>
                                     </div>
                                 </div>
@@ -59,8 +59,8 @@
                                         <span style="font-style: italic; color:black;">Contoh : 16-01-1980</span>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="Save" id="Save" onclick="submitPendidikanForm(event)">Save</button>
-                                <a href="?pg=PegawaiViewPendidikanAdminDesa" class="btn btn-success ">Batal</a>
+                                <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
+                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-1" class="btn btn-success">Batal</a>
                             </div>
                         </div>
                     </form>
@@ -189,12 +189,6 @@
 </div>
 
 <script>
-function submitPendidikanForm(event) {
-    event.preventDefault();
-    var form = document.getElementById('formPendidikan');
-    form.submit();
-}
-
 function confirmDeletePendidikan(idPendidikan, namaSekolah, tingkatPendidikan, idPegawai) {
     swal({
         title: 'Konfirmasi Hapus',

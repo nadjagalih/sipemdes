@@ -173,11 +173,43 @@ if (isset($_GET['Kode'])) {
                                     </div>
                                 </div>
 
+                                <?php
+                                // Ambil status Setting dari database
+                                $QuerySetting = mysqli_query($db, "SELECT Setting FROM history_mutasi WHERE IdMutasi = '$IdTemp'");
+                                $DataSetting = mysqli_fetch_assoc($QuerySetting);
+                                $StatusMutasi = $DataSetting['Setting'];
+                                ?>
+
+                                <div class="form-group row"><label class="col-lg-3 col-form-label">Status Mutasi<span style="font-style: italic; color:red">*</span></label>
+                                    <div class="col-lg-8">
+                                        <select name="StatusMutasi" id="StatusMutasi" class="form-control" required onchange="showStatusInfo()">
+                                            <option value="<?php echo $StatusMutasi; ?>">
+                                                <?php echo ($StatusMutasi == 1) ? 'AKTIF' : 'NON AKTIF'; ?>
+                                            </option>
+                                            <?php if ($StatusMutasi == 0) { ?>
+                                                <option value="1">AKTIF</option>
+                                            <?php } else { ?>
+                                                <option value="0">NON AKTIF</option>
+                                            <?php } ?>
+                                        </select>
+                                        <div id="statusInfo" class="mt-2">
+                                            <?php if ($StatusMutasi == 1) { ?>
+                                                <span class="text-success"><i class="fa fa-info-circle"></i> Mutasi ini sedang aktif</span>
+                                            <?php } else { ?>
+                                                <span class="text-warning"><i class="fa fa-exclamation-circle"></i> Mutasi ini tidak aktif</span>
+                                            <?php } ?>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            <strong>Catatan:</strong> Hanya satu mutasi yang bisa aktif per pegawai. Jika mengaktifkan mutasi ini, mutasi lain akan otomatis menjadi non-aktif.
+                                        </small>
+                                    </div>
+                                </div>
+
                                 <button class="btn btn-primary" type="submit" name="Edit" id="Edit">Save</button>
                                 <?php if (isset($_GET['IdPegawai']) && isset($_GET['tab'])): ?>
                                     <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo sql_url($_GET['IdPegawai']); ?>&tab=<?php echo $_GET['tab']; ?>" class="btn btn-success">Batal</a>
                                 <?php else: ?>
-                                    <a href="?pg=ViewMutasiAdminDesa" class="btn btn-success">Batal</a>
+                                    <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-5" class="btn btn-success">Batal</a>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -187,3 +219,17 @@ if (isset($_GET['Kode'])) {
         </div>
     </div>
 </div>
+
+<script>
+function showStatusInfo() {
+    const statusSelect = document.getElementById('StatusMutasi');
+    const statusInfo = document.getElementById('statusInfo');
+    const selectedValue = statusSelect.value;
+    
+    if (selectedValue == '1') {
+        statusInfo.innerHTML = '<span class="text-success"><i class="fa fa-info-circle"></i> Mutasi ini akan menjadi aktif</span>';
+    } else {
+        statusInfo.innerHTML = '<span class="text-warning"><i class="fa fa-exclamation-circle"></i> Mutasi ini akan menjadi non-aktif</span>';
+    }
+}
+</script>

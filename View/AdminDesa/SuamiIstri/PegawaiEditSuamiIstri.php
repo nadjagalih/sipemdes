@@ -156,7 +156,7 @@ WHERE hiskel_suami_istri.IdSuamiIstri = '$IdTemp'");
                                     </div>
                                 </div>
                                 <button class="btn btn-primary" type="submit" name="Edit" id="Edit">Save</button>
-                                <a href="?pg=PegawaiDetailSuamiIstriAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>" class="btn btn-success ">Batal</a>
+                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-2" class="btn btn-success ">Batal</a>
                             </div>
                         </div>
                     </form>

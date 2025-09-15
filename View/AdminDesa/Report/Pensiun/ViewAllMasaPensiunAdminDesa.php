@@ -235,13 +235,7 @@ $IdDesa = $_SESSION['IdDesa'];
 
                                     <td>
                                         <strong><?php echo $Nama; ?></strong><br>
-                                        <?php
-                                        if ($Jabatan == 'Kepala Desa') {
-                                            echo '<strong style="color: #006400;">' . $Jabatan . '</strong>';
-                                        } else {
-                                            echo '<strong>' . $Jabatan . '</strong>';
-                                        }
-                                        ?><br><br>
+                                        <strong style="color: <?php echo ($Jabatan == 'Kepala Desa') ? '#006400' : 'inherit'; ?> !important;"><?php echo $Jabatan; ?></strong><br><br>
                                         <?php echo $Address; ?>
                                     </td>
                                     <td style="width:110px;">

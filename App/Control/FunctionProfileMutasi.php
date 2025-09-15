@@ -368,7 +368,7 @@
                         
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
-                                <a href="?pg=MutasiEditAdminDesa&Kode=<?php echo $IdMutasi; ?>" 
+                                <a href="?pg=EditMutasiAdminDesa&Kode=<?php echo $IdMutasi; ?>" 
                                     class="btn btn-warning btn-sm" title="Edit Data">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>

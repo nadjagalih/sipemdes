@@ -104,8 +104,10 @@ if (isset($_GET['Kode'])) {
                                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                             <input type="text" name="TanggalMutasi" id="TanggalMutasi" class="form-control" value="<?php echo $TanggalSKMutasi; ?>" required>
                                         </div>
-                                    </div <div class="col-lg-4">
+                                    </div> 
+                                    <div class="col-lg-4">
                                     <span style="font-style: italic; color:black;">Contoh : 16-01-1980</span>
+                                    </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Nomer SK<span style="font-style: italic; color:red">*</span></label>
                                     <div class="col-lg-8"><input type="text" name="NomerSK" id="NomerSK" class="form-control" value="<?php echo $NomerSK; ?>" autocomplete="off" required>

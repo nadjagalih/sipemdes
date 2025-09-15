@@ -167,7 +167,7 @@
                     </div>
                 <?php } else { ?>
                     <div class="ibox-content">
-                        <form action="../App/Model/ExcHistoryMutasiAdminDesa?Act=Save" method="POST"
+                        <form action="../App/Model/ExcHistoryMutasiAdminDesa?Act=Save&IdPegawai=<?php echo $IdPegawaiFK; ?>&tab=tab-5" method="POST"
                             enctype="multipart/form-data" onsubmit="return validateFile()">
                             <div class="row">
                                 <div class="col-lg-6">
@@ -368,11 +368,11 @@
                         
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
-                                <a href="?pg=EditMutasiAdminDesa&Kode=<?php echo $IdMutasi; ?>" 
+                                <a href="?pg=EditMutasiAdminDesa&Kode=<?php echo $IdMutasi; ?>&IdPegawai=<?php echo $IdTemp; ?>&tab=tab-5" 
                                     class="btn btn-warning btn-sm" title="Edit Data">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
-                                <button onclick="confirmDelete('<?php echo $IdMutasi; ?>', '<?php echo $JenisMutasi; ?>', '<?php echo $Jabatan; ?>')" 
+                                <button onclick="confirmDeleteMutasi('<?php echo $IdMutasi; ?>', '<?php echo $JenisMutasi; ?>', '<?php echo $Jabatan; ?>', '<?php echo $IdTemp; ?>')" 
                                     class="btn btn-danger btn-sm" title="Hapus Data">
                                     <i class="fa fa-trash"></i> Hapus
                                 </button>
@@ -387,7 +387,7 @@
 </div>
 
 <script>
-function confirmDelete(idMutasi, jenisMutasi, jabatan) {
+function confirmDeleteMutasi(idMutasi, jenisMutasi, jabatan, idPegawai) {
     swal({
         title: "Apakah Anda yakin?",
         text: "Data mutasi " + jenisMutasi + " untuk jabatan " + jabatan + " akan dihapus secara permanen!",
@@ -400,7 +400,7 @@ function confirmDelete(idMutasi, jenisMutasi, jabatan) {
     },
     function(isConfirm) {
         if (isConfirm) {
-            window.location.href = "../App/Model/ExcHistoryMutasiAdminDesa.php?Act=Delete&Kode=" + idMutasi;
+            window.location.href = '../App/Model/ExcHistoryMutasiAdminDesa?Act=Delete&Kode=' + idMutasi + '&IdPegawai=' + idPegawai + '&tab=tab-5';
         }
     });
 }

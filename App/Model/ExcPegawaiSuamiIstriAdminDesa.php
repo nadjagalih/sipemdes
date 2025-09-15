@@ -1,6 +1,7 @@
 <?php
+ob_start(); // Start output buffering
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(0); // Disable error reporting to prevent output before redirect
 
 include "../../Module/Config/Env.php";
 
@@ -50,7 +51,10 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             VALUE('$IdSuamiIstri','$NIKSuamiIstri','$NamaSuamiIstri','$TempatLahir','$TglLahir','$StatusHubungan','$TglNikah','$Pendidikan','$Pekerjaan','$IdPegawaiFK')");
 
             if ($Save) {
-                header("location:../../View/v?pg=PegawaiViewSuamiIstriAdminDesa&alert=Save");
+                // Redirect back to detail page with pegawai ID
+                ob_end_clean(); // Clear output buffer
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Save&tab=tab-2");
+                exit();
             }
         }
     } elseif ($_GET['Act'] == 'Edit') {
@@ -85,17 +89,42 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             WHERE IdSuamiIstri = '$IdSuamiIstri' ");
 
             if ($Edit) {
-                header("location:../../View/v?pg=PegawaiViewSuamiIstriAdminDesa&alert=Edit");
+                // Get IdPegawaiFK from database before redirect
+                $getSuamiIstri = mysqli_query($db, "SELECT IdPegawaiFK FROM hiskel_suami_istri WHERE IdSuamiIstri = '$IdSuamiIstri'");
+                $suamiIstriData = mysqli_fetch_assoc($getSuamiIstri);
+                $IdPegawaiFK = $suamiIstriData['IdPegawaiFK'];
+                
+                // Redirect back to detail page with pegawai ID
+                ob_end_clean(); // Clear output buffer
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Edit&tab=tab-2");
+                exit();
             }
         }
     } elseif ($_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdTemp = sql_injeksi(($_GET['Kode']));
 
+            // Get IdPegawaiFK before delete for redirect
+            $getSuamiIstri = mysqli_query($db, "SELECT IdPegawaiFK FROM hiskel_suami_istri WHERE IdSuamiIstri = '$IdTemp'");
+            $suamiIstriData = mysqli_fetch_assoc($getSuamiIstri);
+            $IdPegawaiFromDB = $suamiIstriData['IdPegawaiFK'];
+
             $Delete = mysqli_query($db, "DELETE FROM hiskel_suami_istri WHERE IdSuamiIstri = '$IdTemp' ");
 
             if ($Delete) {
-                header("location:../../View/v?pg=PegawaiViewSuamiIstriAdminDesa&alert=Delete");
+                // Check if IdPegawai parameter exists for redirect back to detail page
+                if (isset($_GET['IdPegawai'])) {
+                    $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                    $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-2';
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Delete&tab=" . $tab);
+                    exit();
+                } else {
+                    // Use IdPegawai from database
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFromDB) . "&alert=Delete&tab=tab-2");
+                    exit();
+                }
             }
         }
     }

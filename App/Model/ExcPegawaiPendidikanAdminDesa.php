@@ -1,6 +1,7 @@
 <?php
+ob_start(); // Start output buffering
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(0); // Disable error reporting to prevent output before redirect
 
 include "../../Module/Config/Env.php";
 
@@ -44,7 +45,10 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             VALUE('$IdPendidikanPegawai','$TahunMasuk','$TahunKeluar','$NamaSekolah','$Jurusan','$NomerIjazah','$TglIjazah','$IdPegawaiFK','$IdPendidikan','$Setting')");
 
             if ($Save) {
-                header("location:../../View/v?pg=PegawaiViewPendidikanAdminDesa&alert=Save");
+                // Redirect back to detail page with pegawai ID
+                ob_end_clean(); // Clear output buffer
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Save&tab=tab-1");
+                exit();
             }
         }
     } elseif ($_GET['Act'] == 'Edit') {
@@ -60,6 +64,10 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $TglIjazah = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
             $IdPendidikan = sql_injeksi($_POST['Pendidikan']);
 
+            // Get IdPegawaiFK before update for redirect
+            $getPegawaiId = mysqli_query($db, "SELECT IdPegawaiFK FROM history_pendidikan WHERE IdPendidikanPegawai = '$IdPendidikanV'");
+            $pegawaiData = mysqli_fetch_assoc($getPegawaiId);
+            $IdPegawaiFK = $pegawaiData['IdPegawaiFK'];
 
             $Edit = mysqli_query($db, "UPDATE history_pendidikan SET TahunMasuk = '$TahunMasuk',
             TahunLulus = '$TahunKeluar',
@@ -71,7 +79,10 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             WHERE IdPendidikanPegawai = '$IdPendidikanV' ");
 
             if ($Edit) {
-                header("location:../../View/v?pg=PegawaiViewPendidikanAdminDesa&alert=Edit");
+                // Redirect back to detail page with pegawai ID
+                ob_end_clean(); // Clear output buffer
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Edit&tab=tab-1");
+                exit();
             }
         }
     } elseif ($_GET['Act'] == 'Delete') {
@@ -81,7 +92,18 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $Delete = mysqli_query($db, "DELETE FROM history_pendidikan WHERE IdPendidikanPegawai = '$IdTemp' ");
 
             if ($Delete) {
-                header("location:../../View/v?pg=PegawaiViewPendidikanAdminDesa&alert=Delete");
+                // Check if IdPegawai parameter exists for redirect back to detail page
+                if (isset($_GET['IdPegawai'])) {
+                    $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                    $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-1';
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Delete&tab=" . $tab);
+                    exit();
+                } else {
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiViewPendidikanAdminDesa&alert=Delete");
+                    exit();
+                }
             }
         }
     } elseif ($_GET['Act'] == 'SettingOn') {
@@ -101,7 +123,18 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             WHERE IdPendidikanPegawai = '$IdTemp' ");
 
             if ($SettingAktif) {
-                header("location:../../View/v?pg=PegawaiViewPendidikanAdminDesa&alert=Setting");
+                // Check if IdPegawai parameter exists for redirect back to detail page
+                if (isset($_GET['IdPegawai'])) {
+                    $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Setting");
+                    exit();
+                } else {
+                    // Redirect back to detail page with pegawai ID from database
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($FilterPegawai) . "&alert=Setting");
+                    exit();
+                }
             }
         }
     }

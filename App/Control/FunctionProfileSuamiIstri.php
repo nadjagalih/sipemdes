@@ -185,7 +185,7 @@
                                    class="btn btn-warning btn-sm" title="Edit Data">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
-                                <a href="#" onclick="confirmDelete('<?php echo $IdSuamiIstri; ?>', '<?php echo htmlspecialchars($Nama); ?>')" 
+                                <a href="#" onclick="confirmDeleteSuamiIstri('<?php echo $IdSuamiIstri; ?>', '<?php echo htmlspecialchars($Nama); ?>', '<?php echo $IdTemp; ?>')" 
                                    class="btn btn-danger btn-sm" title="Hapus Data">
                                     <i class="fa fa-trash"></i> Hapus
                                 </a>
@@ -207,7 +207,7 @@
 </div>
 
 <script>
-function confirmDelete(idSuamiIstri, nama) {
+function confirmDeleteSuamiIstri(idSuamiIstri, nama, idPegawai) {
     swal({
         title: 'Konfirmasi Hapus',
         text: 'Apakah Anda yakin ingin menghapus data suami/istri "' + nama + '"?',
@@ -219,8 +219,8 @@ function confirmDelete(idSuamiIstri, nama) {
         cancelButtonText: 'Batal'
     }, function(isConfirm) {
         if (isConfirm) {
-            // Redirect to delete action - Fixed parameter name from 'Id' to 'Kode'
-            window.location.href = '../App/Model/ExcPegawaiSuamiIstriAdminDesa?Act=Delete&Kode=' + idSuamiIstri;
+            // Redirect to delete action with pegawai ID for proper redirect
+            window.location.href = '../App/Model/ExcPegawaiSuamiIstriAdminDesa?Act=Delete&Kode=' + idSuamiIstri + '&IdPegawai=' + idPegawai + '&tab=tab-2';
         }
     });
 }

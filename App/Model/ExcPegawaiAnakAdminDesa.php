@@ -1,6 +1,7 @@
 <?php
+ob_start(); // Start output buffering
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(0); // Disable error reporting to prevent output before redirect
 
 include "../../Module/Config/Env.php";
 
@@ -47,7 +48,10 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             VALUE('$IdAnak','$NIKAnak','$NamaAnak','$TempatLahir','$TglLahir','$JenKel','$Pendidikan','$Pekerjaan','$StatusHubungan','$IdPegawaiFK')");
 
             if ($Save) {
-                header("location:../../View/v?pg=PegawaiViewAnakAdminDesa&alert=Save");
+                // Redirect back to detail page with pegawai ID
+                ob_end_clean(); // Clear output buffer
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Save&tab=tab-3");
+                exit();
             }
         }
     } elseif ($_GET['Act'] == 'Edit') {
@@ -79,17 +83,42 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             WHERE IdAnak = '$IdAnak' ");
 
             if ($Edit) {
-                header("location:../../View/v?pg=PegawaiViewAnakAdminDesa&alert=Edit");
+                // Get IdPegawaiFK from database before redirect
+                $getAnak = mysqli_query($db, "SELECT IdPegawaiFK FROM hiskel_anak WHERE IdAnak = '$IdAnak'");
+                $anakData = mysqli_fetch_assoc($getAnak);
+                $IdPegawaiFK = $anakData['IdPegawaiFK'];
+                
+                // Redirect back to detail page with pegawai ID
+                ob_end_clean(); // Clear output buffer
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Edit&tab=tab-3");
+                exit();
             }
         }
     } elseif ($_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdTemp = sql_injeksi(($_GET['Kode']));
 
+            // Get IdPegawaiFK before delete for redirect
+            $getAnak = mysqli_query($db, "SELECT IdPegawaiFK FROM hiskel_anak WHERE IdAnak = '$IdTemp'");
+            $anakData = mysqli_fetch_assoc($getAnak);
+            $IdPegawaiFromDB = $anakData['IdPegawaiFK'];
+
             $Delete = mysqli_query($db, "DELETE FROM hiskel_anak WHERE IdAnak = '$IdTemp' ");
 
             if ($Delete) {
-                header("location:../../View/v?pg=PegawaiViewAnakAdminDesa&alert=Delete");
+                // Check if IdPegawai parameter exists for redirect back to detail page
+                if (isset($_GET['IdPegawai'])) {
+                    $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                    $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-3';
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Delete&tab=" . $tab);
+                    exit();
+                } else {
+                    // Use IdPegawai from database
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFromDB) . "&alert=Delete&tab=tab-3");
+                    exit();
+                }
             }
         }
     }

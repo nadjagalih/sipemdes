@@ -84,7 +84,16 @@ if (isset($_GET['Kode'])) {
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <form action="../App/Model/ExcHistoryMutasiAdminDesa?Act=Edit" method="POST" enctype="multipart/form-data">
+                    <?php 
+                    // Check if coming from detail pegawai page
+                    $additionalParams = '';
+                    if (isset($_GET['IdPegawai']) && isset($_GET['tab'])) {
+                        $IdPegawaiParam = sql_injeksi($_GET['IdPegawai']);
+                        $tabParam = sql_injeksi($_GET['tab']);
+                        $additionalParams = "&IdPegawai=" . $IdPegawaiParam . "&tab=" . $tabParam;
+                    }
+                    ?>
+                    <form action="../App/Model/ExcHistoryMutasiAdminDesa?Act=Edit<?php echo $additionalParams; ?>" method="POST" enctype="multipart/form-data">
                         <div class="row">
                             <input type="hidden" name="IdMutasi" id="IdMutasi" value="<?php echo $IdMutasi; ?>" class="form-control" readonly>
                             <div class="col-lg-6">
@@ -165,7 +174,11 @@ if (isset($_GET['Kode'])) {
                                 </div>
 
                                 <button class="btn btn-primary" type="submit" name="Edit" id="Edit">Save</button>
-                                <a href="?pg=ViewMutasiAdminDesa" class="btn btn-success ">Batal</a>
+                                <?php if (isset($_GET['IdPegawai']) && isset($_GET['tab'])): ?>
+                                    <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo sql_url($_GET['IdPegawai']); ?>&tab=<?php echo $_GET['tab']; ?>" class="btn btn-success">Batal</a>
+                                <?php else: ?>
+                                    <a href="?pg=ViewMutasiAdminDesa" class="btn btn-success">Batal</a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </form>

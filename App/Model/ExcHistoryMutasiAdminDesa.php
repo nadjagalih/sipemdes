@@ -1,8 +1,9 @@
 <?php
+ob_start(); // Start output buffering
 session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL ^ E_NOTICE);
+ini_set('display_errors', 0); // Disable error display to prevent output before redirect
+ini_set('display_startup_errors', 0);
+error_reporting(0); // Disable error reporting to prevent output before redirect
 
 include "../../Module/Config/Env.php";
 include "../../Module/Variabel/FileUpload.php";
@@ -141,13 +142,38 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     }
 
                     if ($Save) {
-                        header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=Save");
+                        // Check if IdPegawai parameter exists for redirect back to detail page
+                        if (isset($_GET['IdPegawai'])) {
+                            $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                            $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-5';
+                            ob_end_clean(); // Clear output buffer
+                            header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Save&tab=" . $tab);
+                            exit();
+                        } else {
+                            header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=Save");
+                        }
                     }
                 } elseif (in_array($FileExtention, $AllowExtention) == false) {
-                    header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=Cek");
+                    if (isset($_GET['IdPegawai'])) {
+                        $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                        $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-5';
+                        ob_end_clean();
+                        header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Cek&tab=" . $tab);
+                        exit();
+                    } else {
+                        header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=Cek");
+                    }
                 }
             } else {
-                header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=FileMax");
+                if (isset($_GET['IdPegawai'])) {
+                    $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                    $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-5';
+                    ob_end_clean();
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=FileMax&tab=" . $tab);
+                    exit();
+                } else {
+                    header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=FileMax");
+                }
             }
         }
     } elseif ($_GET['Act'] == 'Edit') {
@@ -251,7 +277,16 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             }
 
             if ($Edit) {
-                header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=Edit");
+                // Check if IdPegawai parameter exists for redirect back to detail page
+                if (isset($_GET['IdPegawai'])) {
+                    $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                    $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-5';
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Edit&tab=" . $tab);
+                    exit();
+                } else {
+                    header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=Edit");
+                }
             }
         }
     } elseif ($_GET['Act'] == 'EditSK') {
@@ -305,17 +340,39 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
         if (isset($_GET['Kode'])) {
             $IdMutasi = sql_injeksi(($_GET['Kode']));
 
+            // Langkah 1: Ambil data mutasi untuk mendapatkan ID Pegawai
             $PilihData = mysqli_query($db, "SELECT * FROM history_mutasi WHERE IdMutasi = '$IdMutasi' ");
             $DataPilih = mysqli_fetch_assoc($PilihData);
             $NamaFileLama = $DataPilih['FileSKMutasi'];
+            
+            // Asumsi nama kolom foreign key adalah IdPegawaiFK
+            $IdPegawaiUntukKembali = $DataPilih['IdPegawaiFK']; 
 
+            // Langkah 2: Proses hapus data
             $Delete = mysqli_query($db, "DELETE FROM history_mutasi WHERE IdMutasi = '$IdMutasi' ");
-            unlink("../../Vendor/Media/FileSK/" . $NamaFileLama);
+            
+            // Hapus file jika ada
+            if (!empty($NamaFileLama) && file_exists("../../Vendor/Media/FileSK/" . $NamaFileLama)) {
+                unlink("../../Vendor/Media/FileSK/" . $NamaFileLama);
+            }
 
             if ($Delete) {
-                header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=Delete");
+                // Check if IdPegawai parameter exists for redirect back to detail page
+                if (isset($_GET['IdPegawai'])) {
+                    $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                    $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-5';
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Delete&tab=" . $tab);
+                    exit();
+                } else {
+                    // Langkah 3: Redirect kembali ke halaman DETAIL PEGAWAI
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiUntukKembali) . "&alert=Delete&tab=tab-5");
+                    exit(); // PENTING: Tambahkan exit() untuk menghentikan skrip
+                }
             }
         }
+
     } elseif ($_GET['Act'] == 'SettingOn') {
         if (isset($_GET['Kode'])) {
             $IdTemp = sql_injeksi(($_GET['Kode']));

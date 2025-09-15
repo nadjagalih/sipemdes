@@ -62,7 +62,6 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
 
     // Set default values untuk BPD (Badan Permusyawaratan Desa)
-    $Pendidikan = '-'; // Akan diupdate nanti jika ada sistem pendidikan khusus BPD
     $Jabatan = 'Anggota BPD'; // Default jabatan untuk BPD
 ?>
 
@@ -91,9 +90,6 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
             <?php echo $Address; ?>
         </td>
 
-        <td>
-            <?php echo $Pendidikan; ?>
-        </td>
         <td>
             <?php echo $ViewTglLahir; ?><br>
             <?php

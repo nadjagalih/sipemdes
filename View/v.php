@@ -158,6 +158,8 @@ $_SESSION['start_time'] = time();
                 dom: '<"html5buttons"B>tip',
                 searching: false,
                 lengthChange: false,
+                paging: false,
+                info: false,
                 buttons: [{
                         extend: 'copy'
                     },

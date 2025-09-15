@@ -92,6 +92,9 @@ if ($_GET['alert'] == 'Cek') {
                         <a href="?pg=PegawaiBPDAdd" class="btn btn-primary btn-xl"> 
                             <i class="fa fa-plus"></i> Add Pegawai BPD
                         </a>
+                        <a href="AdminDesa/PegawaiBPD/PdfReportBPD" target="_blank" class="btn btn-success btn-xl" style="margin-left: 10px;">
+                            <i class="fa fa-file-pdf-o"></i> Cetak PDF
+                        </a>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
@@ -101,7 +104,6 @@ if ($_GET['alert'] == 'Cek') {
                                     <th>Foto</th>
                                     <th>NIK</th>
                                     <th>Nama<br>Alamat</th>
-                                    <th>Pendidikan</th>   
                                     <th>Tanggal Lahir<br>Jenis Kelamin</th>
                                     <th>No Telepon</th>
                                     <th>Unit Kerja<br>Kecamatan<br>Kabupaten</th>

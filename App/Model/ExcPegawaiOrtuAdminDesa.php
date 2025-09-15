@@ -1,6 +1,7 @@
 <?php
+ob_start(); // Start output buffering
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(0); // Disable error reporting to prevent output before redirect
 
 include "../../Module/Config/Env.php";
 
@@ -46,7 +47,10 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             VALUE('$IdOrtu','$NIKOrtu','$NamaOrtu','$TempatLahir','$TglLahir','$JenKel','$Pendidikan','$Pekerjaan','$StatusHubungan','$IdPegawaiFK')");
 
             if ($Save) {
-                header("location:../../View/v?pg=PegawaiViewOrtuAdminDesa&alert=Save");
+                // Redirect back to detail page with pegawai ID and tab parameter
+                ob_end_clean(); // Clear output buffer
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Save&tab=tab-4");
+                exit();
             }
         }
     } elseif ($_GET['Act'] == 'Edit') {
@@ -78,17 +82,44 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             WHERE IdOrtu = '$IdOrtu' ");
 
             if ($Edit) {
-                header("location:../../View/v?pg=PegawaiViewOrtuAdminDesa&alert=Edit");
+                // Get IdPegawaiFK from database before redirect
+                $getOrtu = mysqli_query($db, "SELECT IdPegawaiFK FROM hiskel_ortu WHERE IdOrtu = '$IdOrtu'");
+                $ortuData = mysqli_fetch_assoc($getOrtu);
+                $IdPegawaiFK = $ortuData['IdPegawaiFK'];
+                
+                // Redirect back to detail page with pegawai ID and tab parameter
+                ob_end_clean(); // Clear output buffer
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Edit&tab=tab-4");
+                exit();
             }
         }
     } elseif ($_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdTemp = sql_injeksi(($_GET['Kode']));
 
+            // Get IdPegawaiFK before delete for redirect
+            $getOrtu = mysqli_query($db, "SELECT IdPegawaiFK FROM hiskel_ortu WHERE IdOrtu = '$IdTemp'");
+            $ortuData = mysqli_fetch_assoc($getOrtu);
+            $IdPegawaiFromDB = $ortuData['IdPegawaiFK'];
+
             $Delete = mysqli_query($db, "DELETE FROM hiskel_ortu WHERE IdOrtu = '$IdTemp' ");
 
             if ($Delete) {
-                header("location:../../View/v?pg=PegawaiViewOrtuAdminDesa&alert=Delete");
+                // Get tab parameter
+                $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-4';
+                
+                // Check if IdPegawai parameter exists for redirect back to detail page
+                if (isset($_GET['IdPegawai'])) {
+                    $IdPegawai = sql_injeksi($_GET['IdPegawai']);
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Delete&tab=" . $tab);
+                    exit();
+                } else {
+                    // Use IdPegawai from database
+                    ob_end_clean(); // Clear output buffer
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFromDB) . "&alert=Delete&tab=" . $tab);
+                    exit();
+                }
             }
         }
     }

@@ -8,7 +8,7 @@
                     <h5>Form Input Pendidikan <span style="font-style: italic; color:red;">* Wajib Diisi</span></h5>
                 </div>
                 <div class="ibox-content">
-                    <form action="../App/Model/ExcPegawaiPendidikanAdminDesa?Act=Save" method="POST" enctype="multipart/form-data">
+                    <form id="formPendidikan" action="../App/Model/ExcPegawaiPendidikanAdminDesa?Act=Save" method="POST" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-lg-6">
                                 <input type="hidden" name="IdPegawaiFK" id="IdPegawaiFK" value="<?php echo $IdPegawaiFK; ?>" class="form-control" readonly>
@@ -59,7 +59,7 @@
                                         <span style="font-style: italic; color:black;">Contoh : 16-01-1980</span>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
+                                <button class="btn btn-primary" type="submit" name="Save" id="Save" onclick="submitPendidikanForm(event)">Save</button>
                                 <a href="?pg=PegawaiViewPendidikanAdminDesa" class="btn btn-success ">Batal</a>
                             </div>
                         </div>
@@ -160,12 +160,12 @@
                                    class="btn btn-warning btn-sm" title="Edit Data">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
-                                <a href="#" onclick="confirmDelete('<?php echo $IdPendidikanV; ?>', '<?php echo htmlspecialchars($NamaSekolah); ?>', '<?php echo htmlspecialchars($JenjangPendidikan); ?>')" 
+                                <a href="#" onclick="confirmDeletePendidikan('<?php echo $IdPendidikanV; ?>', '<?php echo htmlspecialchars($NamaSekolah); ?>', '<?php echo htmlspecialchars($JenjangPendidikan); ?>', '<?php echo $IdTemp; ?>')" 
                                    class="btn btn-danger btn-sm" title="Hapus Data">
                                     <i class="fa fa-trash"></i> Hapus
                                 </a>
                                 <?php if ($Setting == 0) { ?>
-                                    <a href="../App/Model/ExcPegawaiPendidikanAdminDesa?Act=SettingOn&Kode=<?php echo sql_url($IdPendidikanV); ?>" 
+                                    <a href="../App/Model/ExcPegawaiPendidikanAdminDesa?Act=SettingOn&Kode=<?php echo sql_url($IdPendidikanV); ?>&IdPegawai=<?php echo $IdTemp; ?>" 
                                        class="btn btn-success btn-sm" title="Aktifkan sebagai Pendidikan Akhir">
                                         <i class="fa fa-check"></i> Pilih
                                     </a>
@@ -189,7 +189,13 @@
 </div>
 
 <script>
-function confirmDelete(idPendidikan, namaSekolah, tingkatPendidikan) {
+function submitPendidikanForm(event) {
+    event.preventDefault();
+    var form = document.getElementById('formPendidikan');
+    form.submit();
+}
+
+function confirmDeletePendidikan(idPendidikan, namaSekolah, tingkatPendidikan, idPegawai) {
     swal({
         title: 'Konfirmasi Hapus',
         text: 'Apakah Anda yakin ingin menghapus data pendidikan "' + tingkatPendidikan + ' - ' + namaSekolah + '"?',
@@ -201,8 +207,8 @@ function confirmDelete(idPendidikan, namaSekolah, tingkatPendidikan) {
         cancelButtonText: 'Batal'
     }, function(isConfirm) {
         if (isConfirm) {
-            // Redirect to delete action
-            window.location.href = '../App/Model/ExcPegawaiPendidikanAdminDesa?Act=Delete&Kode=' + idPendidikan;
+            // Redirect to delete action with pegawai ID for proper redirect
+            window.location.href = '../App/Model/ExcPegawaiPendidikanAdminDesa?Act=Delete&Kode=' + idPendidikan + '&IdPegawai=' + idPegawai + '&tab=tab-1';
         }
     });
 }

@@ -209,7 +209,7 @@
                                  <a href="?pg=PegawaiEditAnakAdminDesa&Kode=<?php echo sql_url($IdAnak); ?>" 
                                     class="btn btn-warning btn-sm" title="Edit Data">
                                      <i class="fa fa-edit"></i> Edit                                </a>
-                                 <a href="#" onclick="confirmDelete('<?php echo $IdAnak; ?>', '<?php echo htmlspecialchars($Nama); ?>', '<?php echo htmlspecialchars($Hubungan); ?>')" 
+                                 <a href="#" onclick="confirmDeleteAnak('<?php echo $IdAnak; ?>', '<?php echo htmlspecialchars($Nama); ?>', '<?php echo htmlspecialchars($Hubungan); ?>', '<?php echo $IdTemp; ?>')" 
                                     class="btn btn-danger btn-sm" title="Hapus Data">
                                      <i class="fa fa-trash"></i> Hapus
                                  </a>
@@ -232,7 +232,7 @@
  </div>
 
 <script>
-function confirmDelete(idAnak, namaAnak, statusHubungan) {
+function confirmDeleteAnak(idAnak, namaAnak, statusHubungan, idPegawai) {
     swal({
         title: 'Konfirmasi Hapus',
         text: 'Apakah Anda yakin ingin menghapus data anak "' + namaAnak + ' (' + statusHubungan + ')"?',
@@ -244,8 +244,8 @@ function confirmDelete(idAnak, namaAnak, statusHubungan) {
         cancelButtonText: 'Batal'
     }, function(isConfirm) {
         if (isConfirm) {
-            // Redirect to delete action
-            window.location.href = '../App/Model/ExcPegawaiAnakAdminDesa?Act=Delete&Kode=' + idAnak;
+            // Redirect to delete action with pegawai ID for proper redirect
+            window.location.href = '../App/Model/ExcPegawaiAnakAdminDesa?Act=Delete&Kode=' + idAnak + '&IdPegawai=' + idPegawai + '&tab=tab-3';
         }
     });
 }

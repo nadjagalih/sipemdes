@@ -161,6 +161,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($Delete) {
                 header("location:../../View/v?pg=PegawaiBPDViewAllAdminDesa&alert=Delete");
+                exit();
             }
         }
     }

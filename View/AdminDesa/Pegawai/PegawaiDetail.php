@@ -4,21 +4,22 @@
      </div>
  </div>
 
- <form action="AdminDesa/Pegawai/PdfProfile" method="GET" target="_BLANK" enctype="multipart/form-data">
-     <div class="wrapper wrapper-content animated fadeInRight">
-         <div class="col-lg-12">
-             <div class="ibox ">
-                 <div class="ibox-title">
-                     <h5>Profile</h5>&nbsp;
-                     <a href="?pg=PegawaiViewAllAdminDesa">
-                         <button type="button" class="btn btn-warning" style="width:100px; text-align:center">
-                             Back
-                         </button>
-                     </a>
-                     <?php include "../App/Control/FunctionProfilePegawai.php" ?>
+ <div class="wrapper wrapper-content animated fadeInRight">
+     <div class="col-lg-12">
+         <div class="ibox ">
+             <div class="ibox-title">
+                 <h5>Profile</h5>&nbsp;
+                 <a href="?pg=PegawaiViewAllAdminDesa">
+                     <button type="button" class="btn btn-warning" style="width:100px; text-align:center">
+                         Back
+                     </button>
+                 </a>
+                 <?php include "../App/Control/FunctionProfilePegawai.php" ?>
+                 <form action="AdminDesa/Pegawai/PdfProfile" method="GET" target="_BLANK" enctype="multipart/form-data" style="display:inline;">
                      <input type="hidden" name="Kode" id="Kode" value="<?php echo $IdPegawaiFK; ?>" />
                      <button type="submit" name="Proses" value="Proses" class="btn btn-success">Cetak PDF</button>
-                 </div>
+                 </form>
+             </div>
 
                  <div class="ibox-content">
                      <div class="row">
@@ -248,8 +249,36 @@
                  </div>
              </div>
          </div>
+     </div>
          <?php
             if (isset($_POST['Proses'])) {
                 $Kode = sql_injeksi($_POST['Kode']);
             } ?>
- </form>
+
+<!-- Script untuk mengaktifkan tab berdasarkan parameter URL -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mendapatkan parameter tab dari URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab');
+    
+    if (activeTab) {
+        // Menghapus class active dari semua nav-link dan tab-pane
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('active');
+        });
+        
+        // Mengaktifkan tab yang sesuai
+        const targetLink = document.querySelector(`a[href="#${activeTab}"]`);
+        const targetPane = document.getElementById(activeTab);
+        
+        if (targetLink && targetPane) {
+            targetLink.classList.add('active');
+            targetPane.classList.add('active');
+        }
+    }
+});
+</script>

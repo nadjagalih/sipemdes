@@ -37,6 +37,7 @@ master_pendidikan.IdPendidikan ASC");
     $NamaPegawai = $DataPendidikan['Nama'];
     $NIK = $DataPendidikan['NIK'];
     $IdPendidikan = $DataPendidikan['IdPendidikan'];
+    $IdPegawaiFK = $DataPendidikan['IdPegawaiFK']; // Tambahkan ini untuk tombol Batal
     $NomorIjasah = $DataPendidikan['NomorIjasah'];
     $TanggalIjasah = $DataPendidikan['TanggalIjasah'];
     $exp = explode("-", $TanggalIjasah);
@@ -111,7 +112,7 @@ master_pendidikan.IdPendidikan ASC");
                                     </div>
                                 </div>
                                 <button class="btn btn-primary" type="submit" name="Edit" id="Edit">Save</button>
-                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-1" class="btn btn-success ">Batal</a>
+                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>" class="btn btn-success ">Batal</a>
                             </div>
                         </div>
                     </form>

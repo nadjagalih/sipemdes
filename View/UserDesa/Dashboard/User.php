@@ -90,23 +90,6 @@ if ($tanggalPensiun <= $tanggalSekarang && $flagTampilkanUpload) {
                 }
                 
                 ?>
-                <div class="ibox-tools">
-                    <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
-                    </a>
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-wrench"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#" class="dropdown-item">Config option 1</a>
-                        </li>
-                        <li><a href="#" class="dropdown-item">Config option 2</a>
-                        </li>
-                    </ul>
-                    <a class="close-link">
-                        <i class="fa fa-times"></i>
-                    </a>
-                </div>
             </div>
 
             <div class="ibox-content">
@@ -132,11 +115,6 @@ if ($tanggalPensiun <= $tanggalSekarang && $flagTampilkanUpload) {
         <div class="ibox ">
             <div class="ibox-title">
                 <h5>Profile</h5>&nbsp;
-                <a href="?pg=PegawaiViewAllAdminDesa">
-                    <button type="button" class="btn btn-warning" style="width:100px; text-align:center">
-                        Back
-                    </button>
-                </a>
                 <?php include "../App/Control/FunctionProfilePegawaiUser.php" ?>
                 <input type="hidden" name="Kode" id="Kode" value="<?php echo $IdPegawaiFK; ?>" />
                 <button type="submit" name="Proses" value="Proses" class="btn btn-success">Cetak PDF</button>

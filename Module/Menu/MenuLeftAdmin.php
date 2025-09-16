@@ -5,6 +5,19 @@ include "../App/Control/FunctionProfilePegawaiUser.php";
 $pg = isset($_GET['pg']) ? $_GET['pg'] : '';
 
 echo '<style>
+    /* Override semua warna hijau dengan prioritas tinggi */
+    .nav > li.active,
+    .nav > li.active > a,
+    .sidebar-collapse .nav > li.active,
+    .sidebar-collapse .nav > li.active > a,
+    li.active,
+    li.active > a {
+        background-color: transparent !important;
+        background: transparent !important;
+        border-left: none !important;
+        border-color: transparent !important;
+    }
+    
     .sidebar-collapse {
         position: fixed;
         top: 0;
@@ -139,10 +152,14 @@ echo '<style>
     .nav > li > a:hover:before, .nav > li > a:focus:before {
         opacity: 1;
     }
+    .sidebar-collapse .nav > li.active > a,
     .nav > li.active > a {
-        color: #fff;
-        background: linear-gradient(87deg, #11cdef 0, #1171ef 100%);
-        box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+        color: #fff !important;
+        background: linear-gradient(87deg, #11cdef 0, #1171ef 100%) !important;
+        background-color: transparent !important;
+        box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
+        border-left: none !important;
+        border: none !important;
     }
     .nav > li > a i {
         margin-right: 0.75rem;
@@ -247,18 +264,23 @@ echo '<style>
         box-shadow: 0 0 0 4px rgba(44,123,229,0.18);
     }
 
+    .sidebar-collapse .nav-second-level li.active a,
     .nav-second-level li.active a {
-        color: #2c7be5;
-        background: #e0eaff;
-        font-weight: 600;
-        box-shadow: 0 2px 8px rgba(44,123,229,0.09);
+        color: #2c7be5 !important;
+        background: #e0eaff !important;
+        background-color: #e0eaff !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 8px rgba(44,123,229,0.09) !important;
+        border-left: none !important;
+        border: none !important;
     }
 
+    .sidebar-collapse .nav-second-level li.active a:before,
     .nav-second-level li.active a:before {
-        background: #2c7be5;
-        width: 9px;
-        height: 9px;
-        box-shadow: 0 0 0 4px rgba(44,123,229,0.18);
+        background: #2c7be5 !important;
+        width: 9px !important;
+        height: 9px !important;
+        box-shadow: 0 0 0 4px rgba(44,123,229,0.18) !important;
     }
     
     .badge-notif {
@@ -275,6 +297,30 @@ echo '<style>
     }
     .special_link a i {
         color: #fff !important;
+    }
+    
+    /* Override final untuk memastikan tidak ada warna hijau */
+    * .nav > li.active,
+    * .nav > li.active > a,
+    * li.active,
+    * li.active > a,
+    .metismenu li.active,
+    .metismenu li.active > a {
+        background-color: transparent !important;
+        background: transparent !important;
+        border-left: none !important;
+        border-color: transparent !important;
+    }
+    
+    /* Paksa warna biru untuk menu aktif */
+    .sidebar-collapse .nav > li.active > a,
+    .sidebar-collapse .metismenu li.active > a,
+    .nav.metismenu li.active > a {
+        color: #fff !important;
+        background: linear-gradient(87deg, #11cdef 0, #1171ef 100%) !important;
+        background-color: transparent !important;
+        box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
+        border: none !important;
     }
 </style>';
 $activePages = ['UserViewAdminDesa', 'PegawaiViewAllAdminDesa', 'PegawaiBPDViewAllAdminDesa'];

@@ -456,12 +456,14 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
                 <li class="<?= $pg == 'ViewPensiunAdminDesa' ? 'active' : '' ?>"><a href="?pg=ViewPensiunAdminDesa">Data Pensiun</a></li>
             </ul>
         </li>
+        <!--
         <li class="<?php echo ($_GET['pg'] == 'ReportBPDAdminDesa') ? 'active' : ''; ?>">
             <a href="?pg=ReportBPDAdminDesa"><i class="fa fa-print"></i> <span class="nav-label">Laporan BPD</span></a>
             <!-- <ul class="nav nav-second-level collapse">
                 <li><a href="">BPD</a></li>
-            </ul> -->
+            </ul>
         </li>
+        -->
         <li class="<?= $isRekapDataActive ? 'active' : '' ?>">
             <a href="#">
                 <i class="fa fa-tasks"></i> 

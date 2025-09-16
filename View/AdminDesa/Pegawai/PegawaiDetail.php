@@ -4,6 +4,77 @@
      </div>
  </div>
 
+ <?php
+ // Sistem Notifikasi Universal untuk semua operasi CRUD
+ if (isset($_GET['alert'])) {
+     $alert = $_GET['alert'];
+     
+     // Konfigurasi pesan berdasarkan jenis alert
+     $notifications = [
+         // Operasi CRUD Umum
+         'Save' => ['title' => 'Berhasil!', 'message' => 'Data berhasil disimpan', 'icon' => 'success'],
+         'Edit' => ['title' => 'Berhasil!', 'message' => 'Data berhasil diubah', 'icon' => 'success'],
+         'Delete' => ['title' => 'Berhasil!', 'message' => 'Data berhasil dihapus', 'icon' => 'success'],
+         'Setting' => ['title' => 'Berhasil!', 'message' => 'Pengaturan berhasil diubah', 'icon' => 'success'],
+         
+         // Notifikasi Spesifik per Modul
+         'SavePendidikan' => ['title' => 'Berhasil!', 'message' => 'Data pendidikan berhasil disimpan', 'icon' => 'success'],
+         'EditPendidikan' => ['title' => 'Berhasil!', 'message' => 'Data pendidikan berhasil diubah', 'icon' => 'success'],
+         'DeletePendidikan' => ['title' => 'Berhasil!', 'message' => 'Data pendidikan berhasil dihapus', 'icon' => 'success'],
+         
+         'SaveSuamiIstri' => ['title' => 'Berhasil!', 'message' => 'Data suami/istri berhasil disimpan', 'icon' => 'success'],
+         'EditSuamiIstri' => ['title' => 'Berhasil!', 'message' => 'Data suami/istri berhasil diubah', 'icon' => 'success'],
+         'DeleteSuamiIstri' => ['title' => 'Berhasil!', 'message' => 'Data suami/istri berhasil dihapus', 'icon' => 'success'],
+         
+         'SaveAnak' => ['title' => 'Berhasil!', 'message' => 'Data anak berhasil disimpan', 'icon' => 'success'],
+         'EditAnak' => ['title' => 'Berhasil!', 'message' => 'Data anak berhasil diubah', 'icon' => 'success'],
+         'DeleteAnak' => ['title' => 'Berhasil!', 'message' => 'Data anak berhasil dihapus', 'icon' => 'success'],
+         
+         'SaveOrtu' => ['title' => 'Berhasil!', 'message' => 'Data orang tua berhasil disimpan', 'icon' => 'success'],
+         'EditOrtu' => ['title' => 'Berhasil!', 'message' => 'Data orang tua berhasil diubah', 'icon' => 'success'],
+         'DeleteOrtu' => ['title' => 'Berhasil!', 'message' => 'Data orang tua berhasil dihapus', 'icon' => 'success'],
+         
+         'SaveMutasi' => ['title' => 'Berhasil!', 'message' => 'Data mutasi berhasil disimpan', 'icon' => 'success'],
+         'EditMutasi' => ['title' => 'Berhasil!', 'message' => 'Data mutasi berhasil diubah', 'icon' => 'success'],
+         'DeleteMutasi' => ['title' => 'Berhasil!', 'message' => 'Data mutasi berhasil dihapus', 'icon' => 'success'],
+         
+         // Notifikasi Error
+         'Error' => ['title' => 'Gagal!', 'message' => 'Terjadi kesalahan, silakan coba lagi', 'icon' => 'error'],
+         'ErrorSave' => ['title' => 'Gagal!', 'message' => 'Data gagal disimpan', 'icon' => 'error'],
+         'ErrorEdit' => ['title' => 'Gagal!', 'message' => 'Data gagal diubah', 'icon' => 'error'],
+         'ErrorDelete' => ['title' => 'Gagal!', 'message' => 'Data gagal dihapus', 'icon' => 'error'],
+     ];
+     
+     // Cek apakah alert ada dalam konfigurasi
+     if (array_key_exists($alert, $notifications)) {
+         $notification = $notifications[$alert];
+         $swalType = ($notification['icon'] == 'success') ? 'success' : (($notification['icon'] == 'error') ? 'error' : 'info');
+         
+         echo '<script>
+             document.addEventListener("DOMContentLoaded", function() {
+                 // Pastikan SweetAlert sudah ter-load
+                 if (typeof swal !== "undefined") {
+                     swal({
+                         title: "' . $notification['title'] . '",
+                         text: "' . $notification['message'] . '",
+                         type: "' . $swalType . '",
+                         showConfirmButton: true,
+                         confirmButtonText: "OK",
+                         confirmButtonColor: "#3085d6",
+                         timer: 4000,
+                         allowOutsideClick: true,
+                         allowEscapeKey: true
+                     });
+                 } else {
+                     // Fallback jika SweetAlert tidak tersedia
+                     alert("' . $notification['title'] . ' - ' . $notification['message'] . '");
+                 }
+             });
+         </script>';
+     }
+ }
+ ?>
+
  <div class="wrapper wrapper-content animated fadeInRight">
      <div class="col-lg-12">
          <div class="ibox ">

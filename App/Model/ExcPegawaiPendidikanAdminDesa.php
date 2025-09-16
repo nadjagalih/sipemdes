@@ -101,7 +101,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     exit();
                 } else {
                     ob_end_clean(); // Clear output buffer
-                    header("location:../../View/v?pg=PegawaiViewPendidikanAdminDesa&alert=Delete");
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&alert=Delete");
                     exit();
                 }
             }

@@ -260,8 +260,7 @@
                                             <div class="custom-file">
                                                 <input type="file" name="FUpload" id="File" accept="application/pdf"
                                                     class="custom-file-input" autofocus required>
-                                                <label for="FotoUpload" class="custom-file-label">Pilih File :
-                                                    pdf</label>
+                                                <label for="File" class="custom-file-label">Pilih File SK (PDF)</label>
                                             </div>
                                             <span class="form-text m-b-none" style="font-style: italic;">*) Ukuran File Max
                                                 2 MB</span>
@@ -355,7 +354,11 @@
                         <td><?php echo $TanggalMutasi; ?> </td>
                         <td>Nomor SK : <?php echo $NomorSK; ?>
                             <br>
-                            <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
+                            <?php if (!empty($SKMutasi)) { ?>
+                                <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
+                            <?php } else { ?>
+                                <small class="text-muted">Belum ada file SK</small>
+                            <?php } ?>
                         </td>
 
                         <td>
@@ -404,4 +407,13 @@ function confirmDeleteMutasi(idMutasi, jenisMutasi, jabatan, idPegawai) {
         }
     });
 }
+</script>
+
+<script>
+// Update label ketika file dipilih
+document.getElementById('File').addEventListener('change', function() {
+    var fileName = this.files[0] ? this.files[0].name : 'Pilih File SK (PDF)';
+    var label = this.nextElementSibling;
+    label.textContent = fileName;
+});
 </script>

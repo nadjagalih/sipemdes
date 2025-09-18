@@ -89,7 +89,7 @@ if ($_GET['alert'] == 'Cek') {
             <div class="ibox ">
                 <div class="ibox-content">
                     <div class="ibox">
-                        <a href="?pg=PegawaiBPDAdd" class="btn btn-primary btn-xl"> 
+                        <a href="?pg=PegawaiBPDAddAdminDesa" class="btn btn-primary btn-xl"> 
                             <i class="fa fa-plus"></i> Add Pegawai BPD
                         </a>
                         <a href="AdminDesa/PegawaiBPD/PdfReportBPD" target="_blank" class="btn btn-success btn-xl" style="margin-left: 10px;">

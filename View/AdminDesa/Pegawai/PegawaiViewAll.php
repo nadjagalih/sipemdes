@@ -98,14 +98,14 @@ if ($_GET['alert'] == 'Cek') {
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Foto</th>
+                                    <th class="no-cetak">Foto</th>
                                     <th>NIK</th>
                                     <th>Nama<br>Alamat</th>
                                     <th>Tanggal Lahir<br>Jenis Kelamin</th>
                                     <th>Pendidikan</th>
                                     <th>Unit Kerja<br>Kecamatan<br>Kabupaten</th>
                                     <th>Jabatan</th>
-                                    <th>Action</th>
+                                    <th class="no-cetak">Action</th>
                                 </tr>
                             </thead>
                             <tbody>

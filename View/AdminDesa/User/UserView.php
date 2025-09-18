@@ -109,14 +109,7 @@ if ($_GET['alert'] == 'Save') {
     <div class="row">
         <div class="col-lg-12">
             <div class="ibox ">
-                <div class="ibox-title">
-                    <h3>List Data User</h3>
-                    <div class="ibox-tools">
-                        <a href="?pg=UserAddAdminDesa" class="btn btn-primary btn-xl"> 
-                            <i class="fa fa-plus"></i> Add User
-                        </a>
-                    </div>
-                </div>
+              
                 <div class="ibox-content">
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered table-hover dataTables-kecamatan">

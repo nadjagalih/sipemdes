@@ -155,8 +155,8 @@ $_SESSION['start_time'] = time();
             $('.dataTables-kecamatan').DataTable({
                 pageLength: 25,
                 responsive: true,
-                dom: '<"html5buttons"B>tip',
-                searching: false,
+                dom: 'Bfrtip',
+                searching: true,
                 lengthChange: false,
                 paging: false,
                 info: false,
@@ -172,6 +172,11 @@ $_SESSION['start_time'] = time();
                     },
                     {
                         extend: 'pdf',
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        exportOptions: {
+                            columns: ':not(.no-cetak)'
+                        },
                         title: 'ExampleFile'
                     },
 

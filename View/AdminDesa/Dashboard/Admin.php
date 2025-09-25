@@ -43,10 +43,16 @@ INNER JOIN master_pegawai ON main_user.IdPegawai = master_pegawai.IdPegawaiFK
 INNER JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
 INNER JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
 WHERE master_pegawai.IdDesaFK = '$IdDesa' ");
-$DataHeader = mysqli_fetch_assoc($QHeader);
-$NamaDesaHeader = $DataHeader['NamaDesa'];
-$NamaKecamatanHeader = $DataHeader['Kecamatan'];
-$IdDesaHeader = $DataHeader['IdDesaFK'];
+if ($QHeader && mysqli_num_rows($QHeader) > 0) {
+    $DataHeader = mysqli_fetch_assoc($QHeader);
+    $NamaDesaHeader = $DataHeader['NamaDesa'];
+    $NamaKecamatanHeader = $DataHeader['Kecamatan'];
+    $IdDesaHeader = $DataHeader['IdDesaFK'];
+} else {
+    $NamaDesaHeader = "Data Tidak Ditemukan";
+    $NamaKecamatanHeader = "Data Tidak Ditemukan";
+    $IdDesaHeader = $IdDesa; // fallback ke session ID
+}
 
 $QueryPerangkat = mysqli_query($db, "SELECT
                     master_kecamatan.Kecamatan,
@@ -74,8 +80,12 @@ $QueryPerangkat = mysqli_query($db, "SELECT
                     master_pegawai.IdDesaFK = '$IdDesaHeader' AND
                     history_mutasi.Setting = 1");
 
-$DataPerangkat = mysqli_fetch_assoc($QueryPerangkat);
-$Jumlah = $DataPerangkat['JmlPerangkat'];
+if ($QueryPerangkat && mysqli_num_rows($QueryPerangkat) > 0) {
+    $DataPerangkat = mysqli_fetch_assoc($QueryPerangkat);
+    $Jumlah = $DataPerangkat['JmlPerangkat'];
+} else {
+    $Jumlah = 0;
+}
 $TglSaatIni = date('d-m-Y');
 
 // Gender Statistics
@@ -108,8 +118,12 @@ $QJK = mysqli_query($db, "SELECT
             master_pegawai.IdDesaFK = '$IdDesaHeader' AND
             history_mutasi.Setting = 1
             GROUP BY master_pegawai.JenKel");
-$DataJK = mysqli_fetch_assoc($QJK);
-$LakiLaki = $DataJK['JumlahJKL'] ?? 0;
+if ($QJK && mysqli_num_rows($QJK) > 0) {
+    $DataJK = mysqli_fetch_assoc($QJK);
+    $LakiLaki = $DataJK['JumlahJKL'] ?? 0;
+} else {
+    $LakiLaki = 0;
+}
 
 $QJKP = mysqli_query($db, "SELECT
             master_jenkel.Keterangan,
@@ -140,8 +154,82 @@ $QJKP = mysqli_query($db, "SELECT
             master_pegawai.IdDesaFK = '$IdDesaHeader' AND
             history_mutasi.Setting = 1
             GROUP BY master_pegawai.JenKel");
-$DataJKP = mysqli_fetch_assoc($QJKP);
-$Perempuan = $DataJKP['JumlahJKP'] ?? 0;
+if ($QJKP && mysqli_num_rows($QJKP) > 0) {
+    $DataJKP = mysqli_fetch_assoc($QJKP);
+    $Perempuan = $DataJKP['JumlahJKP'] ?? 0;
+} else {
+    $Perempuan = 0;
+}
+
+// Query untuk mengambil data Kepala Desa berdasarkan jabatan
+$kepdes_sql = "SELECT 
+            master_pegawai.IdPegawaiFK,
+            master_pegawai.Nama AS NamaPegawai,
+            master_pegawai.Foto,
+            master_pegawai.JenKel,
+            master_jabatan.Jabatan
+            FROM master_pegawai 
+            INNER JOIN history_mutasi ON master_pegawai.IdPegawaiFK = history_mutasi.IdPegawaiFK
+            INNER JOIN master_jabatan ON history_mutasi.IdJabatanFK = master_jabatan.IdJabatan
+            WHERE master_pegawai.IdDesaFK = '$IdDesaHeader' 
+            AND master_pegawai.Setting = 1 
+            AND history_mutasi.Setting = 1
+            AND master_jabatan.Jabatan = 'Kepala Desa'
+            ORDER BY history_mutasi.TanggalMutasi DESC
+            LIMIT 1";
+
+$QKepDesa = mysqli_query($db, $kepdes_sql);
+
+// Handle query errors
+if (!$QKepDesa) {
+    error_log("Kepala Desa Query Error: " . mysqli_error($db));
+}
+
+// Log query hasil
+echo "<!-- Kepala Desa Query: " . ($QKepDesa ? mysqli_num_rows($QKepDesa) : 0) . " rows found -->";
+echo "<!-- Query: " . $kepdes_sql . " -->";
+
+// Cek apakah query berhasil dan ada hasil
+if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
+    $DataKepDesa = mysqli_fetch_assoc($QKepDesa);
+    
+    // Data kepala desa ditemukan di database
+    
+    // Set foto kepala desa atau default
+    if($DataKepDesa && !empty($DataKepDesa['Foto']) && file_exists("../Vendor/Media/Pegawai/" . $DataKepDesa['Foto'])) {
+        $FotoKepDesa = "../Vendor/Media/Pegawai/" . $DataKepDesa['Foto'];
+        $NamaKepDesa = $DataKepDesa['NamaPegawai'];
+        $StatusFoto = "Foto Kepala Desa";
+        echo "<!-- Using database photo -->";
+    } else {
+        // Foto tidak ditemukan di file system
+        
+        // Jika ada nama tapi tidak ada foto
+        if($DataKepDesa && !empty($DataKepDesa['NamaPegawai'])) {
+            $NamaKepDesa = $DataKepDesa['NamaPegawai'];
+        } else {
+            $NamaKepDesa = "Kepala Desa " . $NamaDesaHeader;
+        }
+        // Gunakan foto default berdasarkan gender jika ada
+        if($DataKepDesa && isset($DataKepDesa['JenKel'])) {
+            if($DataKepDesa['JenKel'] == 1) {
+                $FotoKepDesa = "../Vendor/Media/Logo/Pria.png";
+            } else {
+                $FotoKepDesa = "../Vendor/Media/Logo/Perempuan.png";
+            }
+        } else {
+            $FotoKepDesa = "../Vendor/Media/Logo/Pria.png"; // Default pria
+        }
+        $StatusFoto = "Foto Default";
+        echo "<!-- Using gender-based default -->";
+    }
+} else {
+    // Jika tidak ada data kepala desa, gunakan default
+    $FotoKepDesa = "../Vendor/Media/Logo/Pria.png";
+    $NamaKepDesa = "Kepala Desa " . $NamaDesaHeader;
+    $StatusFoto = "Foto Default";
+    echo "<!-- Using final fallback default -->";
+}
 ?>
 
 
@@ -515,39 +603,46 @@ $Perempuan = $DataJKP['JumlahJKP'] ?? 0;
         <div class="container-fluid">
             <!-- Organization Info Card - Moved to Top -->
             <div class="row">
-                <div class="col-12 grid-margin stretch-card">
+                <div class="col-md-7 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Sistem Informasi Pemerintahan Desa</h4>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-3 text-center mb-4">
-                                    <img src="../Vendor/Media/Logo/Kabupaten.png" alt="Logo Kabupaten" style="height: 120px; width: auto;" class="mb-3">
-                                    <p class="text-dark mb-0"><?php echo $Nama; ?></p>
+                            <!-- Profil Header Style -->
+                            <div class="profil-header" style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px;">
+                                <div class="profil-avatar" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                                    <img src="<?php echo $FotoKepDesa; ?>" alt="Foto Kepala Desa" 
+                                         style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
-                                <div class="col-md-9">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h5 class="text-purple font-weight-bold mb-2"><?php echo $Dinas; ?></h5>
-                                            <p class="text-muted mb-3">Kabupaten <?php echo $Kabupaten; ?></p>
+                                
+                                <div class="profil-info" style="flex-grow: 1;">
+                                    <h1 style="margin: 0 0 5px 0; font-size: 1.8em; color: var(--purple-primary); font-weight: bold;"><?php echo $NamaKepDesa; ?></h1>
+                                    <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #6c757d;">Kepala Desa</p>
+                                </div>
+                            </div>
 
-                                            <h6 class="font-weight-medium mb-2">Status</h6>
-                                            <p class="text-success mb-4">
-                                                <i class="fas fa-check-circle mr-1"></i>
-                                                Aktif
-                                            </p>
-                                            
-                                            
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6 class="font-weight-medium mb-2">Kecamatan</h6>
-                                            <p class="text-dark mb-4"><?php echo $NamaKecamatanHeader; ?></p>
-                                            
-                                            <h6 class="font-weight-medium mb-2">Desa</h6>
-                                            <p class="text-dark mb-0"><?php echo $NamaDesaHeader; ?></p>
-                                        </div>
-                                    </div>
+                            <!-- Detail Area Style -->
+                            <div class="detail-area" style="border-top: 1px solid #dee2e6; padding-top: 20px;">
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Provinsi</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;">Jawa Timur</span>
+                                </div>
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Kabupaten</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;"><?php echo $Kabupaten; ?></span>
+                                </div>
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Kecamatan</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;"><?php echo $NamaKecamatanHeader; ?></span>
+                                </div>
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Desa</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;"><?php echo $NamaDesaHeader; ?></span>
+                                </div>
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Alamat</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;">-</span>
                                 </div>
                             </div>
                         </div>

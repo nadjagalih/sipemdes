@@ -32,6 +32,47 @@ $Kabupaten = $DataProfile['Kabupaten'];
 
 
 <div class="wrapper wrapper-content animated fadeInRight">
+    <style>
+        /* Custom styling untuk header tabel agar sesuai dengan warna sidebar */
+        .dataTables-kecamatan thead th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+            font-weight: bold !important;
+            text-align: center !important;
+            border: 1px solid #1e3c72 !important;
+            padding: 12px 8px !important;
+        }
+        
+        .dataTables-kecamatan thead tr {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+        }
+        
+        /* Override untuk DataTables sorting */
+        .dataTables-kecamatan thead th.sorting,
+        .dataTables-kecamatan thead th.sorting_asc,
+        .dataTables-kecamatan thead th.sorting_desc {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+        }
+        
+        /* Styling untuk baris tabel */
+        .dataTables-kecamatan tbody tr:hover {
+            background-color: #f0f8ff !important;
+        }
+        
+        /* Styling untuk sel tabel */
+        .dataTables-kecamatan td {
+            border: 1px solid #dee2e6 !important;
+            vertical-align: middle !important;
+            padding: 8px !important;
+        }
+        
+        /* Override Bootstrap default */
+        .table-striped > thead > tr > th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+        }
+    </style>
     <div class="row">
         <div class="col-lg-12">
             <div class="ibox ">

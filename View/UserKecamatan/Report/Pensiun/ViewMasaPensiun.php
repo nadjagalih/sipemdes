@@ -17,6 +17,56 @@ $Kecamatan = $DataQuery['Kecamatan'];
 </div>
 
 <div class="wrapper wrapper-content animated fadeInRight">
+    <style>
+        /* Custom styling untuk header tabel agar sesuai dengan warna sidebar */
+        .dataTables-kecamatan thead th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+            font-weight: bold !important;
+            text-align: center !important;
+            border: 1px solid #1e3c72 !important;
+            padding: 12px 8px !important;
+        }
+        
+        .dataTables-kecamatan thead tr {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+        }
+        
+        /* Override untuk DataTables sorting */
+        .dataTables-kecamatan thead th.sorting,
+        .dataTables-kecamatan thead th.sorting_asc,
+        .dataTables-kecamatan thead th.sorting_desc {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+        }
+        
+        /* Styling untuk baris tabel */
+        .dataTables-kecamatan tbody tr:hover {
+            background-color: #f0f8ff !important;
+        }
+        
+        /* Styling untuk sel tabel */
+        .dataTables-kecamatan td {
+            border: 1px solid #dee2e6 !important;
+            vertical-align: middle !important;
+            padding: 8px !important;
+        }
+        
+        /* Override Bootstrap default */
+        .table-striped > thead > tr > th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+        }
+        
+        /* Styling untuk background highlight pensiun */
+        .dataTables-kecamatan tbody tr[style*="background-color: #fecaca"] {
+            background-color: #fecaca !important;
+        }
+        
+        .dataTables-kecamatan tbody tr[style*="background-color: #fecaca"]:hover {
+            background-color: #fdb8b8 !important;
+        }
+    </style>
 
     <div class="col-lg-12">
         <div class="ibox ">
@@ -72,17 +122,17 @@ $Kecamatan = $DataQuery['Kecamatan'];
             <div class="ibox-content">
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Foto</th>
-                                <th>NIK</th>
-                                <th>Nama<br>Jabatan<br>Alamat</th>
-                                <th>Tanggal Lahir<br>Jenis Kelamin</th>
-                                <th>Tanggal Pensiun</th>
-                                <th>Sisa Pensiun</th>
-                                <th>Keterangan</th>
-                                <th>Unit Kerja<br>Kecamatan<br>Kabupaten</th>
+                        <thead style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
+                            <tr style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">No</th>
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Foto</th>
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">NIK</th>
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Nama<br>Jabatan<br>Alamat</th>
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Tanggal Lahir<br>Jenis Kelamin</th>
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Tanggal Pensiun</th>
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Sisa Pensiun</th>
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Keterangan</th>
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Unit Kerja<br>Kecamatan<br>Kabupaten</th>
                             </tr>
                         </thead>
                         <tbody>

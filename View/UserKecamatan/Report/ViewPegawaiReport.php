@@ -15,6 +15,47 @@ $Kecamatan = $DataQuery['Kecamatan'];
 </div>
 
 <div class="wrapper wrapper-content animated fadeInRight">
+    <style>
+        /* Custom styling untuk header tabel agar sesuai dengan warna sidebar */
+        .dataTables-kecamatan thead th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+            font-weight: bold !important;
+            text-align: center !important;
+            border: 1px solid #1e3c72 !important;
+            padding: 12px 8px !important;
+        }
+        
+        .dataTables-kecamatan thead tr {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+        }
+        
+        /* Override untuk DataTables sorting */
+        .dataTables-kecamatan thead th.sorting,
+        .dataTables-kecamatan thead th.sorting_asc,
+        .dataTables-kecamatan thead th.sorting_desc {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+        }
+        
+        /* Styling untuk baris tabel */
+        .dataTables-kecamatan tbody tr:hover {
+            background-color: #f0f8ff !important;
+        }
+        
+        /* Styling untuk sel tabel */
+        .dataTables-kecamatan td {
+            border: 1px solid #dee2e6 !important;
+            vertical-align: middle !important;
+            padding: 8px !important;
+        }
+        
+        /* Override Bootstrap default */
+        .table-striped > thead > tr > th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+        }
+    </style>
 
     <div class="col-lg-12">
         <div class="ibox ">
@@ -51,23 +92,23 @@ $Kecamatan = $DataQuery['Kecamatan'];
             <div class="ibox-content">
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
-                        <thead>
-                            <tr align="center">
-                                <th rowspan="2">No</th>
-                                <th rowspan="2">Kecamatan<br>Desa<br>Kode Desa</th>
-                                <th rowspan="2">Foto</th>
-                                <th rowspan="2">Nama Perangkat<br>Alamat</th>
-                                <th rowspan="2">Tgl Lahir<br>Jenis Kelamin</th>
-                                <th rowspan="2">Pendidikan</th>
-                                <th colspan="2">SK Pengangkatan</th>
-                                <th rowspan="2">Jabatan</th>
-                                <th rowspan="2">Keterangan</th>
+                        <thead style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
+                            <tr align="center" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
+                                <th rowspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">No</th>
+                                <th rowspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Kecamatan<br>Desa<br>Kode Desa</th>
+                                <th rowspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Foto</th>
+                                <th rowspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Nama Perangkat<br>Alamat</th>
+                                <th rowspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Tgl Lahir<br>Jenis Kelamin</th>
+                                <th rowspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Pendidikan</th>
+                                <th colspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">SK Pengangkatan</th>
+                                <th rowspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Jabatan</th>
+                                <th rowspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Keterangan</th>
                                 <!-- <th rowspan="2">Siltap (Rp.)</th> -->
-                                <th rowspan="2">Telp</th>
+                                <th rowspan="2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Telp</th>
                             </tr>
-                            <tr align="center">
-                                <th>No SK</th>
-                                <th>Tgl SK</th>
+                            <tr align="center" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">No SK</th>
+                                <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">Tgl SK</th>
                             </tr>
                         </thead>
                         <tbody>

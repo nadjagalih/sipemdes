@@ -140,7 +140,7 @@ echo '<style>
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(87deg, #11cdef 0, #1171ef 100%);
+        background: linear-gradient(87deg, #0d6efd 0, #0b5ed7 100%);
         opacity: 0;
         transition: opacity 0.15s ease;
         z-index: -1;
@@ -155,7 +155,7 @@ echo '<style>
     .sidebar-collapse .nav > li.active > a,
     .nav > li.active > a {
         color: #fff !important;
-        background: linear-gradient(87deg, #11cdef 0, #1171ef 100%) !important;
+        background: linear-gradient(87deg, #0d6efd 0, #0b5ed7 100%) !important;
         background-color: transparent !important;
         box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
         border-left: none !important;
@@ -251,36 +251,36 @@ echo '<style>
     }
 
     .nav-second-level li a:hover {
-        color: #2c7be5;
-        background: #e8f0fe;
-        box-shadow: 0 2px 8px rgba(44,123,229,0.07);
+        color: #0d6efd;
+        background: #e7f1ff;
+        box-shadow: 0 2px 8px rgba(13,110,253,0.07);
         padding-left: 52px;
     }
 
     .nav-second-level li a:hover:before {
-        background: #2c7be5;
+        background: #0d6efd;
         width: 9px;
         height: 9px;
-        box-shadow: 0 0 0 4px rgba(44,123,229,0.18);
+        box-shadow: 0 0 0 4px rgba(13,110,253,0.18);
     }
 
     .sidebar-collapse .nav-second-level li.active a,
     .nav-second-level li.active a {
-        color: #2c7be5 !important;
-        background: #e0eaff !important;
-        background-color: #e0eaff !important;
+        color: #0d6efd !important;
+        background: #e7f1ff !important;
+        background-color: #e7f1ff !important;
         font-weight: 600 !important;
-        box-shadow: 0 2px 8px rgba(44,123,229,0.09) !important;
+        box-shadow: 0 2px 8px rgba(13,110,253,0.09) !important;
         border-left: none !important;
         border: none !important;
     }
 
     .sidebar-collapse .nav-second-level li.active a:before,
     .nav-second-level li.active a:before {
-        background: #2c7be5 !important;
+        background: #0d6efd !important;
         width: 9px !important;
         height: 9px !important;
-        box-shadow: 0 0 0 4px rgba(44,123,229,0.18) !important;
+        box-shadow: 0 0 0 4px rgba(13,110,253,0.18) !important;
     }
     
     .badge-notif {
@@ -317,7 +317,7 @@ echo '<style>
     .sidebar-collapse .metismenu li.active > a,
     .nav.metismenu li.active > a {
         color: #fff !important;
-        background: linear-gradient(87deg, #11cdef 0, #1171ef 100%) !important;
+        background: linear-gradient(135deg, #0a0a37 0%, #1845b3 100%) !important;
         background-color: transparent !important;
         box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
         border: none !important;

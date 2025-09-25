@@ -1,0 +1,81 @@
+/* DashboardPack-like styling using only Bootstrap + custom CSS */
+:root{
+  --sidebar-width: 260px;
+}
+
+* { box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+
+.navbar .brand-icon {
+  width: 28px; height: 28px;
+  background: #eef5ff;
+  color: #2c7be5;
+}
+
+/* Sidebar layout */
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: calc(100vh - 56px);
+  transition: transform .25s ease;
+}
+@media (max-width: 991.98px) {
+  .sidebar {
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    z-index: 1030;
+    transform: translateX(-100%);
+  }
+  .sidebar.show { transform: translateX(0); }
+}
+
+/* Normalize legacy sidebar markup inside MenuLeftSAdmin.php */
+.sidebar-inner ul { list-style: none; padding-left: 0; margin: 0; }
+.sidebar-inner .nav > li > a,
+.sidebar-inner a {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .6rem .8rem;
+  color: #334155;
+  text-decoration: none;
+  border-radius: .5rem;
+}
+.sidebar-inner a:hover { background: #f1f5f9; color: #1f2937; }
+.sidebar-inner .active > a,
+.sidebar-inner a.active { background: #2c7be5; color: #fff !important; }
+.sidebar-inner .nav-label { flex: 1; }
+
+.sidebar-inner i.fa { width: 18px; text-align: center; }
+
+/* Headings and cards */
+h1,h2,h3,h4,h5 { color: #0f172a; }
+.card { border-radius: 1rem; }
+.card .card-header { background: transparent; border-bottom: 0; }
+
+/* Tables inside main content */
+.table { border-color: #e5e7eb; }
+.table thead th { font-weight: 600; color: #475569; background: #f8fafc; }
+.table-striped > tbody > tr:nth-of-type(odd) { --bs-table-accent-bg: #fafafa; }
+
+/* Badges & labels normalizer (if legacy classes exist) */
+.label, .badge { font-weight: 600; }
+.label-success, .badge.bg-success { background-color: #22c55e !important; }
+.label-danger, .badge.bg-danger { background-color: #ef4444 !important; }
+.label-warning, .badge.bg-warning { background-color: #f59e0b !important; }
+.label-info, .badge.bg-info { background-color: #0ea5e9 !important; }
+
+/* Buttons */
+.btn { border-radius: .7rem; }
+.btn-primary { background-color: #2c7be5; border-color: #2c7be5; }
+.btn-outline-secondary { border-radius: .7rem; }
+
+/* Forms */
+.form-control, .form-select { border-radius: .7rem; }
+
+/* Make legacy .row/.col content breathe inside injected main content */
+.card-body > .row { margin-left: 0; margin-right: 0; }
+.card-body > .row > [class^="col-"] { padding-left: .5rem; padding-right: .5rem; }
+
+/* Utilities */
+.shadow-sm { box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.1) !important; }

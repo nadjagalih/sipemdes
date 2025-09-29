@@ -1,5 +1,5 @@
 <?php
-include "../App/Control/FunctionSessionKecamatan.php";
+include "../App/Control/FunctionSession.php";
 ?>
 <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0; background: linear-gradient(135deg, #0a0a37 0%, #1845b3 100%); box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
     <div class="navbar-header">

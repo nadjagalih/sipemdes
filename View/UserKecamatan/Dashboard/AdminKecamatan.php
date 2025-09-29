@@ -39,10 +39,23 @@ $TglSaatIni = date('d-m-Y');
 // BAGIAN 3: DATABASE QUERIES
 // ===============================================
 
-// Query 1: Data Header Kecamatan
-$QHeader = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$IdKecamatan'");
-$DataHeader = mysqli_fetch_assoc($QHeader);
-$NamaKecamatanHeader = $DataHeader['Kecamatan'];
+// Query 1: Data Header Kecamatan dengan join ke kabupaten
+$QHeader = mysqli_query($db, "SELECT 
+    master_kecamatan.*, 
+    master_setting_profile_dinas.Kabupaten 
+    FROM master_kecamatan 
+    LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile 
+    WHERE master_kecamatan.IdKecamatan = '$IdKecamatan'");
+
+if ($QHeader && mysqli_num_rows($QHeader) > 0) {
+    $DataHeader = mysqli_fetch_assoc($QHeader);
+    $NamaKecamatanHeader = $DataHeader['Kecamatan'];
+    $Kabupaten = $DataHeader['Kabupaten'] ?? 'Trenggalek';
+} else {
+    // Fallback jika query gagal
+    $NamaKecamatanHeader = 'Trenggalek';
+    $Kabupaten = 'Trenggalek';
+}
 
 // Query 2: Total Perangkat Desa per Kecamatan
 $QueryPerangkat = mysqli_query($db, "SELECT
@@ -71,8 +84,12 @@ $QueryPerangkat = mysqli_query($db, "SELECT
                             master_desa.IdKecamatanFK = '$IdKecamatan' AND
                             history_mutasi.Setting = 1");
 
-$DataPerangkat = mysqli_fetch_assoc($QueryPerangkat);
-$Jumlah = $DataPerangkat['JmlPerangkat'];
+if ($QueryPerangkat && mysqli_num_rows($QueryPerangkat) > 0) {
+    $DataPerangkat = mysqli_fetch_assoc($QueryPerangkat);
+    $Jumlah = $DataPerangkat['JmlPerangkat'];
+} else {
+    $Jumlah = 0;
+}
 
 // Query 3: Data Pegawai Laki-laki
 $QJK = mysqli_query($db, "SELECT
@@ -105,8 +122,12 @@ $QJK = mysqli_query($db, "SELECT
                 master_desa.IdKecamatanFK = '$IdKecamatan' AND
                 history_mutasi.Setting = 1
                 GROUP BY master_pegawai.JenKel");
-$DataJK = mysqli_fetch_assoc($QJK);
-$LakiLaki = $DataJK['JumlahJKL'] ?? 0;
+if ($QJK && mysqli_num_rows($QJK) > 0) {
+    $DataJK = mysqli_fetch_assoc($QJK);
+    $LakiLaki = $DataJK['JumlahJKL'] ?? 0;
+} else {
+    $LakiLaki = 0;
+}
 
 // Query 4: Data Pegawai Perempuan
 $QJKP = mysqli_query($db, "SELECT
@@ -138,8 +159,12 @@ $QJKP = mysqli_query($db, "SELECT
                 master_desa.IdKecamatanFK = '$IdKecamatan' AND
                 history_mutasi.Setting = 1
                 GROUP BY master_pegawai.JenKel");
-$DataJKP = mysqli_fetch_assoc($QJKP);
-$Perempuan = $DataJKP['JumlahJKP'] ?? 0;
+if ($QJKP && mysqli_num_rows($QJKP) > 0) {
+    $DataJKP = mysqli_fetch_assoc($QJKP);
+    $Perempuan = $DataJKP['JumlahJKP'] ?? 0;
+} else {
+    $Perempuan = 0;
+}
 
 // ===============================================
 // BAGIAN 4: HTML & CSS
@@ -753,9 +778,13 @@ $Perempuan = $DataJKP['JumlahJKP'] ?? 0;
         <!-- ============= -->
         <?php
         $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan ='$IdKecamatan' ");
-        $DataKecamatan = mysqli_fetch_assoc($QueryKecamatan);
-        $IdKecamatan = $DataKecamatan['IdKecamatan'];
-        $NamaKecamatan = $DataKecamatan['Kecamatan'];
+        if ($QueryKecamatan && mysqli_num_rows($QueryKecamatan) > 0) {
+            $DataKecamatan = mysqli_fetch_assoc($QueryKecamatan);
+            $IdKecamatan = $DataKecamatan['IdKecamatan'];
+            $NamaKecamatan = $DataKecamatan['Kecamatan'];
+        } else {
+            $NamaKecamatan = 'Trenggalek';
+        }
 
         ?>
         
@@ -887,8 +916,12 @@ $Perempuan = $DataJKP['JumlahJKP'] ?? 0;
                                         master_kecamatan.IdKecamatan
                                     ORDER BY
                                         master_kecamatan.Kecamatan ASC");
-                            $DataJumlah = mysqli_fetch_assoc($QueryJumlah);
-                            $IdKecamatan = $DataJumlah['IdKecamatanFK'];
+                            if ($QueryJumlah && mysqli_num_rows($QueryJumlah) > 0) {
+                                $DataJumlah = mysqli_fetch_assoc($QueryJumlah);
+                                $IdKecamatan = $DataJumlah['IdKecamatanFK'];
+                            } else {
+                                $IdKecamatan = $_SESSION['IdKecamatan'];
+                            }
                             $Kecamatan = $DataJumlah['Kecamatan'];
                             $Jumlah = $DataJumlah['JmlPerangkat'];
                             ?>
@@ -978,8 +1011,12 @@ $Perempuan = $DataJKP['JumlahJKP'] ?? 0;
                     WHERE
                         master_desa.IdKecamatanFK = '$IdKecamatan'");
 
-                            $DataJmlTotalBPD = mysqli_fetch_assoc($QueryJumlahBPD);
-                            $TotalBPDKab = $DataJmlTotalBPD['JmlBPD'];
+                            if ($QueryJumlahBPD && mysqli_num_rows($QueryJumlahBPD) > 0) {
+                                $DataJmlTotalBPD = mysqli_fetch_assoc($QueryJumlahBPD);
+                                $TotalBPDKab = $DataJmlTotalBPD['JmlBPD'];
+                            } else {
+                                $TotalBPDKab = 0;
+                            }
                             ?>
                             <tfoot>
                                 <tr align="right">

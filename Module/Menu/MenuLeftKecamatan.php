@@ -1,5 +1,5 @@
 <?php
-include "../App/Control/FunctionSessionKecamatan.php";
+include "../App/Control/FunctionSession.php";
 include "../App/Control/FunctionProfilePegawaiUserKecamatan.php";
 
 $pg = isset($_GET['pg']) ? $_GET['pg'] : '';

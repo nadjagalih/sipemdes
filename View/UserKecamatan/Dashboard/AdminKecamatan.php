@@ -634,6 +634,54 @@ $Perempuan = $DataJKP['JumlahJKP'] ?? 0;
 <div class="main-content">
     <div class="content-wrapper">
         <div class="container-fluid">
+            <!-- Profile Kecamatan Card -->
+            <div class="row">
+                <div class="col-md-7 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Sistem Informasi Pemerintahan Desa</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Profil Header Style -->
+                            <div class="profil-header" style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px;">
+                                <div class="profil-avatar" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                                    <img src="../Vendor/Media/Logo/Pria.png" alt="Foto Default Kecamatan" 
+                                         style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                
+                                <div class="profil-info" style="flex-grow: 1;">
+                                    <h1 style="margin: 0 0 5px 0; font-size: 1.8em; color: var(--purple-primary); font-weight: bold;">KECAMATAN <?php echo strtoupper($NamaKecamatanHeader); ?></h1>
+                                    <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #6c757d;">Administrator Kecamatan</p>
+                                </div>
+                            </div>
+
+                            <!-- Detail Area Style -->
+                            <div class="detail-area" style="border-top: 1px solid #dee2e6; padding-top: 20px;">
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Provinsi</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;">Jawa Timur</span>
+                                </div>
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Kabupaten</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;"><?php echo $Kabupaten; ?></span>
+                                </div>
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Kecamatan</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;"><?php echo $NamaKecamatanHeader; ?></span>
+                                </div>
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">No Telepon</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;">-</span>
+                                </div>
+                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
+                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Alamat Kantor</span>
+                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="row">
                 <div class="col-12 grid-margin stretch-card">

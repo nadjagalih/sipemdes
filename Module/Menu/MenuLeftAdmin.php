@@ -133,24 +133,9 @@ echo '<style>
         position: relative;
         overflow: hidden;
     }
-    .nav > li > a:before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(87deg, #0d6efd 0, #0b5ed7 100%);
-        opacity: 0;
-        transition: opacity 0.15s ease;
-        z-index: -1;
-    }
     .nav > li > a:hover, .nav > li > a:focus {
-        color: #fff;
-        background: transparent;
-    }
-    .nav > li > a:hover:before, .nav > li > a:focus:before {
-        opacity: 1;
+        color: #0d6efd !important;
+        background: rgba(13, 110, 253, 0.1) !important;
     }
     .sidebar-collapse .nav > li.active > a,
     .nav > li.active > a {
@@ -160,6 +145,7 @@ echo '<style>
         box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
         border-left: none !important;
         border: none !important;
+        border-radius: 0.5rem !important;
     }
     .nav > li > a i {
         margin-right: 0.75rem;
@@ -187,100 +173,150 @@ echo '<style>
     }
     
     .nav-second-level {
-        padding: 0.5rem 0.5rem 0.5rem 0.5rem;
-        margin: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        background: #f4f7fa;
-        border: 1px solid #e3e6ed;
-        box-shadow: 0 4px 16px rgba(50,50,93,.08);
+        padding: 0.75rem 0;
+        margin: 0.5rem 0.75rem;
+        border-radius: 0.75rem;
+        background: rgba(13, 110, 253, 0.1);
+        border: 1px solid rgba(13, 110, 253, 0.2);
+        box-shadow: 0 8px 25px rgba(13,110,253,0.1), 0 3px 10px rgba(13,110,253,0.05);
         visibility: hidden;
         opacity: 0;
         height: 0;
-        transform: translateY(-8px);
-        transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1), visibility 0s linear 0.25s, height 0s linear 0.25s;
+        transform: translateY(-15px) scale(0.95);
+        transition: opacity 0.3s cubic-bezier(.4,0,.2,1), transform 0.3s cubic-bezier(.4,0,.2,1), visibility 0s linear 0.3s, height 0s linear 0.3s;
         will-change: transform, opacity;
+        backdrop-filter: blur(15px);
+        position: relative;
+        overflow: hidden;
     }
     
     .nav-second-level.collapse.in {
         visibility: visible;
-        opacity: 1;
+        opacity: 0.95;
         height: auto;
-        transform: translateY(0);
-        transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+        transform: translateY(0) scale(1);
+        transition: opacity 0.3s cubic-bezier(.4,0,.2,1), transform 0.3s cubic-bezier(.4,0,.2,1);
     }
 
     .nav-second-level li {
         position: relative;
-        margin: 6px 0;
+        margin: 2px 8px;
+        border-radius: 0.5rem;
+        overflow: hidden;
     }
 
     .nav-second-level li:before {
         content: "";
         position: absolute;
-        left: 25px;
+        left: 0;
         top: 0;
         bottom: 0;
-        width: 2px;
-        background: linear-gradient(to bottom, transparent, #5e72e4, transparent);
-        opacity: 0.2;
+        width: 4px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        opacity: 0.3;
+        transition: opacity 0.3s ease;
+        border-radius: 0 2px 2px 0;
+    }
+
+    .nav-second-level li:hover:before {
+        opacity: 1;
     }
 
     .nav-second-level li a {
-        padding: 0.5rem 1.2rem 0.5rem 48px;
-        color: #5a6782;
+        padding: 0.75rem 1rem;
+        color: #0d6efd;
         display: block;
-        font-size: 0.95rem;
-        font-weight: 400;
-        transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(.4,0,.2,1);
         position: relative;
-        border-radius: 0.35rem;
+        border-radius: 0.5rem;
+        margin: 2px 0;
     }
 
     .nav-second-level li a:before {
-        content: "";
-        position: absolute;
-        left: 28px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #cbd5e0;
-        transition: all .18s;
-        box-shadow: 0 0 0 0 rgba(94,114,228,0.18);
+        display: none;
     }
 
     .nav-second-level li a:hover {
-        color: #0d6efd;
-        background: #e7f1ff;
-        box-shadow: 0 2px 8px rgba(13,110,253,0.07);
-        padding-left: 52px;
+        color: #fff;
+        background: rgba(13, 110, 253, 0.7);
+        box-shadow: 0 4px 12px rgba(13,110,253,0.15);
+        transform: translateX(4px);
     }
 
-    .nav-second-level li a:hover:before {
-        background: #0d6efd;
-        width: 9px;
-        height: 9px;
-        box-shadow: 0 0 0 4px rgba(13,110,253,0.18);
-    }
+
 
     .sidebar-collapse .nav-second-level li.active a,
     .nav-second-level li.active a {
-        color: #0d6efd !important;
-        background: #e7f1ff !important;
-        background-color: #e7f1ff !important;
+        color: #fff !important;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
         font-weight: 600 !important;
-        box-shadow: 0 2px 8px rgba(13,110,253,0.09) !important;
+        box-shadow: 0 4px 15px rgba(13,110,253,0.3) !important;
         border-left: none !important;
         border: none !important;
+        transform: translateX(4px) !important;
+        border-radius: 0.5rem !important;
     }
 
-    .sidebar-collapse .nav-second-level li.active a:before,
-    .nav-second-level li.active a:before {
-        background: #0d6efd !important;
-        width: 9px !important;
-        height: 9px !important;
-        box-shadow: 0 0 0 4px rgba(13,110,253,0.18) !important;
+
+    
+    /* Reset all menu items to default state */
+    .nav > li > a {
+        background: transparent !important;
+        color: #525f7f !important;
+        border-radius: 0.375rem;
+        margin: 2px 8px;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Override for active items */
+    .nav > li.active > a {
+        color: #fff !important;
+        background: linear-gradient(87deg, #0d6efd 0, #0b5ed7 100%) !important;
+        box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
+    }
+    
+    .nav-second-level li a {
+        background: transparent !important;
+        color: #495057 !important;
+    }
+    
+    .nav-second-level li.active a {
+        color: #fff !important;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+    }
+    
+    /* Force reset all menu items */
+    .nav li {
+        background: transparent !important;
+    }
+    
+    .nav > li > a:hover,
+    .nav > li > a:focus {
+        background: rgba(13, 110, 253, 0.6) !important;
+        color: #fff !important;
+    }
+    
+    /* Active state overrides */
+    .nav > li.active > a,
+    .nav > li.active > a:hover,
+    .nav > li.active > a:focus {
+        color: #fff !important;
+        background: linear-gradient(87deg, #0d6efd 0, #0b5ed7 100%) !important;
+        box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
+    }
+    
+    .nav-second-level li.active a,
+    .nav-second-level li.active a:hover,
+    .nav-second-level li.active a:focus {
+        color: #fff !important;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 15px rgba(13,110,253,0.3) !important;
+        transform: translateX(4px) !important;
     }
     
     .badge-notif {
@@ -292,11 +328,22 @@ echo '<style>
         margin-left: 5px;
     }
     .special_link a {
-        background: #f5365c !important;
+        background: linear-gradient(87deg, #f5365c 0, #dc3545 100%) !important;
         color: #fff !important;
+        box-shadow: 0 4px 6px rgba(245,54,92,.11), 0 1px 3px rgba(0,0,0,.08) !important;
+        border-radius: 0.5rem !important;
+        margin: 2px 8px !important;
+        font-weight: 500 !important;
     }
     .special_link a i {
         color: #fff !important;
+    }
+    .special_link a:hover,
+    .special_link a:focus {
+        background: linear-gradient(87deg, #dc3545 0, #c82333 100%) !important;
+        color: #fff !important;
+        box-shadow: 0 6px 10px rgba(245,54,92,.2), 0 2px 5px rgba(0,0,0,.1) !important;
+        transform: translateY(-1px) !important;
     }
     
     /* Override final untuk memastikan tidak ada warna hijau */
@@ -543,3 +590,38 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
     </ul>
 
 </div>
+
+<script>
+$(document).ready(function() {
+    // Handle menu item clicks
+    $('.nav > li > a').click(function(e) {
+        var $this = $(this);
+        var $parent = $this.parent();
+        
+        // If this is not a dropdown toggle
+        if (!$this.find('.fa.arrow').length) {
+            // Remove all active classes
+            $('.nav > li').removeClass('active');
+            $('.nav-second-level li').removeClass('active');
+            
+            // Add active to current item
+            $parent.addClass('active');
+        }
+    });
+    
+    // Handle submenu item clicks
+    $('.nav-second-level li a').click(function(e) {
+        var $this = $(this);
+        var $subParent = $this.parent();
+        var $mainParent = $this.closest('.nav > li');
+        
+        // Remove all active classes
+        $('.nav > li').removeClass('active');
+        $('.nav-second-level li').removeClass('active');
+        
+        // Add active to main parent and submenu item
+        $mainParent.addClass('active');
+        $subParent.addClass('active');
+    });
+});
+</script>

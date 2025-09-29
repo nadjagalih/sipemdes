@@ -526,6 +526,10 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
             </ul>
         </li>
 
+        <li class="<?php echo ($_GET['pg'] == 'SettingProfileDesa') ? 'active' : ''; ?>">
+            <a href="?pg=SettingProfileDesa"><i class="fa fa-wrench"></i> <span class="nav-label">Setting</span></a>
+        </li>
+
         <li class="<?php echo ($_GET['pg'] == 'FileViewDesa') ? 'active' : ''; ?>">
             <a href="?pg=FileViewDesa"><i class="fa fa-upload"></i> <span class="nav-label">Upload File</span></a>
         </li>

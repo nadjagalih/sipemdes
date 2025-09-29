@@ -323,6 +323,11 @@ if ($_GET['pg'] == 'UserResetAdminDesa') {
     include "AdminDesa/User/UserReset.php";
 }
 
+//SETTING KOORDINAT DESA
+if ($_GET['pg'] == 'SettingProfileDesa') {
+    include "AdminDesa/ProfileDesa/SettingProfile.php";
+}
+
 //PEGAWAI DESA
 if ($_GET['pg'] == 'PegawaiViewAllAdminDesa') {
     include "AdminDesa/Pegawai/PegawaiViewAll.php";

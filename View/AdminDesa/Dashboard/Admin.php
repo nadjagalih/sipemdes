@@ -34,24 +34,40 @@ master_pegawai.IdPegawaiFK,
 master_pegawai.IdDesaFK,
 master_desa.IdDesa,
 master_desa.NamaDesa,
+master_desa.NoTelepon,
+master_desa.alamatDesa,
+master_desa.Latitude,
+master_desa.Longitude,
 master_desa.IdKecamatanFK,
 master_kecamatan.IdKecamatan,
-master_kecamatan.Kecamatan
+master_kecamatan.Kecamatan,
+master_setting_profile_dinas.Kabupaten
 FROM
 main_user
 INNER JOIN master_pegawai ON main_user.IdPegawai = master_pegawai.IdPegawaiFK
 INNER JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
 INNER JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
+LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile
 WHERE master_pegawai.IdDesaFK = '$IdDesa' ");
 if ($QHeader && mysqli_num_rows($QHeader) > 0) {
     $DataHeader = mysqli_fetch_assoc($QHeader);
     $NamaDesaHeader = $DataHeader['NamaDesa'];
     $NamaKecamatanHeader = $DataHeader['Kecamatan'];
     $IdDesaHeader = $DataHeader['IdDesaFK'];
+    $NoTelepon = $DataHeader['NoTelepon'];
+    $alamatDesa = $DataHeader['alamatDesa'];
+    $Latitude = $DataHeader['Latitude'];
+    $Longitude = $DataHeader['Longitude'];
+    $Kabupaten = $DataHeader['Kabupaten'] ?? "Data Tidak Ditemukan";
 } else {
     $NamaDesaHeader = "Data Tidak Ditemukan";
     $NamaKecamatanHeader = "Data Tidak Ditemukan";
     $IdDesaHeader = $IdDesa; // fallback ke session ID
+    $NoTelepon = "Data Tidak Ditemukan";
+    $alamatDesa = "Data Tidak Ditemukan";
+    $Latitude = null;
+    $Longitude = null;
+    $Kabupaten = "Data Tidak Ditemukan";
 }
 
 $QueryPerangkat = mysqli_query($db, "SELECT
@@ -237,6 +253,10 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
 <link href="../Assets/argon/argon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
     :root {
@@ -570,6 +590,61 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             font-size: 1.5rem;
         }
     }
+    
+    /* Map Styles */
+    .map-container {
+        height: 300px;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+    
+    #desaMap {
+        height: 100% !important;
+        width: 100% !important;
+    }
+    
+    /* Card fixes */
+    .stretch-card .card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .stretch-card .card .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .leaflet-popup-content {
+        font-family: 'Ubuntu', sans-serif !important;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
+    .leaflet-popup-content-wrapper {
+        background: white;
+        color: var(--text-dark);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+    }
+    
+    .leaflet-popup-tip {
+        background: white;
+    }
+    
+    /* Map button styling */
+    .card-header .btn-sm {
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .card-header .btn-sm:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
 </style>
 
 <script>
@@ -603,47 +678,92 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
         <div class="container-fluid">
             <!-- Organization Info Card - Moved to Top -->
             <div class="row">
-                <div class="col-md-7 grid-margin stretch-card">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Sistem Informasi Pemerintahan Desa</h4>
+                <div class="col-md-5 grid-margin stretch-card">
+                    <div class="card" style="height: 300px;">
+                        <div class="card-header" style="padding: 15px;">
+                            <h4 class="card-title" style="font-size: 1.1rem; margin: 0;">Sistem Informasi Pemerintahan Desa</h4>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="padding: 15px; height: calc(100% - 60px);">
                             <!-- Profil Header Style -->
-                            <div class="profil-header" style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px;">
-                                <div class="profil-avatar" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                            <div class="profil-header" style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
+                                <div class="profil-avatar" style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); flex-shrink: 0;">
                                     <img src="<?php echo $FotoKepDesa; ?>" alt="Foto Kepala Desa" 
                                          style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
                                 
-                                <div class="profil-info" style="flex-grow: 1;">
-                                    <h1 style="margin: 0 0 5px 0; font-size: 1.8em; color: var(--purple-primary); font-weight: bold;"><?php echo $NamaKepDesa; ?></h1>
-                                    <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #6c757d;">Kepala Desa</p>
+                                <div class="profil-info" style="flex-grow: 1; min-width: 0;">
+                                    <h1 style="margin: 0 0 5px 0; font-size: 1.4em; color: var(--purple-primary); font-weight: bold; line-height: 1.2;"><?php echo $NamaKepDesa; ?></h1>
+                                    <p style="margin: 0 0 10px 0; font-size: 0.9em; color: #6c757d;">Kepala Desa</p>
                                 </div>
                             </div>
 
-                            <!-- Detail Area Style -->
-                            <div class="detail-area" style="border-top: 1px solid #dee2e6; padding-top: 20px;">
-                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
-                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Provinsi</span>
-                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;">Jawa Timur</span>
+                            <!-- Detail Area Style with 2 Column Layout -->
+                            <div class="detail-area" style="border-top: 1px solid #dee2e6; padding-top: 15px;">
+                                <div style="display: flex; gap: 20px;">
+                                    <!-- Kolom Kiri: Wilayah -->
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
+                                            <span class="detail-label" style="width: 80px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Provinsi</span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;">Jawa Timur</span>
+                                        </div>
+                                        <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
+                                            <span class="detail-label" style="width: 80px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Kabupaten</span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;"><?php echo $Kabupaten; ?></span>
+                                        </div>
+                                        <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
+                                            <span class="detail-label" style="width: 80px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Kecamatan</span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;"><?php echo $NamaKecamatanHeader; ?></span>
+                                        </div>
+                                        <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
+                                            <span class="detail-label" style="width: 80px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Desa</span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;"><?php echo $NamaDesaHeader; ?></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Kolom Kanan: Kontak -->
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
+                                            <span class="detail-label" style="width: 70px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Telepon</span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;"><?php echo $NoTelepon; ?></span>
+                                        </div>
+                                        <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: flex-start;">
+                                            <span class="detail-label" style="width: 70px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0; margin-top: 2px;">Alamat</span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em; line-height: 1.4;" title="<?php echo $alamatDesa; ?>"><?php echo $alamatDesa; ?></span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
-                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Kabupaten</span>
-                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;"><?php echo $Kabupaten; ?></span>
-                                </div>
-                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
-                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Kecamatan</span>
-                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;"><?php echo $NamaKecamatanHeader; ?></span>
-                                </div>
-                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
-                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Desa</span>
-                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;"><?php echo $NamaDesaHeader; ?></span>
-                                </div>
-                                <div class="detail-baris" style="display: flex; padding: 8px 0; align-items: center;">
-                                    <span class="detail-label" style="width: 150px; color: #6c757d; font-weight: bold; font-size: 0.95em;">Alamat</span>
-                                    <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500;">-</span>
-                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map Card - Added next to Organization Info -->
+                <div class="col-md-7 grid-margin stretch-card">
+                    <div class="card" style="height: 300px;">
+                        <div class="card-header" style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 class="card-title" style="font-size: 1.1rem; margin: 0;">Peta Wilayah Desa</h4>
+                                <p class="card-subtitle" style="font-size: 0.85rem; color: #666; margin: 5px 0 0 0;">
+                                    Lokasi geografis <?php echo $NamaDesaHeader; ?>
+                                    <?php if (empty($Latitude) || empty($Longitude)): ?>
+                                    <span style="color: #ffc107; font-weight: 500;"> - Koordinat belum diset</span>
+                                    <?php else: ?>
+                                    <span style="color: #28a745; font-weight: 500;"> - Koordinat aktual</span>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                            <?php if (empty($Latitude) || empty($Longitude)): ?>
+                            <a href="../../v.php?pg=SettingProfileDesa" 
+                               class="btn btn-warning btn-sm" 
+                               style="border-radius: 20px; padding: 6px 15px; font-size: 11px; font-weight: 600;"
+                               title="Atur koordinat desa">
+                                <i class="fas fa-cog"></i> Set Koordinat
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                        <div class="card-body" style="padding: 0; height: calc(100% - 80px);">
+                            <div class="map-container" style="height: 100%; border-radius: 0;">
+                                <div id="desaMap"></div>
                             </div>
                         </div>
                     </div>
@@ -1244,5 +1364,105 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                 },
             <?php } ?>
         ]
+    });
+</script>
+
+<!-- Leaflet Map Script -->
+<script>
+    // Initialize the map after the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Koordinat dari database atau default jika belum diset
+        var desaLat = <?php echo !empty($Latitude) ? $Latitude : '-8.055'; ?>;
+        var desaLng = <?php echo !empty($Longitude) ? $Longitude : '111.715'; ?>;
+        var hasCoordinates = <?php echo (!empty($Latitude) && !empty($Longitude)) ? 'true' : 'false'; ?>;
+        
+        // Center on desa coordinates or default
+        var map = L.map('desaMap').setView([desaLat, desaLng], hasCoordinates ? 15 : 12);
+        
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        
+        // Tambahkan marker desa (menggunakan marker default seperti di SettingProfile.php)
+        var desaMarker = L.marker([desaLat, desaLng], {
+            draggable: false // Tidak bisa di-drag di dashboard
+        }).addTo(map);
+        
+        // Status koordinat
+        var statusBadge = hasCoordinates 
+            ? '<span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;"><i class="fas fa-check-circle"></i> Koordinat Aktual</span>'
+            : '<span style="background: #ffc107; color: #333; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Koordinat Default</span>';
+        
+        // Info popup
+        var popupContent = `
+            <div style="text-align: center; min-width: 220px; font-family: 'Ubuntu', sans-serif;">
+                <div style="background: linear-gradient(135deg, #6f42c1, #5a34a3); color: white; margin: -10px -10px 15px -10px; padding: 15px; border-radius: 8px 8px 0 0;">
+                    <h5 style="margin: 0; font-weight: 600;"><i class="fas fa-home"></i> <?php echo htmlspecialchars($NamaDesaHeader); ?></h5>
+                </div>
+                
+                <div style="padding: 0 5px;">
+                    <p style="margin: 5px 0; font-size: 13px; color: #666;"><i class="fas fa-map"></i> Kec. <?php echo htmlspecialchars($NamaKecamatanHeader); ?></p>
+                    <p style="margin: 5px 0; font-size: 13px; color: #666;"><i class="fas fa-building"></i> Kab. <?php echo htmlspecialchars($Kabupaten); ?></p>
+                    
+                    <?php if (!empty($alamatDesa)): ?>
+                    <p style="margin: 8px 0; font-size: 12px; color: #555; font-style: italic; line-height: 1.4;">
+                        <i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($alamatDesa); ?>
+                    </p>
+                    <?php endif; ?>
+                    
+                    <?php if (!empty($NoTelepon)): ?>
+                    <p style="margin: 5px 0; font-size: 12px; color: #555;">
+                        <i class="fas fa-phone"></i> <?php echo htmlspecialchars($NoTelepon); ?>
+                    </p>
+                    <?php endif; ?>
+                    
+                    <hr style="margin: 12px 0; border: none; border-top: 1px solid #eee;">
+                    
+                    <div style="margin: 10px 0;">
+                        ${statusBadge}
+                    </div>
+                    
+                    <p style="margin: 8px 0; font-size: 11px; color: #888;">
+                        Koordinat: ${desaLat.toFixed(6)}, ${desaLng.toFixed(6)}
+                    </p>
+                    
+                    ${!hasCoordinates ? 
+                        '<p style="margin: 10px 0; font-size: 11px; color: #dc3545; font-style: italic;"><i class="fas fa-info-circle"></i> Silakan set koordinat di Setting Profile</p>' : 
+                        '<p style="margin: 10px 0; font-size: 11px; color: #28a745; font-style: italic;"><i class="fas fa-check"></i> Koordinat sudah diatur</p>'
+                    }
+                </div>
+            </div>
+        `;
+        
+        desaMarker.bindPopup(popupContent);
+        
+        // Auto buka popup jika koordinat belum diset
+        if (!hasCoordinates) {
+            desaMarker.openPopup();
+        }
+        
+        // Optional: Add click event to map
+        map.on('click', function(e) {
+            console.log('Map clicked at: ' + e.latlng);
+        });
+        
+        // Disable map interaction on mobile for better scrolling
+        if (window.innerWidth < 768) {
+            map.dragging.disable();
+            map.touchZoom.disable();
+            map.doubleClickZoom.disable();
+            map.scrollWheelZoom.disable();
+            map.boxZoom.disable();
+            map.keyboard.disable();
+            
+            // Tambahkan pesan untuk mobile
+            map.on('click', function(e) {
+                if (!hasCoordinates) {
+                    alert('Untuk mengatur koordinat desa, silakan buka Setting Profile melalui menu.');
+                }
+            });
+        }
     });
 </script>

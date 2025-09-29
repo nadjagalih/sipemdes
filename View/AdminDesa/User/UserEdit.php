@@ -55,23 +55,6 @@ include "../App/Control/FunctionPegawaiEdit.php";
             <div class="ibox ">
                 <div class="ibox-title">
                     <h5>Form Edit User</h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#" class="dropdown-item">Config option 1</a>
-                            </li>
-                            <li><a href="#" class="dropdown-item">Config option 2</a>
-                            </li>
-                        </ul>
-                        <a class="close-link">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcUserAdminDesa?Act=Edit" method="POST" enctype="multipart/form-data">
@@ -124,7 +107,7 @@ include "../App/Control/FunctionPegawaiEdit.php";
                         <div class="form-group row">
                             <div class="col-lg-offset-2 col-lg-10">
                                 <?php if ($EditStatus == 0 and $EditSetting == 0) { ?>
-                                    <a href="?pg=UserView" class="btn btn-success ">Batal</a>
+                                    <a href="?pg=UserViewAdminDesa" class="btn btn-success ">Batal</a>
                                 <?php } else { ?>
                                     <button class="btn btn-primary" type="submit" name="Edit" id="Edit">Save</button>
                                     <a href="?pg=UserViewAdminDesa" class="btn btn-success ">Batal</a>

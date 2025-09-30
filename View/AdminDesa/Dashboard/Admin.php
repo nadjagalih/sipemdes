@@ -708,15 +708,39 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                                         </div>
                                         <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
                                             <span class="detail-label" style="width: 80px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Kabupaten</span>
-                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;"><?php echo $Kabupaten; ?></span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: <?php echo ($Kabupaten == 'Data Tidak Ditemukan' || empty($Kabupaten)) ? '#ffc107' : '#343a40'; ?>; font-weight: 500; font-size: 0.85em; <?php echo ($Kabupaten == 'Data Tidak Ditemukan' || empty($Kabupaten)) ? 'font-style: italic;' : ''; ?>">
+                                                <?php 
+                                                if ($Kabupaten == 'Data Tidak Ditemukan' || empty($Kabupaten)) {
+                                                    echo 'Belum di set';
+                                                } else {
+                                                    echo $Kabupaten;
+                                                }
+                                                ?>
+                                            </span>
                                         </div>
                                         <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
                                             <span class="detail-label" style="width: 80px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Kecamatan</span>
-                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;"><?php echo $NamaKecamatanHeader; ?></span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: <?php echo ($NamaKecamatanHeader == 'Data Tidak Ditemukan' || empty($NamaKecamatanHeader)) ? '#ffc107' : '#343a40'; ?>; font-weight: 500; font-size: 0.85em; <?php echo ($NamaKecamatanHeader == 'Data Tidak Ditemukan' || empty($NamaKecamatanHeader)) ? 'font-style: italic;' : ''; ?>">
+                                                <?php 
+                                                if ($NamaKecamatanHeader == 'Data Tidak Ditemukan' || empty($NamaKecamatanHeader)) {
+                                                    echo 'Belum di set';
+                                                } else {
+                                                    echo $NamaKecamatanHeader;
+                                                }
+                                                ?>
+                                            </span>
                                         </div>
                                         <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
                                             <span class="detail-label" style="width: 80px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Desa</span>
-                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;"><?php echo $NamaDesaHeader; ?></span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: <?php echo ($NamaDesaHeader == 'Data Tidak Ditemukan' || empty($NamaDesaHeader)) ? '#ffc107' : '#343a40'; ?>; font-weight: 500; font-size: 0.85em; <?php echo ($NamaDesaHeader == 'Data Tidak Ditemukan' || empty($NamaDesaHeader)) ? 'font-style: italic;' : ''; ?>">
+                                                <?php 
+                                                if ($NamaDesaHeader == 'Data Tidak Ditemukan' || empty($NamaDesaHeader)) {
+                                                    echo 'Belum di set';
+                                                } else {
+                                                    echo $NamaDesaHeader;
+                                                }
+                                                ?>
+                                            </span>
                                         </div>
                                     </div>
                                     
@@ -724,11 +748,27 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                                     <div style="flex: 1; min-width: 0;">
                                         <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
                                             <span class="detail-label" style="width: 70px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Telepon</span>
-                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;"><?php echo $NoTelepon; ?></span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: <?php echo ($NoTelepon == 'Data Tidak Ditemukan' || empty($NoTelepon)) ? '#ffc107' : '#343a40'; ?>; font-weight: 500; font-size: 0.85em; <?php echo ($NoTelepon == 'Data Tidak Ditemukan' || empty($NoTelepon)) ? 'font-style: italic;' : ''; ?>">
+                                                <?php 
+                                                if ($NoTelepon == 'Data Tidak Ditemukan' || empty($NoTelepon)) {
+                                                    echo 'Belum di set';
+                                                } else {
+                                                    echo $NoTelepon;
+                                                }
+                                                ?>
+                                            </span>
                                         </div>
                                         <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: flex-start;">
                                             <span class="detail-label" style="width: 70px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0; margin-top: 2px;">Alamat</span>
-                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em; line-height: 1.4;" title="<?php echo $alamatDesa; ?>"><?php echo $alamatDesa; ?></span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: <?php echo ($alamatDesa == 'Data Tidak Ditemukan' || empty($alamatDesa)) ? '#ffc107' : '#343a40'; ?>; font-weight: 500; font-size: 0.85em; line-height: 1.4; <?php echo ($alamatDesa == 'Data Tidak Ditemukan' || empty($alamatDesa)) ? 'font-style: italic;' : ''; ?>" title="<?php echo ($alamatDesa == 'Data Tidak Ditemukan' || empty($alamatDesa)) ? 'Belum di set' : $alamatDesa; ?>">
+                                                <?php 
+                                                if ($alamatDesa == 'Data Tidak Ditemukan' || empty($alamatDesa)) {
+                                                    echo 'Belum di set';
+                                                } else {
+                                                    echo $alamatDesa;
+                                                }
+                                                ?>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -746,18 +786,18 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                                 <p class="card-subtitle" style="font-size: 0.85rem; color: #666; margin: 5px 0 0 0;">
                                     Lokasi geografis <?php echo $NamaDesaHeader; ?>
                                     <?php if (empty($Latitude) || empty($Longitude)): ?>
-                                    <span style="color: #ffc107; font-weight: 500;"> - Koordinat belum diset</span>
+                                    <span style="color: #ffc107; font-weight: 500;"> - Alamat Desa belum diset</span>
                                     <?php else: ?>
                                     <span style="color: #28a745; font-weight: 500;"> - Koordinat aktual</span>
                                     <?php endif; ?>
                                 </p>
                             </div>
                             <?php if (empty($Latitude) || empty($Longitude)): ?>
-                            <a href="../../v.php?pg=SettingProfileDesa" 
+                            <a href="v?pg=SettingProfileDesa" 
                                class="btn btn-warning btn-sm" 
                                style="border-radius: 20px; padding: 6px 15px; font-size: 11px; font-weight: 600;"
                                title="Atur koordinat desa">
-                                <i class="fas fa-cog"></i> Set Koordinat
+                                <i class="fas fa-cog"></i> Set Alamat
                             </a>
                             <?php endif; ?>
                         </div>
@@ -1398,7 +1438,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
         // Info popup
         var popupContent = `
             <div style="text-align: center; min-width: 220px; font-family: 'Ubuntu', sans-serif;">
-                <div style="background: linear-gradient(135deg, #6f42c1, #5a34a3); color: white; margin: -10px -10px 15px -10px; padding: 15px; border-radius: 8px 8px 0 0;">
+                <div style="background: linear-gradient(135deg, #6f42c1, #5a34a3); color: white; margin: 8px 10px 15px 8px; padding: 15px; border-radius: 8px 8px 0 0;">
                     <h5 style="margin: 0; font-weight: 600;"><i class="fas fa-home"></i> <?php echo htmlspecialchars($NamaDesaHeader); ?></h5>
                 </div>
                 
@@ -1429,7 +1469,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                     </p>
                     
                     ${!hasCoordinates ? 
-                        '<p style="margin: 10px 0; font-size: 11px; color: #dc3545; font-style: italic;"><i class="fas fa-info-circle"></i> Silakan set koordinat di Setting Profile</p>' : 
+                        '<p style="margin: 10px 0; font-size: 11px; color: #dc3545; font-style: italic;"><i class="fas fa-info-circle"></i> Silakan set alamat desa di menu Setting</p>' : 
                         '<p style="margin: 10px 0; font-size: 11px; color: #28a745; font-style: italic;"><i class="fas fa-check"></i> Koordinat sudah diatur</p>'
                     }
                 </div>
@@ -1460,7 +1500,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             // Tambahkan pesan untuk mobile
             map.on('click', function(e) {
                 if (!hasCoordinates) {
-                    alert('Untuk mengatur koordinat desa, silakan buka Setting Profile melalui menu.');
+                    alert('Untuk mengatur koordinat desa, silakan buka Setting melalui menu.');
                 }
             });
         }

@@ -267,7 +267,7 @@ if (isset($_GET['alert'])) {
     }
 
     .search-button-external {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        background: #1c84c6;
         border-radius: 0 25px 25px 0;
         border: 2px solid #007bff;
         border-left: none;
@@ -279,7 +279,7 @@ if (isset($_GET['alert'])) {
     }
 
     .search-button-external:hover {
-        background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+        background: #0056b3;
         border-color: #0056b3;
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);

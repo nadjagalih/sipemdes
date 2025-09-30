@@ -280,6 +280,8 @@ echo '<style>
         transform: translateX(4px);
     }
 
+
+
     .sidebar-collapse .nav-second-level li.active a,
     .nav-second-level li.active a {
         color: #fff !important;
@@ -291,6 +293,66 @@ echo '<style>
         transform: translateX(4px) !important;
         border-radius: 0.5rem !important;
     }
+
+
+    
+    /* Reset all menu items to default state */
+    .nav > li > a {
+        background: transparent !important;
+        color: #525f7f !important;
+        border-radius: 0.375rem;
+        margin: 2px 8px;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Override for active items */
+    .nav > li.active > a {
+        color: #fff !important;
+        background: linear-gradient(87deg, #0d6efd 0, #0b5ed7 100%) !important;
+        box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
+    }
+    
+    .nav-second-level li a {
+        background: transparent !important;
+        color: #495057 !important;
+    }
+    
+    .nav-second-level li.active a {
+        color: #fff !important;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+    }
+    
+    /* Force reset all menu items */
+    .nav li {
+        background: transparent !important;
+    }
+    
+    .nav > li > a:hover,
+    .nav > li > a:focus {
+        background: rgba(13, 110, 253, 0.6) !important;
+        color: #fff !important;
+    }
+    
+    /* Active state overrides */
+    .nav > li.active > a,
+    .nav > li.active > a:hover,
+    .nav > li.active > a:focus {
+        color: #fff !important;
+        background: linear-gradient(87deg, #0d6efd 0, #0b5ed7 100%) !important;
+        box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
+    }
+    
+    .nav-second-level li.active a,
+    .nav-second-level li.active a:hover,
+    .nav-second-level li.active a:focus {
+        color: #fff !important;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 15px rgba(13,110,253,0.3) !important;
+        transform: translateX(4px) !important;
+    }
     
     .badge-notif {
         background: #f5365c;
@@ -300,23 +362,13 @@ echo '<style>
         border-radius: 4px;
         margin-left: 5px;
     }
+
     .special_link a {
-        background: linear-gradient(87deg, #f5365c 0, #dc3545 100%) !important;
+        background: #f5365c !important;
         color: #fff !important;
-        box-shadow: 0 4px 6px rgba(245,54,92,.11), 0 1px 3px rgba(0,0,0,.08) !important;
-        border-radius: 0.5rem !important;
-        margin: 2px 8px !important;
-        font-weight: 500 !important;
     }
     .special_link a i {
         color: #fff !important;
-    }
-    .special_link a:hover,
-    .special_link a:focus {
-        background: linear-gradient(87deg, #dc3545 0, #c82333 100%) !important;
-        color: #fff !important;
-        box-shadow: 0 6px 10px rgba(245,54,92,.2), 0 2px 5px rgba(0,0,0,.1) !important;
-        transform: translateY(-1px) !important;
     }
     
     /* Override final untuk memastikan tidak ada warna hijau */

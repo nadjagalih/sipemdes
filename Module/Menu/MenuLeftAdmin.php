@@ -327,23 +327,13 @@ echo '<style>
         border-radius: 4px;
         margin-left: 5px;
     }
+
     .special_link a {
-        background: linear-gradient(87deg, #f5365c 0, #dc3545 100%) !important;
+        background: #f5365c !important;
         color: #fff !important;
-        box-shadow: 0 4px 6px rgba(245,54,92,.11), 0 1px 3px rgba(0,0,0,.08) !important;
-        border-radius: 0.5rem !important;
-        margin: 2px 8px !important;
-        font-weight: 500 !important;
     }
     .special_link a i {
         color: #fff !important;
-    }
-    .special_link a:hover,
-    .special_link a:focus {
-        background: linear-gradient(87deg, #dc3545 0, #c82333 100%) !important;
-        color: #fff !important;
-        box-shadow: 0 6px 10px rgba(245,54,92,.2), 0 2px 5px rgba(0,0,0,.1) !important;
-        transform: translateY(-1px) !important;
     }
     
     /* Override final untuk memastikan tidak ada warna hijau */
@@ -552,7 +542,7 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
         <!--
         <li class="<?php echo ($_GET['pg'] == 'ReportBPDAdminDesa') ? 'active' : ''; ?>">
             <a href="?pg=ReportBPDAdminDesa"><i class="fa fa-print"></i> <span class="nav-label">Laporan BPD</span></a>
-            <!-- <ul class="nav nav-second-level collapse">
+            <ul class="nav nav-second-level collapse">
                 <li><a href="">BPD</a></li>
             </ul>
         </li>
@@ -582,7 +572,7 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
         </li>
 
         <li class="<?php echo ($_GET['pg'] == 'Pass') ? 'active' : ''; ?>">
-            <a href="?pg=Pass"><i class="fa fa-terminal"></i> <span class="nav-label">Ganti Password</span></a>
+            <a href="?pg=Pass"><i class="fa fa-key"></i> <span class="nav-label">Ganti Password</span></a>
         </li>
         <li class="special_link">
             <a href="../Auth/SignOut"><i class="fa fa-power-off"></i> <span class="nav-label">Keluar</span></a>

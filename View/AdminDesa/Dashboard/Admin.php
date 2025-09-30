@@ -926,21 +926,6 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                     </div>
                 </div>
             </div>
-
-            <!-- BPD Statistics Row -->
-            <div class="row">
-                <div class="col-12 grid-margin stretch-card">
-                    <div class="card chart-card">
-                        <div class="card-header">
-                            <h4 class="card-title">Statistik Badan Permusyawaratan Desa (BPD)</h4>
-                            <p class="card-subtitle">Overview anggota BPD per desa</p>
-                        </div>
-                        <div class="card-body">
-                            <div id="StatistikBPD" style="height: 350px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

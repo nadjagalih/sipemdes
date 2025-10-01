@@ -1,6 +1,6 @@
 <?php
 // ===============================================
-// BAGIAN 1: ALERT NOTIFICATIONS
+// ALERT NOTIFICATIONS
 // ===============================================
 if (empty($_GET['alert'])) {
     echo "";
@@ -26,9 +26,6 @@ if (empty($_GET['alert'])) {
           </script>";
 }
 
-// ===============================================
-// BAGIAN 2: INCLUDES & VARIABLES
-// ===============================================
 include "../App/Control/FunctionProfileDinasView.php";
 include "../App/Control/FunctionProfilePegawaiUser.php";
 
@@ -36,7 +33,7 @@ $IdKecamatan = $_SESSION['IdKecamatan'];
 $TglSaatIni = date('d-m-Y');
 
 // ===============================================
-// BAGIAN 3: DATABASE QUERIES
+// DATABASE QUERIES
 // ===============================================
 
 // Query 1: Data Header Kecamatan dengan join ke kabupaten
@@ -166,9 +163,6 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
     $Perempuan = 0;
 }
 
-// ===============================================
-// BAGIAN 4: HTML & CSS
-// ===============================================
 ?>
 
 <!-- Purple Theme Assets -->
@@ -653,7 +647,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- =============================================== -->
-<!-- BAGIAN 5: HTML LAYOUT & CONTENT -->
+<!-- HTML LAYOUT & CONTENT -->
 <!-- =============================================== -->
 
 <div class="main-content">
@@ -789,7 +783,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
         ?>
         
         <!-- =============================================== -->
-        <!-- BAGIAN 6: TABEL DATA PERANGKAT DESA -->
+        <!-- TABEL DATA PERANGKAT DESA -->
         <!-- =============================================== -->
         <div class="ibox-content">
             <h2><strong>Data Kecamatan <?php echo $NamaKecamatan; ?></strong></h2>
@@ -1098,7 +1092,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </div>
 
 <!-- =============================================== -->
-<!-- BAGIAN 7: JAVASCRIPT CHARTS -->
+<!-- JAVASCRIPT CHARTS -->
 <!-- =============================================== -->
 
 <!-- Chart 1: Grafik Perangkat Desa per Kecamatan -->

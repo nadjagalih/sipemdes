@@ -6,6 +6,7 @@ master_desa.KodeDesa,
 master_desa.NamaDesa,
 master_desa.IdKecamatanFK,
 master_desa.IdKabupatenFK,
+master_desa.AlamatDesa,
 master_kecamatan.IdKecamatan,
 master_kecamatan.Kecamatan,
 master_setting_profile_dinas.IdKabupatenProfile,
@@ -23,14 +24,15 @@ while ($DataDesa = mysqli_fetch_assoc($QueryDesa)) {
     $Desa = $DataDesa['NamaDesa'];
     $Kecamatan = $DataDesa['Kecamatan'];
     $Kabupaten = $DataDesa['Kabupaten'];
+    $AlamatDesa = $DataDesa['AlamatDesa'];
 ?>
     <tr class="gradeX">
         <td>
             <?php echo $Nomor; ?>
         </td>
-        <td>
+        <!--<td>
             <?php echo $KodeDesa; ?>
-        </td>
+        </td>-->
         <td>
             <?php echo $Desa; ?>
         </td>
@@ -39,6 +41,13 @@ while ($DataDesa = mysqli_fetch_assoc($QueryDesa)) {
         </td>
         <td>
             <?php echo $Kabupaten; ?>
+        </td>
+        <td>
+            <?php if ($AlamatDesa == 'Data Tidak Ditemukan' || empty($AlamatDesa)) {
+                echo '<span style="color: red; font-weight: 500; font-size: 0.85em; font-style: italic;" title="Belum di set">Belum di set</span>';
+            } else {
+                echo $AlamatDesa;
+            } ?>
         </td>
         <td>
             <a href="?pg=DesaEdit&Kode=<?php echo $IdDesa; ?>">

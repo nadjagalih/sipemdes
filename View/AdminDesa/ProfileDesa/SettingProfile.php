@@ -495,6 +495,7 @@ if (isset($_GET['alert'])) {
                                         id="AlamatDesa"
                                         rows="3"
                                         placeholder="Masukkan alamat lengkap desa..."
+                                        required
                                         autocomplete="off"><?php echo htmlspecialchars($alamatDesa); ?></textarea>
                                 </div>
                             </div>

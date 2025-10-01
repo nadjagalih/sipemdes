@@ -8,6 +8,10 @@ if (isset($_GET['Kode'])) {
     master_desa.NamaDesa,
     master_desa.IdKecamatanFK,
     master_desa.IdKabupatenFK,
+    master_desa.AlamatDesa,
+    master_desa.NoTelepon,
+    master_desa.Latitude,
+    master_desa.Longitude,
     master_kecamatan.IdKecamatan,
     master_kecamatan.Kecamatan,
     master_setting_profile_dinas.IdKabupatenProfile,
@@ -26,5 +30,9 @@ if (isset($_GET['Kode'])) {
     $EditNamaKecamatan = $EditDesa['Kecamatan'];
     $EditIdDesa = $EditDesa['IdDesa'];
     $EditKodeDesa = $EditDesa['KodeDesa'];
-    $EditDesa = $EditDesa['NamaDesa'];
+    $EditNamaDesa = $EditDesa['NamaDesa'];
+    $EditAlamatDesa = $EditDesa['AlamatDesa'];
+    $EditNoTelepon = $EditDesa['NoTelepon'];
+    $EditLatitude = $EditDesa['Latitude'];
+    $EditLongitude = $EditDesa['Longitude'];
 }

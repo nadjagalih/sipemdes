@@ -100,10 +100,11 @@ if ($_GET['alert'] == 'Save') {
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Kode Desa</th>
+                                    <!--<th>Kode Desa</th>-->
                                     <th>Desa</th>
                                     <th>Kecamatan</th>
                                     <th>Kabupaten</th>
+                                    <th>Alamat</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>

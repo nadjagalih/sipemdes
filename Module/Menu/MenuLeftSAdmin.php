@@ -408,12 +408,17 @@ $rekapitulasiPages = [
     'JabatanPegawaiTerkini', 'ReportPendidikan', 'ReportUnitKerja'
 ];
 
+//$dataAwardPages = [
+//    'AwardView', 'AwardAdd', 'AwardEdit', 'AwardDetail'
+//];
+
 // Check if current page is in any group
 $isDataMasterActive = isActiveGroup($dataMasterPages);
 $isDataKeluargaActive = isActiveGroup($dataKeluargaPages);  
 $isLaporanPensiunActive = isActiveGroup($laporanPensiunPages);
 $isLaporanTambahanActive = isActiveGroup($laporanTambahanPages);
 $isRekapitulasiActive = isActiveGroup($rekapitulasiPages);
+//$isDataAwardActive = isActiveGroup($dataAwardPages);
 
 // Count pegawai pensiun in next 5 years (all desa, all kecamatan)
 $notifPensiun = 0;
@@ -491,6 +496,9 @@ $showNotif = ($notifPensiun > 0 && empty($_SESSION['visited_pensiun_sadmin']));
                 <li class="<?= isActive('PegawaiViewAnak') ?>"><a href="?pg=PegawaiViewAnak">Anak</a></li>
                 <li class="<?= isActive('PegawaiViewOrtu') ?>"><a href="?pg=PegawaiViewOrtu">Orang Tua</a></li>
             </ul>
+        </li>
+        <li class="<?= isActive('AwardView') ?>">
+            <a href="?pg=AwardView"><i class="fa fa-trophy"></i> <span class="nav-label">Daftar Award Desa</span></a>
         </li>
         <li class="<?= isActive('ViewPegawaiReport') ?>">
             <a href="?pg=ViewPegawaiReport"><i class="fa fa-print"></i> <span class="nav-label">Laporan</span></a>

@@ -508,6 +508,23 @@ if ($_GET['pg'] == 'Pass') {
     include "Pass/Pass.php";
 }
 
+//AWARD/PENGHARGAAN DESA
+if ($_GET['pg'] == 'AwardView') {
+    include "Award/AwardView.php";
+}
+if ($_GET['pg'] == 'AwardAdd') {
+    include "Award/AwardAdd.php";
+}
+if ($_GET['pg'] == 'AwardEdit') {
+    include "Award/AwardEdit.php";
+}
+if ($_GET['pg'] == 'AwardDetail') {
+    include "Award/AwardDetail.php";
+}
+if ($_GET['pg'] == 'KategoriDetail') {
+    include "Award/KategoriDetail.php";
+}
+
 if ($_GET['pg'] == 'PassKecamatan') {
     include "UserKecamatan/Pass/Pass.php";
 }

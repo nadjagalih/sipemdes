@@ -364,6 +364,26 @@ if ($_GET['pg'] == 'BPDViewFotoAdminDesa') {
     include "AdminDesa/PegawaiBPD/BPDViewFoto.php";
 }
 
+//AWARD DESA - PENDAFTARAN KARYA
+if ($_GET['pg'] == 'AwardViewAdminDesa') {
+    include "AdminDesa/AwardDesa/AwardViewAdminDesa.php";
+}
+if ($_GET['pg'] == 'DetailAwardAdminDesa') {
+    include "AdminDesa/AwardDesa/DetailAwardAdminDesa.php";
+}
+if ($_GET['pg'] == 'DaftarKarya' || $_GET['pg'] == 'DaftarKaryaAdminDesa') {
+    include "AdminDesa/AwardDesa/DaftarKarya.php";
+}
+if ($_GET['pg'] == 'KaryaDesa' || $_GET['pg'] == 'KaryaDesaAdminDesa') {
+    include "AdminDesa/AwardDesa/KaryaDesa.php";
+}
+if ($_GET['pg'] == 'EditKarya' || $_GET['pg'] == 'EditKaryaAdminDesa') {
+    include "AdminDesa/AwardDesa/EditKarya.php";
+}
+if ($_GET['pg'] == 'EditKaryaAward') {
+    include "AdminDesa/AwardDesa/EditKaryaAward.php";
+}
+
 //HOSTORY DATA SUAMI/ISTRI PEGAWAI
 if ($_GET['pg'] == 'PegawaiViewSuamiIstriAdminDesa') {
     include "AdminDesa/SuamiIstri/PegawaiViewSuamiIstri.php";

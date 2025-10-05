@@ -111,7 +111,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             }
 
             if ($Update) {
-                header("location:../../View/v?pg=AwardView&alert=Edit");
+                header("location:../../View/v?pg=AwardDetail&Kode=$IdAward&alert=Edit");
             }
         }
     } elseif ($_GET['Act'] == 'Delete') {

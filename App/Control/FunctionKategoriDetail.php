@@ -90,15 +90,17 @@ if (isset($_GET['Kode']) && !empty($_GET['Kode'])) {
             $statusPenjurian = 'Masa Penjurian Belum Ditentukan (Update Diizinkan)';
         }
         
-        // Query untuk mendapatkan daftar peserta dalam kategori ini
+        // Query untuk mendapatkan daftar peserta dalam kategori ini dengan nama desa dari master_desa
         $QueryPeserta = mysqli_query($db, "SELECT 
             da.IdPesertaAward,
-            da.NamaPeserta,
+            COALESCE(md.NamaDesa, da.NamaPeserta, 'Desa Tidak Dikenal') as NamaPeserta,
             da.NamaKarya,
             da.LinkKarya,
             da.Posisi,
-            da.TanggalInput as TanggalSubmit
+            da.TanggalInput as TanggalSubmit,
+            da.IdDesaFK
             FROM desa_award da
+            LEFT JOIN master_desa md ON da.IdDesaFK = md.IdDesa
             WHERE da.IdKategoriAwardFK = '$IdKategoriAward'
             ORDER BY 
                 CASE 

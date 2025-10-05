@@ -96,10 +96,7 @@ include "../App/Control/FunctionAwardDetail.php";
 
         <div class="col-lg-4">
             <!-- Action Panel -->
-            <div class="ibox">
-                <div class="ibox-title">
-                    <h5>Aksi</h5>
-                </div>
+            <div class="ibox" style="margin-bottom: 10px;">
                 <div class="ibox-content">
                     <div class="btn-group-vertical btn-block">
                         <a href="?pg=AwardEdit&Kode=<?php echo $IdAward; ?>" class="btn btn-success">
@@ -119,11 +116,15 @@ include "../App/Control/FunctionAwardDetail.php";
             <!-- Info Panel -->
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>Informasi</h5>
+                    <h5>Deskripsi Penghargaan</h5>
                 </div>
                 <?php if (!empty($Deskripsi)): ?>
-                    <div class="ibox-content text-center">
+                    <div class="ibox-content text-center" style="min-height: 172px;">
                         <p class="form-control-static"><?php echo nl2br($Deskripsi); ?></p>
+                    </div>
+                <?php else: ?>
+                    <div class="ibox-content text-center" style="min-height: 172px;">
+                        <p class="form-control-static text-muted"><em>Tidak ada deskripsi</em></p>
                     </div>
                 <?php endif; ?>
             </div>

@@ -117,8 +117,8 @@ if (mysqli_num_rows($QueryAward) > 0) {
                 </div>
                 <div class="col-md-1 text-right" style="position: absolute; top: 27px; right: 25px;">
                     <div class="dropdown">
-                        <button class="btn btn-xs btn-outline btn-default" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border: 1px solid #ddd; background: #f8f9fa; color: #6c757d; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
-                            <i class="fa fa-cog"></i> <span class="caret"></span>
+                        <button class="btn btn-xs btn-outline btn-default" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-cog"></i><span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-right">
                             <li>

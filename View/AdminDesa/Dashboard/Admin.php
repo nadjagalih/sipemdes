@@ -25,6 +25,7 @@ if (empty($_GET['alert'])) {
 
 include "../App/Control/FunctionProfileDinasView.php";
 include "../App/Control/FunctionProfilePegawaiUser.php";
+include "../App/Control/FunctionNotifikasiAward.php";
 
 $IdDesa = $_SESSION['IdDesa'];
 
@@ -645,6 +646,176 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
+    
+    /* Award Notification Styles */
+    .notification-item {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .notification-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background: #ffffff !important;
+    }
+    
+    .stat-card.success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card.warning {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card.purple {
+        background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card.info {
+        background: linear-gradient(135deg, #17a2b8 0%, #007bff 100%);
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+        margin-bottom: 10px;
+    }
+    
+    .stat-number {
+        font-size: 2.8rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        opacity: 0.9;
+    }
+    
+    .stat-change {
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+    
+    .notification-footer {
+        border-top: 1px solid #dee2e6;
+        padding-top: 15px;
+        margin-top: 10px;
+    }
+    
+    .badge-sm {
+        padding: 0.25em 0.4em;
+        font-size: 0.65em;
+        font-weight: 600;
+    }
+
+        /* Animation untuk notification bar */
+    @keyframes slideDown {
+        from {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+    }
+    
+    /* Responsive untuk notification bar */
+    @media (max-width: 768px) {
+        .notification-bar {
+            padding: 8px 15px !important;
+            font-size: 12px !important;
+            min-height: 40px !important;
+        }
+        
+        .notification-content {
+            gap: 10px !important;
+        }
+        
+        .notification-icon {
+            padding: 5px 6px !important;
+        }
+        
+        .notification-icon i {
+            font-size: 14px !important;
+        }
+        
+        .notification-actions a {
+            font-size: 11px !important;
+            padding: 5px 10px !important;
+        }
+        
+        .notification-text {
+            font-size: 12px !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .notification-bar {
+            padding: 6px 12px !important;
+            min-height: 35px !important;
+        }
+        
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .notification-text {
+            font-size: 11px !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .notification-actions {
+            flex-shrink: 0;
+            gap: 5px !important;
+        }
+        
+        .notification-actions a {
+            display: none; /* Hide pada mobile sangat kecil */
+        }
+    }
+    
+    /* Pulse animation untuk notification icon */
+    .notification-icon {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
 </style>
 
 <script>
@@ -676,6 +847,93 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
 <div class="main-content">
     <div class="content-wrapper">
         <div class="container-fluid">
+            <!-- Notification Bar Tipis -->
+            <?php if ($totalNotifications > 0): ?>
+            <div class="notification-bar" style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 6px 20px;
+                margin: -15px -15px 15px -15px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+                border-radius: 0 0 8px 8px;
+                font-size: 13px;
+                animation: slideDown 0.5s ease-out;
+                min-height: 45px;
+                position: relative;
+                overflow: hidden;
+            ">
+                <!-- Background subtle pattern -->
+                <div style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(255,255,255,0.03) 2px,
+                        rgba(255,255,255,0.03) 4px
+                    );
+                    pointer-events: none;
+                "></div>
+                
+                <div class="notification-content" style="display: flex; align-items: center; gap: 12px; position: relative; z-index: 1;">
+                    <div class="notification-icon" style="
+                        background: rgba(255,255,255,0.2);
+                        padding: 6px 8px;
+                        border-radius: 6px;
+                        display: flex;
+                        align-items: center;
+                    ">
+                        <i class="fas fa-bell" style="font-size: 16px;"></i>
+                    </div>
+                    <div class="notification-text">
+                        <strong><?= $totalNotifications ?></strong> notifikasi award baru | Buka di menu Award untuk mendaftar
+                        <?php if ($notifStats['award_baru'] > 0): ?>
+                            • <span style="color: #FFD700;">🏆 <?= $notifStats['award_baru'] ?> award baru tersedia</span>
+                        <?php endif; ?>
+                        <?php if ($notifStats['menunggu_penjurian'] > 0): ?>
+                            • <span style="color: #87CEEB;">⏰ <?= $notifStats['menunggu_penjurian'] ?> karya menunggu penjurian</span>
+                        <?php endif; ?>
+                        <?php if ($notifStats['menang'] > 0): ?>
+                            • <span style="color: #90EE90;">🎉 <?= $notifStats['menang'] ?> award dimenangkan!</span>
+                        <?php endif; ?>
+                        <?php if ($notifStats['tidak_menang'] > 0): ?>
+                            • <span style="color: #FFB6C1;">📋 <?= $notifStats['tidak_menang'] ?> hasil pengumuman</span>
+                        <?php endif; ?>
+                        <?php if ($notifStats['award_baru'] > 0): ?>
+                            | <small style="opacity: 0.8;">Buka menu Award untuk mendaftar</small>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="notification-actions" style="display: flex; align-items: center; gap: 10px;">
+                    <button onclick="closeNotificationBar()" style="
+                        background: none;
+                        border: none;
+                        color: white;
+                        font-size: 18px;
+                        cursor: pointer;
+                        padding: 4px;
+                        border-radius: 50%;
+                        width: 24px;
+                        height: 24px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.2)'" 
+                       onmouseout="this.style.background='none'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <?php endif; ?>
+            
             <!-- Organization Info Card - Moved to Top -->
             <div class="row">
                 <div class="col-md-6 grid-margin stretch-card">
@@ -812,6 +1070,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                     </div>
                 </div>
             </div>
+                        
             <!-- Statistics Cards Row -->
             <div class="row">
                 <div class="col-12 grid-margin stretch-card">
@@ -900,7 +1159,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                     </div>
                 </div>
             </div>
-
+            
             <!-- Charts Row -->
             <div class="row">
                 <!-- Education Chart -->
@@ -1491,6 +1750,62 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                     alert('Untuk mengatur koordinat desa, silakan buka Setting melalui menu.');
                 }
             });
+        }
+    });
+</script>
+
+<!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
+<script>
+    // Force pace loading to complete after page is fully loaded
+    window.addEventListener('load', function() {
+        // Wait a bit for all scripts to finish
+        setTimeout(function() {
+            // Force pace to complete if it's still running
+            if (typeof Pace !== 'undefined' && Pace.running) {
+                Pace.stop();
+            }
+            // Add pace-done class to body if not already present
+            if (!document.body.classList.contains('pace-done')) {
+                document.body.classList.add('pace-done');
+            }
+            // Hide any remaining pace elements
+            var paceElements = document.querySelectorAll('.pace');
+            paceElements.forEach(function(el) {
+                el.style.display = 'none';
+            });
+        }, 1000); // Wait 1 second after page load
+    });
+
+    // Fallback - force pace to complete after DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof Pace !== 'undefined' && Pace.running) {
+                Pace.stop();
+            }
+            document.body.classList.add('pace-done');
+        }, 2000); // Wait 2 seconds after DOM ready
+    });
+    
+    // Function untuk close notification bar
+    function closeNotificationBar() {
+        const notifBar = document.querySelector('.notification-bar');
+        if (notifBar) {
+            notifBar.style.animation = 'slideUp 0.3s ease-out forwards';
+            setTimeout(() => {
+                notifBar.style.display = 'none';
+                // Store in localStorage untuk session ini
+                localStorage.setItem('notifBarClosed', 'true');
+            }, 300);
+        }
+    }
+    
+    // Check apakah notification bar sudah di-close sebelumnya
+    document.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.getItem('notifBarClosed') === 'true') {
+            const notifBar = document.querySelector('.notification-bar');
+            if (notifBar) {
+                notifBar.style.display = 'none';
+            }
         }
     });
 </script>

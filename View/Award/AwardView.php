@@ -134,128 +134,179 @@
 </div>
 
 <style>
-/* Modern Card List Styling - Untuk struktur div yang sudah ada */
+/* Award List Styling - Menggunakan style dari AwardViewAdminDesa */
 .wrapper-content {
     background: #f8f9fa;
 }
 
 .ibox {
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    overflow: visible;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
     border: none;
     position: relative;
 }
 
 .ibox-title {
-    background: #f8f9fa;
-    padding: 15px 20px;
-    border-bottom: 1px solid #dee2e6;
+    background: white;
+    color: #495057;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e6e9ed;
 }
 
 .ibox-title h5 {
     margin: 0;
-    color: #495057;
-    font-weight: 500;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.ibox-title i {
+    margin-right: 10px;
+    font-size: 1.2rem;
 }
 
 .ibox-content {
-    padding: 20px;
+    padding: 0;
     overflow: visible;
+}
+
+/* Jika ada content di dalam ibox-content yang bukan award-item, beri padding */
+.ibox-content > div:not(.award-item):not(.award-list) {
+    padding: 20px;
+}
+
+/* Award List Container */
+.award-list {
+    padding: 0;
 }
 
 /* Styling untuk award-item yang sudah ada di FunctionAwardList.php */
 .award-item {
-    background: white;
-    margin-bottom: 20px !important;
-    padding: 25px !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-    border: 1px solid #e9ecef !important;
-    border-bottom: none !important; /* Override border-bottom dari PHP */
+    display: flex;
+    align-items: flex-start;
+    padding: 25px;
+    border-bottom: 1px solid #f1f3f4;
     transition: all 0.3s ease;
+    background: white;
+    margin-bottom: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
     position: relative;
 }
 
 .award-item:hover {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
-    transform: translateY(-3px);
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
 }
 
-/* Nomor urut styling */
+.award-item:last-child {
+    border-bottom: none;
+}
+
+/* Nomor urut styling - seperti AwardViewAdminDesa */
+.award-item .col-md-1:first-child {
+    min-width: 60px;
+    margin-right: 20px;
+    padding: 0 !important;
+}
+
 .award-item .col-md-1:first-child h4 {
-    background: #007bff !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px !important;
+    height: 45px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     color: white !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 8px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-weight: bold !important;
-    font-size: 16px !important;
-    margin: 0 auto !important;
+    border-radius: 50% !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3) !important;
+    margin: 0 !important;
 }
 
-/* Award title - sesuaikan dengan AwardDesa.php */
+/* Award content area */
+.award-item .col-md-8 {
+    flex: 1;
+    padding: 0 !important;
+}
+
+/* Award title - style seperti AwardViewAdminDesa */
 .award-item .col-md-8 h4 {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    color: #007bff !important;
-    margin-bottom: 10px !important;
+    margin: 0 0 10px 0 !important;
+    font-size: 1.3rem !important;
+    font-weight: 600 !important;
+    color: #2c3e50 !important;
     text-decoration: none !important;
 }
 
-/* Add trophy icon - hanya satu */
-.award-item .col-md-8 h4:before {
-    content: "🏆 ";
-    margin-right: 10px;
+.award-item .col-md-8 h4 i {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    color: #ffc107;
 }
 
-/* Info paragraphs styling - rapat seperti gambar */
+/* Award details section */
+.award-item .col-md-8 .award-details {
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+/* Info paragraphs styling */
 .award-item .col-md-8 p {
-    font-size: 14px !important;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px !important;
+    font-size: 0.9rem !important;
+    color: #555 !important;
     line-height: 1.4 !important;
-    margin-bottom: 5px !important;
-    color: #6c757d !important;
 }
 
-/* Deskripsi tanpa margin bottom */
 .award-item .col-md-8 p:last-child {
     margin-bottom: 0 !important;
 }
 
-/* Icons FontAwesome seperti di gambar */
+/* Icons FontAwesome - detail row style */
 .award-item .col-md-8 p .fa {
-    margin-right: 8px;
-    color: #999;
-    width: 16px;
+    min-width: 25px;
     text-align: center;
+    margin-right: 10px;
+    color: #667eea;
+    width: auto;
 }
 
 /* Status badge positioning and styling */
 .award-item .col-md-2 {
     position: absolute !important;
     top: 25px !important;
-    right: 80px !important;
+    right: 120px !important;
     width: auto !important;
+    padding: 0 !important;
 }
 
 .award-item .col-md-2 .label {
-    padding: 8px 16px !important;
-    font-size: 12px !important;
+    padding: 6px 14px !important;
     border-radius: 20px !important;
-    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
     text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    display: inline-block !important;
 }
 
 /* Action buttons positioning */
 .award-item .col-md-1:last-child {
     position: absolute !important;
     top: 25px !important;
-    right: 25px !important;
+    right: 15px !important;
     width: auto !important;
+    padding: 0 !important;
 }
 
 /* Dropdown styling */
@@ -306,30 +357,35 @@
     color: white !important;
 }
 
-/* Status badge colors - lebih kontras dan terlihat */
-.label-primary {
-    background-color: #007bff !important;
-    color: white !important;
+/* Status Colors - menggunakan style AwardViewAdminDesa */
+.label-primary, .status-aktif {
+    background-color: #e3f2fd !important;
+    color: #1976d2 !important;
+    border: 1px solid #90caf9 !important;
 }
 
-.label-success {
-    background-color: #007bff !important;
-    color: white !important;
+.label-success, .status-pendaftaran {
+    background-color: #e8f5e8 !important;
+    color: #2e7d32 !important;
+    border: 1px solid #a5d6a7 !important;
 }
 
-.label-warning {
-    background-color: #ffc107 !important;
-    color: #212529 !important;
+.label-warning, .status-berlangsung {
+    background-color: #fff3e0 !important;
+    color: #f57c00 !important;
+    border: 1px solid #ffcc02 !important;
 }
 
-.label-danger {
-    background-color: #dc3545 !important;
-    color: white !important;
+.label-danger, .status-selesai {
+    background-color: #f3e5f5 !important;
+    color: #7b1fa2 !important;
+    border: 1px solid #ce93d8 !important;
 }
 
-.label-default {
-    background-color: #6c757d !important;
-    color: white !important;
+.label-default, .status-tutup {
+    background-color: #fafafa !important;
+    color: #616161 !important;
+    border: 1px solid #e0e0e0 !important;
 }
 
 /* Override khusus untuk badge Non-Aktif agar lebih terlihat */
@@ -341,25 +397,72 @@
     letter-spacing: 0.5px !important;
 }
 
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.empty-content h4 {
+    color: #666;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+}
+
+.empty-content p {
+    color: #999;
+    font-size: 1rem;
+}
+
+/* Award Description */
+.award-description {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.6;
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .award-item {
-        padding: 20px !important;
+        flex-direction: column;
+        padding: 20px 15px !important;
+    }
+    
+    .award-item .col-md-1:first-child {
+        margin-bottom: 15px;
+        margin-right: 0;
+        text-align: center;
     }
     
     .award-item .col-md-1:first-child h4 {
-        width: 35px !important;
-        height: 35px !important;
-        font-size: 14px !important;
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 1rem !important;
     }
     
     .award-item .col-md-8 h4 {
-        font-size: 16px !important;
+        font-size: 1.1rem !important;
         margin-bottom: 12px !important;
     }
     
     .award-item .col-md-8 p {
-        font-size: 13px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .award-item .col-md-8 .award-details {
+        margin: 10px 0;
+        padding: 12px;
     }
     
     .award-item .col-md-2,
@@ -368,7 +471,15 @@
         top: auto !important;
         right: auto !important;
         margin-top: 15px;
-        text-align: left !important;
+        text-align: center !important;
+    }
+    
+    .ibox-title {
+        padding: 15px 20px;
+    }
+    
+    .ibox-title h5 {
+        font-size: 1.2rem;
     }
 }
 

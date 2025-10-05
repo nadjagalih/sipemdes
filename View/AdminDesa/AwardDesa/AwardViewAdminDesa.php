@@ -624,24 +624,21 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-8">
-        <h2>Award/Penghargaan Tersedia</h2>
+        <h2>Award/Penghargaan Desa</h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a href="?pg=Dashboard">Dashboard</a>
             </li>
             <li class="breadcrumb-item active">
-                <strong>Award Tersedia</strong>
+                <strong>Award Desa</strong>
             </li>
         </ol>
     </div>
     <div class="col-lg-4">
         <br>
         <div class="title-action">
-            <a href="?pg=DaftarKaryaAdminDesa" class="btn btn-success">
-                <i class="fa fa-plus"></i> Daftar Karya
-            </a>
             <a href="?pg=KaryaDesaAdminDesa" class="btn btn-primary">
-                <i class="fa fa-list"></i> Karya Saya
+                <i class="fa fa-list"></i> Riwayat Karya Desa
             </a>
         </div>
     </div>
@@ -714,7 +711,7 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         <div class="col-lg-3">
             <div class="ibox">
                 <div class="ibox-content">
-                    <h5>Karya Terdaftar</h5>
+                    <h5>Riwayat Karya</h5>
                     <h1 class="no-margins text-success"><?php echo $TotalKaryaTerdaftar; ?></h1>
                     <small>Sudah didaftarkan</small>
                 </div>
@@ -745,7 +742,7 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         <div class="col-lg-12">
             <div class="ibox list-section">
                 <div class="list-header">
-                    <h5><i class="fa fa-trophy"></i> Daftar Award Tersedia</h5>
+                    <h5><i class="fa fa-trophy"></i> Awards </h5>
                 </div>                
                 <div class="award-list">
                     <?php 
@@ -799,9 +796,6 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                             }
                     ?>
                     <div class="award-item-row">
-                        <div class="award-number">
-                            <span class="number"><?php echo $no++; ?></span>
-                        </div>
                         <div class="award-content">
                             <div class="award-main-info">
                                 <h5 class="award-title">
@@ -858,13 +852,6 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                                         <?php echo date('d M Y', strtotime($MasaPenjurianSelesai)); ?>
                                     </span>
                                 </div>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <div class="award-description">
-                                Award/penghargaan untuk desa berprestasi dalam berbagai kategori pembangunan desa.
-                                <?php if ($SudahDaftar): ?>
-                                <strong class="text-success">✓ Desa Anda telah terdaftar dalam award ini.</strong>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -1076,4 +1063,60 @@ document.getElementById('formDaftarKarya').addEventListener('submit', function(e
         submitBtn.disabled = false;
     });
 });
+</script>
+
+<!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
+<script>
+    // Force pace loading to complete after page is fully loaded
+    window.addEventListener('load', function() {
+        // Wait a bit for all scripts to finish
+        setTimeout(function() {
+            // Force pace to complete if it's still running
+            if (typeof Pace !== 'undefined' && Pace.running) {
+                Pace.stop();
+            }
+            // Add pace-done class to body if not already present
+            if (!document.body.classList.contains('pace-done')) {
+                document.body.classList.add('pace-done');
+            }
+            // Hide any remaining pace elements
+            var paceElements = document.querySelectorAll('.pace');
+            paceElements.forEach(function(el) {
+                el.style.display = 'none';
+            });
+        }, 1000); // Wait 1 second after page load
+    });
+
+    // Fallback - force pace to complete after DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof Pace !== 'undefined' && Pace.running) {
+                Pace.stop();
+            }
+            document.body.classList.add('pace-done');
+        }, 2000); // Wait 2 seconds after DOM ready
+    });
+    
+    // Function untuk close notification bar
+    function closeNotificationBar() {
+        const notifBar = document.querySelector('.notification-bar');
+        if (notifBar) {
+            notifBar.style.animation = 'slideUp 0.3s ease-out forwards';
+            setTimeout(() => {
+                notifBar.style.display = 'none';
+                // Store in localStorage untuk session ini
+                localStorage.setItem('notifBarClosed', 'true');
+            }, 300);
+        }
+    }
+    
+    // Check apakah notification bar sudah di-close sebelumnya
+    document.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.getItem('notifBarClosed') === 'true') {
+            const notifBar = document.querySelector('.notification-bar');
+            if (notifBar) {
+                notifBar.style.display = 'none';
+            }
+        }
+    });
 </script>

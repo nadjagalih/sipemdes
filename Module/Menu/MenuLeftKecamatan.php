@@ -461,6 +461,10 @@ echo '<style>
             </ul>
         </li>
 
+        <li class="<?php echo ($_GET['pg'] == 'SettingProfileKecamatan') ? 'active' : ''; ?>">
+            <a href="?pg=SettingProfileKecamatan"><i class="fa fa-wrench"></i> <span class="nav-label">Setting</span></a>
+        </li>
+
         <li class="<?php echo ($pg == 'FileViewKecamatan') ? 'active' : ''; ?>">
             <a href="?pg=FileViewKecamatan">
                 <i class="fa fa-upload"></i> 

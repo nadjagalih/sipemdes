@@ -3,7 +3,7 @@ include "../App/Control/FunctionKaryaDesa.php";
 ?>
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
-        <h2>Karya yang Didaftarkan</h2>
+        <h2>Riwayat Karya</h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a href="?pg=Dashboard">Dashboard</a>
@@ -15,8 +15,8 @@ include "../App/Control/FunctionKaryaDesa.php";
     </div>
     <div class="col-lg-2">
         <div class="title-action">
-            <a href="?pg=AwardViewAdminDesa" class="btn btn-primary">
-                <i class="fa fa-plus"></i> Daftar Karya Baru
+            <a href="?pg=AwardViewAdminDesa" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> Kembali
             </a>
         </div>
     </div>
@@ -25,39 +25,21 @@ include "../App/Control/FunctionKaryaDesa.php";
 <div class="wrapper wrapper-content animated fadeInRight">
     <!-- Statistics Cards -->
     <div class="row">
-        <div class="col-lg-3">
+        <div class="col-lg-6">
             <div class="ibox">
                 <div class="ibox-content">
-                    <h5>Total Karya</h5>
+                    <h5>Riwayat Karya</h5>
                     <h1 class="no-margins"><?php echo $totalKarya; ?></h1>
-                    <small>Karya terdaftar</small>
+                    <small>Total Karya</small>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-6">
             <div class="ibox">
                 <div class="ibox-content">
                     <h5>Menang</h5>
                     <h1 class="no-margins text-success"><?php echo $totalMenang; ?></h1>
                     <small>Mendapat posisi</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <h5>Sedang Dinilai</h5>
-                    <h1 class="no-margins text-warning"><?php echo $totalProses; ?></h1>
-                    <small>Belum ada hasil</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <h5>Award Tersedia</h5>
-                    <h1 class="no-margins text-info"><?php echo $totalAwardTersedia; ?></h1>
-                    <small>Bisa didaftarkan</small>
                 </div>
             </div>
         </div>
@@ -135,14 +117,6 @@ include "../App/Control/FunctionKaryaDesa.php";
                                                 <button type="button" class="btn btn-sm btn-info" onclick="detailKarya('<?php echo $DataKarya['IdDesaAward']; ?>', '<?php echo addslashes($DataKarya['JudulKarya']); ?>', '<?php echo addslashes($DataKarya['Keterangan'] ?? ''); ?>', '<?php echo $DataKarya['LinkKarya']; ?>')">
                                                     <i class="fa fa-eye"></i>
                                                 </button>
-                                                <?php if ($DataKarya['StatusAward'] == 'Aktif'): ?>
-                                                <a href="?pg=EditKarya&Kode=<?php echo $DataKarya['IdDesaAward']; ?>" class="btn btn-sm btn-warning">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>
-                                                <button type="button" class="btn btn-sm btn-danger" onclick="hapusKarya('<?php echo $DataKarya['IdDesaAward']; ?>', '<?php echo addslashes($DataKarya['JudulKarya']); ?>')">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                                <?php endif; ?>
                                             </div>
                                         </td>
                                     </tr>
@@ -155,9 +129,6 @@ include "../App/Control/FunctionKaryaDesa.php";
                             <i class="fa fa-trophy" style="font-size: 60px; color: #ddd;"></i>
                             <h3>Belum Ada Karya</h3>
                             <p class="text-muted">Anda belum mendaftarkan karya apapun.</p>
-                            <a href="?pg=AwardViewAdminDesa" class="btn btn-primary">
-                                <i class="fa fa-plus"></i> Daftar Karya Pertama
-                            </a>
                         </div>
                     <?php endif; ?>
                 </div>

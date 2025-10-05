@@ -36,50 +36,50 @@ if (mysqli_num_rows($QueryKategori) > 0) {
         // Format deskripsi yang panjang
         $deskripsiShort = !empty($DeskripsiKategori) ? (strlen($DeskripsiKategori) > 80 ? substr($DeskripsiKategori, 0, 80) . '...' : $DeskripsiKategori) : '';
 ?>
-        <div class="kategori-item" style="border-bottom: 1px solid #e7eaec; padding: 20px 0;">
+        <div class="kategori-item" style="border-bottom: 1px solid #e7eaec; padding: 20px !important; margin-bottom: 20px !important; border-radius: 12px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; border: 1px solid #e9ecef !important; transition: all 0.3s ease; position: relative; background: white;">
             <div class="row">
-                <div class="col-md-1 text-center">
-                    <div style="padding-top: 10px;">
-                        <h4 style="margin: 0; color: #676a6c; font-weight: bold;"><?php echo $no; ?></h4>
-                    </div>
-                </div>
-                <div class="col-md-1 text-center">
-                    <i class="fa fa-trophy" style="font-size: 32px; color: #f8ac59; margin-top: 8px;"></i>
-                </div>
-                <div class="col-md-6">
+                <!-- Content area dengan padding minimal -->
+                <div class="col-md-6" style="padding-left: 35px !important; margin-left: -25px !important;">
                     <div>
-                        <h4 style="margin: 0 0 5px 0; color: #1ab394; font-weight: bold;">
-                            <?php echo $NamaKategori; ?>
+                        <h4 style="margin: 0 0 10px 0; color: #007bff !important; font-weight: 700 !important; font-size: 18px !important;">
+                            🏅 <?php echo $NamaKategori; ?>
                         </h4>
                         <?php if (!empty($deskripsiShort)): ?>
-                            <p style="margin: 0 0 8px 0; color: #676a6c; font-size: 13px;">
-                                <?php echo $deskripsiShort; ?>
+                            <p style="margin: 0 0 5px 0; color: #6c757d !important; font-size: 14px !important; line-height: 1.4 !important;">
+                                <i class="fa fa-info-circle" style="margin-right: 8px; color: #999; width: 16px; text-align: center;"></i><?php echo $deskripsiShort; ?>
                             </p>
                         <?php endif; ?>
-                        <p style="margin: 0; color: #999; font-size: 12px;">
-                            <i class="fa fa-calendar text-muted"></i> Dibuat: <?php echo $TanggalInputKategori; ?>
+                        <p style="margin: 0; color: #6c757d !important; font-size: 14px !important; line-height: 1.4 !important;">
+                            <i class="fa fa-calendar" style="margin-right: 8px; color: #999; width: 16px; text-align: center;"></i>Dibuat: <?php echo $TanggalInputKategori; ?>
                         </p>
                     </div>
                 </div>
-                <div class="col-md-2 text-right">
+                <!-- Status badge dengan posisi absolute -->
+                <div class="col-md-2" style="position: absolute !important; top: 30px !important; right: 120px !important; width: auto !important; min-width: 100px !important;">
+                    <span class="label <?php echo $badgeAward; ?>" style="padding: 8px 12px !important; font-size: 11px !important; border-radius: 20px !important; font-weight: 500 !important; text-transform: uppercase !important; min-width: 90px !important; display: inline-block !important; text-align: center !important; font-weight: 600 !important; letter-spacing: 0.3px !important; white-space: nowrap !important;">
+                        <?php echo $StatusAward; ?>
+                    </span>
+                </div>
+                <!-- Action buttons dengan posisi absolute -->
+                <div class="col-md-2" style="position: absolute !important; top: 25px !important; right: 15px !important; width: auto !important;">
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-outline btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-outline" style="border: 1px solid #ddd; background: #f8f9fa; color: #6c757d; padding: 8px 12px; border-radius: 6px; font-size: 12px;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-cog"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-right">
+                        <ul class="dropdown-menu dropdown-menu-right" style="box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid #e9ecef; border-radius: 6px; z-index: 1050; min-width: 150px;">
                             <li>
-                                <a href="?pg=KategoriDetail&Kode=<?php echo $IdKategoriAward; ?>">
+                                <a href="?pg=KategoriDetail&Kode=<?php echo $IdKategoriAward; ?>" style="padding: 10px 16px; color: #495057; font-size: 14px;">
                                     <i class="fa fa-eye text-info"></i> Detail
                                 </a>
                             </li>
                             <li>
-                                <a href="#" onclick="editKategori('<?php echo $IdKategoriAward; ?>')">
+                                <a href="#" onclick="editKategori('<?php echo $IdKategoriAward; ?>')" style="padding: 10px 16px; color: #495057; font-size: 14px;">
                                     <i class="fa fa-edit text-success"></i> Edit Kategori
                                 </a>
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a href="#" onclick="confirmDelete('../App/Model/ExcKategoriAward.php?Act=Delete&Kode=<?php echo $IdKategoriAward; ?>', 'Yakin ingin menghapus kategori ini? Semua peserta dalam kategori ini akan ikut terhapus.')">
+                                <a href="#" onclick="confirmDelete('../App/Model/ExcKategoriAward.php?Act=Delete&Kode=<?php echo $IdKategoriAward; ?>', 'Yakin ingin menghapus kategori ini? Semua peserta dalam kategori ini akan ikut terhapus.')" style="padding: 10px 16px; color: #495057; font-size: 14px;">
                                     <i class="fa fa-trash text-danger"></i> Hapus Kategori
                                 </a>
                             </li>

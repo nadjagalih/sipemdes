@@ -136,7 +136,7 @@ include "../App/Control/FunctionAwardDetail.php";
         <div class="col-lg-12">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5><i class="fa fa-list"></i> Kategori dan Peserta Award</h5>
+                    <h5><i class="fa fa-list"></i> Kategori Award</h5>
                 </div>
                 <div class="ibox-content">
                     <?php include "../App/Control/FunctionAwardKategoriList.php"; ?>
@@ -528,8 +528,13 @@ include "../App/Control/FunctionAwardDetail.php";
                     
                     <div class="form-group">
                         <label>Posisi/Juara</label>
-                        <input type="number" name="Posisi" id="updatePosisiPosisi" class="form-control" min="1" 
-                               placeholder="1 untuk juara 1, dst. Kosongkan jika tidak ada posisi">
+                        <select name="Posisi" id="updatePosisiPosisi" class="form-control">
+                            <option value="">-- Tidak Mendapat Juara --</option>
+                            <option value="1">🥇 Juara 1</option>
+                            <option value="2">🥈 Juara 2</option>
+                            <option value="3">🥉 Juara 3</option>
+                        </select>
+                        <small class="text-muted">Hanya tersedia juara 1, 2, dan 3. Peserta lain tidak mendapat juara.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -561,7 +566,13 @@ function updatePosisi(id, namaPeserta, namaKarya, posisi, linkKarya) {
     $('#updatePosisiIdPeserta').val(id);
     $('#updatePosisiNamaPeserta').val(namaPeserta);
     $('#updatePosisiNamaKarya').val(namaKarya);
-    $('#updatePosisiPosisi').val(posisi || '');
+    
+    // Set dropdown value berdasarkan posisi
+    if (posisi && (posisi == 1 || posisi == 2 || posisi == 3)) {
+        $('#updatePosisiPosisi').val(posisi);
+    } else {
+        $('#updatePosisiPosisi').val(''); // Tidak mendapat juara
+    }
     
     // Handle link karya
     if (linkKarya && linkKarya.trim() !== '') {

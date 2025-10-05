@@ -309,6 +309,11 @@ if ($_GET['pg'] == 'Admin') {
     include "AdminDesa/Dashboard/Admin.php";
 }
 
+//AWARD DESA
+if ($_GET['pg'] == 'AwardDesa') {
+    include "AdminDesa/Award/AwardDesa.php";
+}
+
 //USER DESA
 if ($_GET['pg'] == 'UserViewAdminDesa') {
     include "AdminDesa/User/UserView.php";
@@ -521,6 +526,7 @@ if ($_GET['pg'] == 'AwardEdit') {
 if ($_GET['pg'] == 'AwardDetail') {
     include "Award/AwardDetail.php";
 }
+
 if ($_GET['pg'] == 'KategoriDetail') {
     include "Award/KategoriDetail.php";
 }

@@ -438,6 +438,13 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
             </a>
         </li>
 
+        <li class="<?php echo ($_GET['pg'] == 'AwardDesa') ? 'active' : ''; ?>">
+            <a href="?pg=AwardDesa">
+                <i class="fa fa-trophy"></i> 
+                <span class="nav-label">Award</span>
+            </a>
+        </li>
+
         <li class="<?php echo in_array($pg, $activePages) ? 'active' : ''; ?>">
             <a href="#"><i class="fa fa-database"></i> 
                 <span class="nav-label">Data Master</span>

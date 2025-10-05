@@ -893,21 +893,17 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                         <i class="fas fa-bell" style="font-size: 16px;"></i>
                     </div>
                     <div class="notification-text">
-                        <strong><?= $totalNotifications ?></strong> notifikasi award baru | Buka di menu Award untuk mendaftar
                         <?php if ($notifStats['award_baru'] > 0): ?>
-                            • <span style="color: #FFD700;">🏆 <?= $notifStats['award_baru'] ?> award baru tersedia</span>
+                            • <span style="color: #FFD700;">🏆 <?= $notifStats['award_baru'] ?> Notifikasi Award Baru | Buka di Menu Award Desa untuk Mendaftar</span>
                         <?php endif; ?>
                         <?php if ($notifStats['menunggu_penjurian'] > 0): ?>
-                            • <span style="color: #87CEEB;">⏰ <?= $notifStats['menunggu_penjurian'] ?> karya menunggu penjurian</span>
+                            • <span style="color: #87CEEB;">⏰ <?= $notifStats['menunggu_penjurian'] ?> Karya Menunggu Penjurian</span>
                         <?php endif; ?>
                         <?php if ($notifStats['menang'] > 0): ?>
-                            • <span style="color: #90EE90;">🎉 <?= $notifStats['menang'] ?> award dimenangkan!</span>
+                            • <span style="color: #90EE90;">🎉 <?= $notifStats['menang'] ?> Award Dimenangkan!</span>
                         <?php endif; ?>
                         <?php if ($notifStats['tidak_menang'] > 0): ?>
-                            • <span style="color: #FFB6C1;">📋 <?= $notifStats['tidak_menang'] ?> hasil pengumuman</span>
-                        <?php endif; ?>
-                        <?php if ($notifStats['award_baru'] > 0): ?>
-                            | <small style="opacity: 0.8;">Buka menu Award untuk mendaftar</small>
+                            • <span style="color: #FFB6C1;">📋 <?= $notifStats['tidak_menang'] ?> Terimakasih telah Berpartisipasi</span>
                         <?php endif; ?>
                     </div>
                 </div>

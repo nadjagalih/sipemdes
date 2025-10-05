@@ -5,7 +5,7 @@ session_start();
 error_reporting(E_ALL ^ E_NOTICE);
 
 // Include files
-include_once "../App/Control/FunctionSettingProfileAdminDesa.php";
+include_once "../App/Control/FunctionSettingProfileAdminKecamatan.php";
 
 // Alert Handler seperti di PegawaiViewAll.php
 if (isset($_GET['alert'])) {
@@ -14,7 +14,7 @@ if (isset($_GET['alert'])) {
             setTimeout(function () {
                 swal({
                     title: 'Berhasil!',
-                    text: 'Data Profile Desa Berhasil Diperbarui',
+                    text: 'Data Profile Kecamatan Berhasil Diperbarui',
                     type: 'success',
                     showConfirmButton: true
                 });
@@ -25,7 +25,7 @@ if (isset($_GET['alert'])) {
             setTimeout(function () {
                 swal({
                     title: 'Gagal!',
-                    text: 'Gagal Memperbarui Data Profile Desa',
+                    text: 'Gagal Memperbarui Data Profile Kecamatan',
                     type: 'error',
                     showConfirmButton: true
                 });
@@ -65,7 +65,7 @@ if (isset($_GET['alert'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Setting Profile Desa</title>
+<title>Setting Profile Kecamatan</title>
 
 <!-- Bootstrap CSS -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
@@ -458,18 +458,18 @@ if (isset($_GET['alert'])) {
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="container-fluid">
-        <form action="../App/Model/ExcSettingProfileAdminDesa.php?Act=Save" method="POST" id="koordinatForm">
+        <form action="../App/Model/ExcSettingProfileAdminKecamatan.php?Act=Save" method="POST" id="koordinatForm">
             <div class="row">
                 <div class="col-lg-4">
                     <div class="ibox ">
                         <div class="ibox-title">
-                            <h5>Form Setting Profile Desa</h5>
+                            <h5>Form Setting Profile Kecamatan</h5>
                         </div>
                         <div class="ibox-content">
                             <div class="form-group row">
                                 <label class="col-lg-12 col-form-label">
                                     <i class="fas fa-phone"></i>
-                                    Nomor Telepon Desa
+                                    Nomor Telepon Kecamatan
                                 </label>
                                 <div class="col-lg-12">
                                     <input type="text"
@@ -486,17 +486,16 @@ if (isset($_GET['alert'])) {
                             <div class="form-group row">
                                 <label class="col-lg-12 col-form-label">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    Alamat Desa
+                                    Alamat Kantor
                                 </label>
                                 <div class="col-lg-12">
                                     <textarea 
                                         class="form-control"
-                                        name="AlamatDesa"
-                                        id="AlamatDesa"
+                                        name="AlamatKantor"
+                                        id="AlamatKantor"
                                         rows="3"
-                                        placeholder="Masukkan alamat lengkap desa..."
-                                        required
-                                        autocomplete="off"><?php echo htmlspecialchars($alamatDesa); ?></textarea>
+                                        placeholder="Masukkan alamat lengkap kantor..."
+                                        autocomplete="off"><?php echo htmlspecialchars($AlamatKecamatan); ?></textarea>
                                 </div>
                             </div>
 
@@ -520,7 +519,7 @@ if (isset($_GET['alert'])) {
                                     <i class="fas fa-save"></i>
                                     Simpan Pengaturan
                                 </button>
-                                <a href="?pg=Admin" class="btn btn-secondary" style="width: 100%;">
+                                <a href="?pg=Kecamatan" class="btn btn-secondary" style="width: 100%;">
                                     <i class="fas fa-arrow-left"></i>
                                     Kembali ke Dashboard
                                 </a>
@@ -864,61 +863,5 @@ if (isset($_GET['alert'])) {
             });
             */
         });
-    });
-</script>
-
-<!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
-    // Force pace loading to complete after page is fully loaded
-    window.addEventListener('load', function() {
-        // Wait a bit for all scripts to finish
-        setTimeout(function() {
-            // Force pace to complete if it's still running
-            if (typeof Pace !== 'undefined' && Pace.running) {
-                Pace.stop();
-            }
-            // Add pace-done class to body if not already present
-            if (!document.body.classList.contains('pace-done')) {
-                document.body.classList.add('pace-done');
-            }
-            // Hide any remaining pace elements
-            var paceElements = document.querySelectorAll('.pace');
-            paceElements.forEach(function(el) {
-                el.style.display = 'none';
-            });
-        }, 1000); // Wait 1 second after page load
-    });
-
-    // Fallback - force pace to complete after DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-            if (typeof Pace !== 'undefined' && Pace.running) {
-                Pace.stop();
-            }
-            document.body.classList.add('pace-done');
-        }, 2000); // Wait 2 seconds after DOM ready
-    });
-    
-    // Function untuk close notification bar
-    function closeNotificationBar() {
-        const notifBar = document.querySelector('.notification-bar');
-        if (notifBar) {
-            notifBar.style.animation = 'slideUp 0.3s ease-out forwards';
-            setTimeout(() => {
-                notifBar.style.display = 'none';
-                // Store in localStorage untuk session ini
-                localStorage.setItem('notifBarClosed', 'true');
-            }, 300);
-        }
-    }
-    
-    // Check apakah notification bar sudah di-close sebelumnya
-    document.addEventListener('DOMContentLoaded', function() {
-        if (localStorage.getItem('notifBarClosed') === 'true') {
-            const notifBar = document.querySelector('.notification-bar');
-            if (notifBar) {
-                notifBar.style.display = 'none';
-            }
-        }
     });
 </script>

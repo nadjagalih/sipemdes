@@ -587,6 +587,11 @@ if ($_GET['pg'] == 'UserResetKecamatan') {
     include "UserKecamatan/UserResetKecamatan.php";
 }
 
+//=========================================
+//PROFILE KECAMATAN
+if ($_GET['pg'] == 'SettingProfileKecamatan') {
+    include "UserKecamatan/ProfileKecamatan/SettingProfile.php";
+}
 
 //=========================================
 //REPORT KECAMATAN

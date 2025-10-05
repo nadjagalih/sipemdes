@@ -361,12 +361,11 @@ echo '<style>
     }
 </style>';
 $activePages = ['UserViewAdminDesa', 'PegawaiViewAllAdminDesa', 'PegawaiBPDViewAllAdminDesa'];
-$isAwardDesaActive = in_array($pg, ['DaftarKarya', 'KaryaDesa', 'EditKarya', 'AwardViewAdminDesa']);
 $isDataKeluargaActive = in_array($pg, [
     'PegawaiViewSuamiIstriAdminDesa',
     'PegawaiViewAnakAdminDesa',
     'PegawaiViewOrtuAdminDesa'
-  ]);
+]);
 $isLaporanPensiunActive = in_array($pg, [
     'ViewMasaPensiunAdminDesaKades',
     'ViewMasaPensiunAdminDesa',
@@ -376,7 +375,7 @@ $isLaporanPensiunActive = in_array($pg, [
 $isRekapDataActive = in_array($pg, [
     'JabatanPegawaiTerkiniAdminDesa',
     'ReportPendidikanAdminDesa'
-  ]);
+]);
 
 if (isset($_GET['pg']) && $_GET['pg'] == 'ViewMasaPensiunAdminDesa') {
     $_SESSION['visited_pensiun_perangkat'] = true;
@@ -416,7 +415,7 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
             <div class="dropdown profile-element">
                 <?php
                 if (empty($Foto)) {
-                    ?>
+                ?>
                     <img style="width:80px; height:auto" alt="image" class="rounded-circle"
                         src="../Vendor/Media/Pegawai/no-image.jpg">
                 <?php } else { ?>
@@ -434,20 +433,13 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
         </li>
         <li class="<?php echo ($_GET['pg'] == 'Admin') ? 'active' : ''; ?>">
             <a href="?pg=Admin">
-                <i class="fa fa-th-large"></i> 
+                <i class="fa fa-th-large"></i>
                 <span class="nav-label">Dashboards</span>
             </a>
         </li>
 
-        <li class="<?php echo ($_GET['pg'] == 'AwardDesa') ? 'active' : ''; ?>">
-            <a href="?pg=AwardDesa">
-                <i class="fa fa-trophy"></i> 
-                <span class="nav-label">Award</span>
-            </a>
-        </li>
-
         <li class="<?php echo in_array($pg, $activePages) ? 'active' : ''; ?>">
-            <a href="#"><i class="fa fa-database"></i> 
+            <a href="#"><i class="fa fa-database"></i>
                 <span class="nav-label">Data Master</span>
                 <span class="fa arrow"></span>
             </a>
@@ -464,19 +456,11 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
             </ul>
         </li>
 
-        <li class="<?php echo $isAwardDesaActive ? 'active' : ''; ?>">
-            <a href="#">
+        <li class="<?php echo $pg == 'AwardViewAdminDesa' ? 'active' : ''; ?>">
+            <a href="?pg=AwardViewAdminDesa">
                 <i class="fa fa-trophy"></i> 
                 <span class="nav-label">Award Desa</span>
-                <span class="fa arrow"></span>
             </a>
-            <ul class="nav nav-second-level collapse <?php echo $isAwardDesaActive ? 'in' : ''; ?>">
-                <li class="<?php echo $pg == 'AwardViewAdminDesa' ? 'active' : ''; ?>">
-                    <a href="?pg=AwardViewAdminDesa">Daftar Award Desa</a>
-                <li class="<?php echo $pg == 'DaftarKarya' ? 'active' : ''; ?>">
-                    <a href="?pg=DaftarKarya">Daftar Karya Baru</a>
-                </li>
-            </ul>
         </li>
 
         <!--
@@ -572,7 +556,7 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
         -->
         <li class="<?= $isRekapDataActive ? 'active' : '' ?>">
             <a href="#">
-                <i class="fa fa-tasks"></i> 
+                <i class="fa fa-tasks"></i>
                 <span class="nav-label">Rekap Data</span>
                 <span class="fa arrow"></span>
             </a>
@@ -605,36 +589,36 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
 </div>
 
 <script>
-$(document).ready(function() {
-    // Handle menu item clicks
-    $('.nav > li > a').click(function(e) {
-        var $this = $(this);
-        var $parent = $this.parent();
-        
-        // If this is not a dropdown toggle
-        if (!$this.find('.fa.arrow').length) {
+    $(document).ready(function() {
+        // Handle menu item clicks
+        $('.nav > li > a').click(function(e) {
+            var $this = $(this);
+            var $parent = $this.parent();
+
+            // If this is not a dropdown toggle
+            if (!$this.find('.fa.arrow').length) {
+                // Remove all active classes
+                $('.nav > li').removeClass('active');
+                $('.nav-second-level li').removeClass('active');
+
+                // Add active to current item
+                $parent.addClass('active');
+            }
+        });
+
+        // Handle submenu item clicks
+        $('.nav-second-level li a').click(function(e) {
+            var $this = $(this);
+            var $subParent = $this.parent();
+            var $mainParent = $this.closest('.nav > li');
+
             // Remove all active classes
             $('.nav > li').removeClass('active');
             $('.nav-second-level li').removeClass('active');
-            
-            // Add active to current item
-            $parent.addClass('active');
-        }
+
+            // Add active to main parent and submenu item
+            $mainParent.addClass('active');
+            $subParent.addClass('active');
+        });
     });
-    
-    // Handle submenu item clicks
-    $('.nav-second-level li a').click(function(e) {
-        var $this = $(this);
-        var $subParent = $this.parent();
-        var $mainParent = $this.closest('.nav > li');
-        
-        // Remove all active classes
-        $('.nav > li').removeClass('active');
-        $('.nav-second-level li').removeClass('active');
-        
-        // Add active to main parent and submenu item
-        $mainParent.addClass('active');
-        $subParent.addClass('active');
-    });
-});
 </script>

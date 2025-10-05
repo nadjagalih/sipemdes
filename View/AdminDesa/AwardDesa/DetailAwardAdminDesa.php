@@ -11,7 +11,7 @@ include "../App/Control/FunctionDetailAwardAdminDesa.php";
                 <a href="?pg=Dashboard">Dashboard</a>
             </li>
             <li class="breadcrumb-item">
-                <a href="?pg=AwardViewAdminDesa">Award Tersedia</a>
+                <a href="?pg=AwardViewAdminDesa">Award Desa</a>
             </li>
             <li class="breadcrumb-item active">
                 <strong>Detail Award</strong>
@@ -32,65 +32,87 @@ include "../App/Control/FunctionDetailAwardAdminDesa.php";
     <?php if ($DataAward): ?>
     <div class="row">
         <!-- Award Info -->
-        <div class="col-lg-8">
+        <div class="col-lg-12">
             <div class="ibox">
-                <div class="ibox-title">
-                    <h5><i class="fa fa-trophy"></i> Informasi Award</h5>
-                </div>
                 <div class="ibox-content">
+                    <div class="text-center">
+                        <i class="fa fa-trophy" style="font-size: 80px; color: #FFD700; margin-bottom: 20px;"></i>
+                        <h1 class="font-bold"><?php echo $DataAward['JenisPenghargaan']; ?></h1>
+                        <div style="margin: 15px 0;">
+                            <span class="badge badge-primary badge-lg" style="font-size: 16px; padding: 8px 15px; background-color: #007bff; color: white;">
+                                Tahun <?php echo $DataAward['TahunPenghargaan']; ?>
+                            </span>
+                            <span class="badge <?php echo ($DataAward['StatusAktif'] == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 16px; padding: 8px 15px; margin-left: 10px;">
+                                <?php echo $DataAward['StatusAktif']; ?>
+                            </span>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="award-header text-center mb-4">
-                                <div class="award-year" style="font-size: 48px; font-weight: bold; color: #1ab394;">
-                                    <?php echo $DataAward['TahunPenghargaan']; ?>
-                                </div>
-                                <h1 class="award-title"><?php echo $DataAward['JenisPenghargaan']; ?></h1>
-                                <span class="badge <?php echo $statusInfo['badge']; ?> badge-lg">
-                                    <?php echo $statusInfo['text']; ?>
-                                </span>
+                            <div class="form-group text-center">
+                                <label><strong>Masa Aktif Penghargaan:</strong></label>
+                                <p class="form-control-static">
+                                    <?php 
+                                    if (!empty($DataAward['MasaAktifMulai']) && !empty($DataAward['MasaAktifSelesai'])) {
+                                        echo date('d M Y', strtotime($DataAward['MasaAktifMulai'])) . ' - ' . date('d M Y', strtotime($DataAward['MasaAktifSelesai']));
+                                        
+                                        // Cek apakah masih dalam masa aktif
+                                        $today = date('Y-m-d');
+                                        if ($today >= $DataAward['MasaAktifMulai'] && $today <= $DataAward['MasaAktifSelesai']) {
+                                            echo ' <span class="label label-success">Sedang Berlangsung</span>';
+                                        } elseif ($today < $DataAward['MasaAktifMulai']) {
+                                            echo ' <span class="label label-warning">Belum Dimulai</span>';
+                                        } else {
+                                            echo ' <span class="label label-default">Sudah Berakhir</span>';
+                                        }
+                                    } else {
+                                        echo '<em class="text-muted">Belum ditentukan</em>';
+                                    }
+                                    ?>
+                                </p>
+                            </div>
+                            
+                            <div class="form-group text-center">
+                                <label><strong>Masa Penjurian:</strong></label>
+                                <p class="form-control-static">
+                                    <?php 
+                                    if (!empty($DataAward['MasaPenjurianMulai']) && !empty($DataAward['MasaPenjurianSelesai'])) {
+                                        echo date('d M Y', strtotime($DataAward['MasaPenjurianMulai'])) . ' - ' . date('d M Y', strtotime($DataAward['MasaPenjurianSelesai']));
+                                        
+                                        // Cek status masa penjurian
+                                        $today = date('Y-m-d');
+                                        if ($today >= $DataAward['MasaPenjurianMulai'] && $today <= $DataAward['MasaPenjurianSelesai']) {
+                                            echo ' <span class="label label-success">Sedang Berlangsung</span>';
+                                        } elseif ($today < $DataAward['MasaPenjurianMulai']) {
+                                            echo ' <span class="label label-warning">Belum Dimulai</span>';
+                                        } else {
+                                            echo ' <span class="label label-default">Sudah Berakhir</span>';
+                                        }
+                                    } else {
+                                        echo '<em class="text-muted">Belum ditentukan</em>';
+                                    }
+                                    ?>
+                                </p>
                             </div>
                             
                             <?php if (!empty($DataAward['Deskripsi'])): ?>
-                            <div class="award-description">
-                                <h4>Deskripsi</h4>
-                                <p class="text-justify"><?php echo nl2br($DataAward['Deskripsi']); ?></p>
+                            <div class="form-group text-center">
+                                <label><strong>Deskripsi Penghargaan:</strong></label>
+                                <p class="form-control-static"><?php echo nl2br($DataAward['Deskripsi']); ?></p>
                             </div>
                             <?php endif; ?>
-                            
-                            <div class="award-timeline">
-                                <h4>Timeline Award</h4>
-                                <div class="timeline-item">
-                                    <?php if ($DataAward['MasaAktifMulai'] && $DataAward['MasaAktifSelesai']): ?>
-                                    <div class="timeline-content">
-                                        <span class="timeline-title">
-                                            <i class="fa fa-calendar text-primary"></i> Masa Aktif Pendaftaran
-                                        </span>
-                                        <p><?php echo date('d F Y', strtotime($DataAward['MasaAktifMulai'])); ?> - <?php echo date('d F Y', strtotime($DataAward['MasaAktifSelesai'])); ?></p>
-                                    </div>
-                                    <?php endif; ?>
-                                    
-                                    <?php if (!empty($DataAward['MasaPenjurianMulai']) && !empty($DataAward['MasaPenjurianSelesai'])): ?>
-                                    <div class="timeline-content">
-                                        <span class="timeline-title">
-                                            <i class="fa fa-gavel text-warning"></i> Masa Penjurian
-                                        </span>
-                                        <p><?php echo date('d F Y', strtotime($DataAward['MasaPenjurianMulai'])); ?> - <?php echo date('d F Y', strtotime($DataAward['MasaPenjurianSelesai'])); ?></p>
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+    </div>
+    
+    <div class="row">
         <!-- Action Panel -->
-        <div class="col-lg-4">
+        <div class="col-lg-12">
             <div class="ibox">
-                <div class="ibox-title">
-                    <h5><i class="fa fa-cogs"></i> Aksi</h5>
-                </div>
                 <div class="ibox-content">
                     <div class="text-center">
                         <?php 
@@ -102,9 +124,6 @@ include "../App/Control/FunctionDetailAwardAdminDesa.php";
                                 <strong>Sudah Terdaftar</strong><br>
                                 Desa sudah mendaftarkan <?php echo $jumlahKaryaAward; ?> karya ke award ini.
                             </div>
-                            <a href="?pg=KaryaDesa" class="btn btn-primary btn-block">
-                                <i class="fa fa-list"></i> Lihat Semua Karya Desa
-                            </a>
                             <?php if ($statusInfo['text'] == 'Pendaftaran'): ?>
                             <small class="text-muted">
                                 <i class="fa fa-info-circle"></i> 
@@ -130,87 +149,6 @@ include "../App/Control/FunctionDetailAwardAdminDesa.php";
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Status Detail -->
-            <div class="ibox">
-                <div class="ibox-title">
-                    <h5><i class="fa fa-info-circle"></i> Status Detail</h5>
-                </div>
-                <div class="ibox-content">
-                    <div class="status-detail">
-                        <div class="status-item">
-                            <span class="status-label">Status Award:</span>
-                            <span class="badge <?php echo $statusInfo['badge']; ?>">
-                                <?php echo $statusInfo['text']; ?>
-                            </span>
-                        </div>
-                        
-                        <div class="status-item">
-                            <span class="status-label">Tahun:</span>
-                            <span class="status-value"><?php echo $DataAward['TahunPenghargaan']; ?></span>
-                        </div>
-                        
-                        <div class="status-item">
-                            <span class="status-label">Status:</span>
-                            <span class="status-value"><?php echo $DataAward['StatusAktif']; ?></span>
-                        </div>
-                        
-                        <div class="status-item">
-                            <span class="status-label">Karya Terdaftar:</span>
-                            <span class="status-value"><?php echo $jumlahKaryaAward . ' karya'; ?></span>
-                        </div>
-                        
-                        <?php 
-                        // Hitung jumlah kategori
-                        $jumlahKategori = !empty($KategoriList) ? count($KategoriList) : 0;
-                        ?>
-                        <div class="status-item">
-                            <span class="status-label">Kategori Tersedia:</span>
-                            <span class="status-value"><?php echo $jumlahKategori; ?> kategori</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Kategori -->
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="ibox">
-                <div class="ibox-title">
-                    <h5><i class="fa fa-tags"></i> Kategori Award</h5>
-                </div>
-                <div class="ibox-content">
-                    <?php if (!empty($KategoriList)): ?>
-                    <div class="row">
-                        <?php foreach ($KategoriList as $kategori): ?>
-                        <div class="col-lg-4 col-md-6 mb-3">
-                            <div class="kategori-card">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <i class="fa fa-tag text-primary"></i>
-                                            <?php echo $kategori['NamaKategori']; ?>
-                                        </h5>
-                                        <?php if (!empty($kategori['DeskripsiKategori'])): ?>
-                                        <p class="card-text">
-                                            <?php echo $kategori['DeskripsiKategori']; ?>
-                                        </p>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php else: ?>
-                    <div class="alert alert-info text-center">
-                        <i class="fa fa-info-circle"></i> Belum ada kategori yang tersedia untuk award ini.
-                    </div>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -338,6 +276,7 @@ include "../App/Control/FunctionDetailAwardAdminDesa.php";
 </div>
 
 <style>
+/* Award Detail Styling */
 .award-header {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     padding: 30px;
@@ -409,6 +348,34 @@ include "../App/Control/FunctionDetailAwardAdminDesa.php";
 .table-hover tbody tr:hover {
     background-color: #f8f9fa;
 }
+
+/* Modern ibox styling untuk konsistensi */
+.ibox {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid #e7eaec;
+    overflow: visible;
+    position: relative;
+}
+
+.ibox-title {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+}
+
+.ibox-title h5 {
+    margin: 0;
+    color: #495057;
+    font-weight: 500;
+}
+
+.ibox-content {
+    padding: 20px;
+    overflow: visible;
+}
 </style>
 
 <!-- Modal Detail Karya Award -->
@@ -466,4 +433,51 @@ function hapusKaryaAward(id, judul) {
         window.location.href = '../App/Model/ExcKaryaDesa.php?Act=Delete&Kode=' + id + '&redirect=DetailAwardAdminDesa&award=<?php echo $IdAward; ?>';
     }
 }
+</script>
+
+<!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
+<script>
+    // Force pace loading to complete after page is fully loaded
+    window.addEventListener('load', function() {
+        // Wait a bit for all scripts to finish
+        setTimeout(function() {
+            // Force pace to complete if it's still running
+            if (typeof Pace !== 'undefined' && Pace.running) {
+                Pace.stop();
+            }
+            // Add pace-done class to body if not already present
+            if (!document.body.classList.contains('pace-done')) {
+                document.body.classList.add('pace-done');
+            }
+            // Hide any remaining pace elements
+            var paceElements = document.querySelectorAll('.pace');
+            paceElements.forEach(function(el) {
+                el.style.display = 'none';
+            });
+        }, 1000); // Wait 1 second after page load
+    });
+
+    // Fallback - force pace to complete after DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof Pace !== 'undefined' && Pace.running) {
+                Pace.stop();
+            }
+            document.body.classList.add('pace-done');
+        }, 2000); // Wait 2 seconds after DOM ready
+    });
+    
+    // Function untuk close notification bar
+    function closeNotificationBar() {
+        const notifBar = document.querySelector('.notification-bar');
+        if (notifBar) {
+            notifBar.style.animation = 'slideUp 0.3s ease-out forwards';
+            setTimeout(() => {
+                notifBar.style.display = 'none';
+                // Store in localStorage untuk session ini
+                localStorage.setItem('notifBarClosed', 'true');
+            }, 300);
+        }
+    }
+    
 </script>

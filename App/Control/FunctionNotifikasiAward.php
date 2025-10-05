@@ -28,13 +28,15 @@ function getAwardNotifications($db, $IdDesa) {
     
     $currentDate = date('Y-m-d');
     
-    // 1. Award Baru (Belum mendaftar)
+    // 1. Award Baru (Belum mendaftar) - Hanya tampilkan jika award masih aktif
     $QueryAwardBaru = mysqli_query($db, "SELECT 
         ma.IdAward,
         ma.JenisPenghargaan,
         ma.TahunPenghargaan,
         ma.MasaAktifMulai,
         ma.MasaAktifSelesai,
+        ma.MasaPenjurianSelesai,
+        ma.StatusAktif,
         COUNT(da.IdPesertaAward) as SudahDaftar
         FROM master_award_desa ma
         LEFT JOIN master_kategori_award mk ON ma.IdAward = mk.IdAwardFK
@@ -42,6 +44,7 @@ function getAwardNotifications($db, $IdDesa) {
         WHERE ma.StatusAktif = 'Aktif'
         AND (ma.MasaAktifMulai IS NULL OR ma.MasaAktifMulai <= '$currentDate')
         AND (ma.MasaAktifSelesai IS NULL OR ma.MasaAktifSelesai >= '$currentDate')
+        AND (ma.MasaPenjurianSelesai IS NULL OR ma.MasaPenjurianSelesai >= '$currentDate')
         GROUP BY ma.IdAward
         HAVING SudahDaftar = 0
         ORDER BY ma.TanggalInput DESC");
@@ -63,7 +66,7 @@ function getAwardNotifications($db, $IdDesa) {
         }
     }
     
-    // 2. Sudah Daftar - Menunggu Penjurian
+    // 2. Sudah Daftar - Menunggu Penjurian (Semua karya yang sudah disubmit tapi belum ada hasil)
     $QueryMenungguPenjurian = mysqli_query($db, "SELECT 
         da.IdPesertaAward,
         da.NamaKarya,
@@ -72,27 +75,41 @@ function getAwardNotifications($db, $IdDesa) {
         ma.JenisPenghargaan,
         ma.TahunPenghargaan,
         ma.MasaPenjurianMulai,
-        ma.MasaPenjurianSelesai
+        ma.MasaPenjurianSelesai,
+        ma.MasaAktifSelesai,
+        ma.StatusAktif
         FROM desa_award da
         JOIN master_kategori_award mk ON da.IdKategoriAwardFK = mk.IdKategoriAward
         JOIN master_award_desa ma ON mk.IdAwardFK = ma.IdAward
         WHERE da.IdDesaFK = '$IdDesa'
-        AND ma.StatusAktif = 'Aktif'
         AND (da.Posisi IS NULL OR da.Posisi = 0)
         AND (
-            (ma.MasaPenjurianMulai IS NOT NULL AND '$currentDate' < ma.MasaPenjurianMulai) OR
+            -- Tampilkan jika award masih aktif dan belum ada hasil
+            (ma.StatusAktif = 'Aktif' AND (ma.MasaPenjurianSelesai IS NULL OR ma.MasaPenjurianSelesai >= '$currentDate'))
+            OR
+            -- Tampilkan jika masa penjurian sedang berlangsung
             (ma.MasaPenjurianMulai IS NOT NULL AND ma.MasaPenjurianSelesai IS NOT NULL 
              AND '$currentDate' >= ma.MasaPenjurianMulai AND '$currentDate' <= ma.MasaPenjurianSelesai)
+            OR
+            -- Tampilkan jika sudah submit tapi penjurian belum dimulai
+            (ma.MasaPenjurianMulai IS NOT NULL AND '$currentDate' < ma.MasaPenjurianMulai)
         )
         ORDER BY da.TanggalInput DESC");
     
     if ($QueryMenungguPenjurian && mysqli_num_rows($QueryMenungguPenjurian) > 0) {
         while ($karya = mysqli_fetch_assoc($QueryMenungguPenjurian)) {
             $status = '';
+            $iconText = '';
             if (!empty($karya['MasaPenjurianMulai']) && $currentDate < $karya['MasaPenjurianMulai']) {
-                $status = 'Menunggu Dimulai';
+                $status = 'Menunggu Penjurian Dimulai';
+                $iconText = '⏳';
+            } elseif (!empty($karya['MasaPenjurianMulai']) && !empty($karya['MasaPenjurianSelesai']) 
+                     && $currentDate >= $karya['MasaPenjurianMulai'] && $currentDate <= $karya['MasaPenjurianSelesai']) {
+                $status = 'Sedang Dinilai Juri';
+                $iconText = '⚖️';
             } else {
-                $status = 'Sedang Dinilai';
+                $status = 'Menunggu Hasil Penjurian';
+                $iconText = '🕐';
             }
             
             $notifications[] = [
@@ -100,8 +117,8 @@ function getAwardNotifications($db, $IdDesa) {
                 'icon' => 'fa-clock-o',
                 'color' => 'text-warning',
                 'badge' => 'badge-warning',
-                'title' => $status,
-                'message' => $karya['NamaKarya'] . ' (' . $karya['NamaKategori'] . ')',
+                'title' => $iconText . ' ' . $status,
+                'message' => 'Penghargaan: ' . $karya['JenisPenghargaan'] . ' ' . $karya['TahunPenghargaan'] . ' - Kategori: ' . $karya['NamaKategori'] . ' - Karya: ' . $karya['NamaKarya'],
                 'action' => "window.location.href='?pg=KaryaDesa'",
                 'action_text' => 'Lihat Karya',
                 'time' => time_elapsed_string($karya['TanggalInput']),
@@ -110,7 +127,7 @@ function getAwardNotifications($db, $IdDesa) {
         }
     }
     
-    // 3. Menang (Posisi 1-3) - Tampilkan dalam 30 hari terakhir
+    // 3. Menang (Posisi 1-3) - Tampilkan lebih lama jika award sudah selesai
     $QueryMenang = mysqli_query($db, "SELECT 
         da.IdPesertaAward,
         da.NamaKarya,
@@ -119,7 +136,9 @@ function getAwardNotifications($db, $IdDesa) {
         mk.NamaKategori,
         ma.JenisPenghargaan,
         ma.TahunPenghargaan,
-        ma.MasaPenjurianSelesai
+        ma.MasaPenjurianSelesai,
+        ma.MasaAktifSelesai,
+        ma.StatusAktif
         FROM desa_award da
         JOIN master_kategori_award mk ON da.IdKategoriAwardFK = mk.IdKategoriAward
         JOIN master_award_desa ma ON mk.IdAwardFK = ma.IdAward
@@ -127,7 +146,17 @@ function getAwardNotifications($db, $IdDesa) {
         AND da.Posisi IS NOT NULL 
         AND da.Posisi > 0 
         AND da.Posisi <= 3
-        AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 30 DAY)
+        AND (
+            -- Jika award masih aktif: tampilkan dalam 30 hari
+            (ma.StatusAktif = 'Aktif' AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 30 DAY))
+            OR
+            -- Jika award sudah selesai: tampilkan dalam 90 hari (lebih lama)
+            (ma.StatusAktif = 'Non-Aktif' AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 90 DAY))
+            OR
+            -- Jika masa aktif sudah berakhir: tampilkan dalam 90 hari
+            (ma.MasaAktifSelesai IS NOT NULL AND ma.MasaAktifSelesai < '$currentDate' 
+             AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 90 DAY))
+        )
         ORDER BY da.Posisi ASC, da.TanggalInput DESC");
     
     if ($QueryMenang && mysqli_num_rows($QueryMenang) > 0) {
@@ -158,8 +187,8 @@ function getAwardNotifications($db, $IdDesa) {
                 'icon' => 'fa-trophy',
                 'color' => 'text-success',
                 'badge' => 'badge-success',
-                'title' => $iconText . ' Selamat! ' . $posisiText,
-                'message' => 'Award: ' . $karya['JenisPenghargaan'] . ' ' . $karya['TahunPenghargaan'] . ' - Karya: ' . $karya['NamaKarya'],
+                'title' => $iconText . ' Selamat! Meraih ' . $posisiText,
+                'message' => 'Penghargaan: ' . $karya['JenisPenghargaan'] . ' ' . $karya['TahunPenghargaan'] . ' - Kategori: ' . $karya['NamaKategori'] . ' - Karya: ' . $karya['NamaKarya'],
                 'action' => "window.location.href='?pg=KaryaDesa'",
                 'action_text' => 'Lihat Detail',
                 'time' => time_elapsed_string($karya['TanggalInput']),
@@ -178,13 +207,17 @@ function getAwardNotifications($db, $IdDesa) {
         ma.JenisPenghargaan,
         ma.TahunPenghargaan,
         ma.MasaPenjurianSelesai,
-        ma.MasaAktifSelesai
+        ma.MasaAktifSelesai,
+        ma.StatusAktif
         FROM desa_award da
         JOIN master_kategori_award mk ON da.IdKategoriAwardFK = mk.IdKategoriAward
         JOIN master_award_desa ma ON mk.IdAwardFK = ma.IdAward
         WHERE da.IdDesaFK = '$IdDesa'
         AND (
-            (da.Posisi IS NOT NULL AND da.Posisi > 3) OR
+            -- Tidak menang: posisi lebih dari 3 atau posisi 0 (tidak lolos)
+            (da.Posisi IS NOT NULL AND (da.Posisi > 3 OR da.Posisi = 0))
+            OR
+            -- Tidak ada posisi dan penjurian sudah selesai
             (da.Posisi IS NULL AND ma.MasaPenjurianSelesai IS NOT NULL AND '$currentDate' > ma.MasaPenjurianSelesai)
         )
         AND (
@@ -202,15 +235,23 @@ function getAwardNotifications($db, $IdDesa) {
                 continue;
             }
             
-            $statusText = empty($karya['Posisi']) ? 'Tidak Lolos Seleksi' : 'Peringkat ' . $karya['Posisi'];
+            $statusText = '';
+            $iconText = '';
+            if (empty($karya['Posisi'])) {
+                $statusText = 'Tidak Lolos Seleksi';
+                $iconText = '📋';
+            } else {
+                $statusText = 'Peringkat ' . $karya['Posisi'];
+                $iconText = '🏅';
+            }
             
             $notifications[] = [
                 'type' => 'tidak_menang',
                 'icon' => 'fa-info-circle',
                 'color' => 'text-muted',
                 'badge' => 'badge-secondary',
-                'title' => '📋 ' . $statusText,
-                'message' => 'Award: ' . $karya['JenisPenghargaan'] . ' ' . $karya['TahunPenghargaan'] . ' - Karya: ' . $karya['NamaKarya'],
+                'title' => $iconText . ' ' . $statusText,
+                'message' => 'Penghargaan: ' . $karya['JenisPenghargaan'] . ' ' . $karya['TahunPenghargaan'] . ' - Kategori: ' . $karya['NamaKategori'] . ' - Karya: ' . $karya['NamaKarya'],
                 'action' => "window.location.href='?pg=KaryaDesa'",
                 'action_text' => 'Lihat Detail',
                 'time' => time_elapsed_string($karya['TanggalInput']),
@@ -219,7 +260,49 @@ function getAwardNotifications($db, $IdDesa) {
         }
     }
     
-    return $notifications;
+    // Filter notifikasi: Jika ada notifikasi menang dari award yang sudah selesai,
+    // sembunyikan notifikasi award_baru dan menunggu_penjurian dari award yang sama
+    $awardSelesaiDenganJuara = [];
+    $filteredNotifications = [];
+    
+    // Identifikasi award yang sudah selesai dan ada pemenangnya
+    foreach ($notifications as $notif) {
+        if ($notif['type'] == 'menang') {
+            $awardId = $notif['data']['JenisPenghargaan'] . '_' . $notif['data']['TahunPenghargaan'];
+            $isAwardSelesai = false;
+            
+            // Cek apakah award sudah selesai berdasarkan berbagai kondisi
+            if (isset($notif['data']['StatusAktif']) && $notif['data']['StatusAktif'] == 'Non-Aktif') {
+                $isAwardSelesai = true;
+            } elseif (!empty($notif['data']['MasaAktifSelesai']) && $notif['data']['MasaAktifSelesai'] < $currentDate) {
+                $isAwardSelesai = true;
+            } elseif (!empty($notif['data']['MasaPenjurianSelesai']) && $notif['data']['MasaPenjurianSelesai'] < $currentDate) {
+                $isAwardSelesai = true;
+            }
+            
+            if ($isAwardSelesai) {
+                $awardSelesaiDenganJuara[] = $awardId;
+            }
+        }
+    }
+    
+    // Filter notifikasi berdasarkan award yang sudah selesai
+    foreach ($notifications as $notif) {
+        $awardId = $notif['data']['JenisPenghargaan'] . '_' . $notif['data']['TahunPenghargaan'];
+        
+        // Jika award sudah selesai dan ada pemenangnya, hanya tampilkan notifikasi menang dan tidak_menang
+        if (in_array($awardId, $awardSelesaiDenganJuara)) {
+            if ($notif['type'] == 'menang' || $notif['type'] == 'tidak_menang') {
+                $filteredNotifications[] = $notif;
+            }
+            // Skip notifikasi award_baru dan menunggu_penjurian untuk award yang sudah selesai
+        } else {
+            // Tampilkan semua notifikasi untuk award yang masih aktif
+            $filteredNotifications[] = $notif;
+        }
+    }
+    
+    return $filteredNotifications;
 }
 
 // Function untuk menghitung waktu yang lalu
@@ -237,7 +320,7 @@ function time_elapsed_string($datetime, $full = false) {
     return 'baru saja';
 }
 
-// Get notifications
+// Get notifications (sudah terfilter di dalam function)
 $awardNotifications = getAwardNotifications($db, $IdDesa);
 $totalNotifications = count($awardNotifications);
 

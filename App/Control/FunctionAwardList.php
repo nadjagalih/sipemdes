@@ -86,11 +86,6 @@ if (mysqli_num_rows($QueryAward) > 0) {
 ?>
         <div class="award-item" style="border-bottom: none; padding: 25px; background: white; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e9ecef; position: relative; transition: all 0.3s ease;">
             <div class="row">
-                <div class="col-md-1 text-center">
-                    <div style="background: #007bff; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; margin: 0 auto;">
-                        <?php echo $no; ?>
-                    </div>
-                </div>
                 <div class="col-md-8">
                     <div>
                         <h4 style="margin: 0 0 10px 0; color: #007bff; font-weight: 700; font-size: 18px;">
@@ -102,8 +97,8 @@ if (mysqli_num_rows($QueryAward) > 0) {
                         <p style="margin: 0 0 5px 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
                             <i class="fa fa-calendar" style="margin-right: 8px; color: #999;"></i> Dibuat: <?php echo $TanggalInput; ?>
                         </p>
-                        <p style="margin: 0 0 5px 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
-                            <i class="fa fa-clock-o" style="margin-right: 8px; color: #999;"></i> Masa Aktif: <?php echo $masaAktifText; ?>
+                        <p style="margin: 0 0 5px 0; color: #495057; font-size: 14px; line-height: 1.4;">
+                            <i class="fa fa-clock-o" style="margin-right: 8px; color: #495057;"></i> Masa Aktif: <?php echo $masaAktifText; ?>
                         </p>
                         <p style="margin: 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
                             <?php echo $deskripsiShort; ?>

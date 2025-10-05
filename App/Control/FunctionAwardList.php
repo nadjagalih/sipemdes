@@ -74,7 +74,8 @@ if (mysqli_num_rows($QueryAward) > 0) {
             } elseif ($today < $MasaAktifMulai) {
                 $masaAktifText .= ' (Belum Dimulai)';
             } else {
-                $masaAktifText .= ' (Sudah Berakhir)';
+                // Hapus teks "Sudah Berakhir" sesuai permintaan user
+                // $masaAktifText .= ' (Sudah Berakhir)';
             }
         } else {
             $masaAktifText = 'Belum ditentukan';
@@ -83,36 +84,40 @@ if (mysqli_num_rows($QueryAward) > 0) {
         // Format deskripsi yang panjang
         $deskripsiShort = !empty($Deskripsi) ? (strlen($Deskripsi) > 60 ? substr($Deskripsi, 0, 60).'...' : $Deskripsi) : '';
 ?>
-        <div class="award-item" style="border-bottom: 1px solid #e7eaec; padding: 15px 0;">
+        <div class="award-item" style="border-bottom: none; padding: 25px; background: white; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e9ecef; position: relative; transition: all 0.3s ease;">
             <div class="row">
                 <div class="col-md-1 text-center">
-                    <h4 style="margin: 0; color: #676a6c; font-weight: bold;"><?php echo $no; ?></h4>
+                    <div style="background: #007bff; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; margin: 0 auto;">
+                        <?php echo $no; ?>
+                    </div>
                 </div>
                 <div class="col-md-8">
                     <div>
-                        <h4 style="margin: 0 0 5px 0; color: #1ab394; font-weight: bold;">
+                        <h4 style="margin: 0 0 10px 0; color: #007bff; font-weight: 700; font-size: 18px;">
                             <?php echo $JenisPenghargaan; ?>
                         </h4>
-                        <p style="margin: 0; color: #676a6c; font-size: 13px;">
-                            <i class="fa fa-building text-muted"></i> Pemerintah Kabupaten Trenggalek &nbsp;&nbsp;
-                            <i class="fa fa-calendar text-muted"></i> Dibuat: <?php echo $TanggalInput; ?>
+                        <p style="margin: 0 0 5px 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
+                            <i class="fa fa-building" style="margin-right: 8px; color: #999;"></i> Pemerintah Kabupaten Trenggalek
                         </p>
-                        <p style="margin: 0; color: #676a6c; font-size: 13px;">
-                            <i class="fa fa-clock-o text-muted"></i> Masa Aktif: <?php echo $masaAktifText; ?>
+                        <p style="margin: 0 0 5px 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
+                            <i class="fa fa-calendar" style="margin-right: 8px; color: #999;"></i> Dibuat: <?php echo $TanggalInput; ?>
                         </p>
-                        <p style="margin: 5px 0 0 0; color: #676a6c; font-size: 12px;">
+                        <p style="margin: 0 0 5px 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
+                            <i class="fa fa-clock-o" style="margin-right: 8px; color: #999;"></i> Masa Aktif: <?php echo $masaAktifText; ?>
+                        </p>
+                        <p style="margin: 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
                             <?php echo $deskripsiShort; ?>
                         </p>
                     </div>
                 </div>
-                <div class="col-md-2 text-center">
-                    <span class="label <?php echo $badgeClass; ?>" style="padding: 4px 12px; font-size: 11px;">
+                <div class="col-md-2 text-center" style="position: absolute; top: 25px; right: 100px;">
+                    <span class="label <?php echo $badgeClass; ?>" style="padding: 10px 18px; font-size: 12px; border-radius: 20px; font-weight: 600; text-transform: uppercase; color: white; border: 2px solid #495057; box-shadow: 0 2px 4px rgba(0,0,0,0.2); min-width: 80px; text-align: center;">
                         <?php echo $StatusAktif; ?>
                     </span>
                 </div>
-                <div class="col-md-1 text-right">
+                <div class="col-md-1 text-right" style="position: absolute; top: 27px; right: 25px;">
                     <div class="dropdown">
-                        <button class="btn btn-xs btn-outline btn-default" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-xs btn-outline btn-default" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border: 1px solid #ddd; background: #f8f9fa; color: #6c757d; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
                             <i class="fa fa-cog"></i> <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-right">

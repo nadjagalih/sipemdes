@@ -1,5 +1,34 @@
 <?php
-include "../App/Control/FunctionKategoriDetail.php";
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Debug parameter
+echo "<!-- Debug: Kode parameter = " . (isset($_GET['Kode']) ? $_GET['Kode'] : 'TIDAK ADA') . " -->";
+
+try {
+    include "../App/Control/FunctionKategoriDetail.php";
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+    die();
+}
+
+// Pastikan variabel terdefinisi dengan nilai default
+$NamaKategori = isset($NamaKategori) ? $NamaKategori : 'Kategori Tidak Ditemukan';
+$JenisPenghargaan = isset($JenisPenghargaan) ? $JenisPenghargaan : 'Unknown';
+$StatusAward = isset($StatusAward) ? $StatusAward : 'Unknown';
+$IdAward = isset($IdAward) ? $IdAward : '';
+$IdKategoriAward = isset($IdKategoriAward) ? $IdKategoriAward : '';
+$totalPeserta = isset($totalPeserta) ? $totalPeserta : 0;
+$pesertaBerposisi = isset($pesertaBerposisi) ? $pesertaBerposisi : 0;
+$DeskripsiKategori = isset($DeskripsiKategori) ? $DeskripsiKategori : '';
+$MasaPenjurianMulai = isset($MasaPenjurianMulai) ? $MasaPenjurianMulai : '';
+$MasaPenjurianSelesai = isset($MasaPenjurianSelesai) ? $MasaPenjurianSelesai : '';
+$isMasaPenjurian = isset($isMasaPenjurian) ? $isMasaPenjurian : false;
+$statusPenjurian = isset($statusPenjurian) ? $statusPenjurian : 'Status tidak diketahui';
+$QueryPeserta = isset($QueryPeserta) ? $QueryPeserta : null;
+
+echo "<!-- Debug: Variabel sudah disiapkan -->";
 ?>
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
@@ -30,51 +59,27 @@ include "../App/Control/FunctionKategoriDetail.php";
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-8">
-            <div class="ibox">
+            <div class="ibox" style="min-height: 280px;">
                 <div class="ibox-content">
                     <div class="text-center">
-                        <i class="fa fa-trophy" style="font-size: 60px; color: #f8ac59; margin-bottom: 20px;"></i>
+                        <i class="fa fa-trophy" style="font-size: 80px; color: #FFD700; margin-bottom: 20px;"></i>
                         <h1 class="font-bold"><?php echo $NamaKategori; ?></h1>
                         <div style="margin: 15px 0;">
-                            <span class="badge badge-warning badge-lg" style="font-size: 14px; padding: 6px 12px;">
+                            <span class="badge badge-warning badge-lg" style="font-size: 16px; padding: 8px 15px; background-color: #007bff; color: white;">
                                 Kategori <?php echo $JenisPenghargaan; ?>
                             </span>
-                            <span class="badge <?php echo ($StatusAward == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 14px; padding: 6px 12px; margin-left: 10px;">
+                            <span class="badge <?php echo ($StatusAward == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 16px; padding: 8px 15px; margin-left: 10px;">
                                 Award <?php echo $StatusAward; ?>
                             </span>
                         </div>
-                        <?php if (!empty($DeskripsiKategori)): ?>
-                            <p class="text-muted" style="margin-top: 15px; font-size: 16px;">
-                                <?php echo nl2br($DeskripsiKategori); ?>
-                            </p>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-4">
-            <!-- Stats Panel -->
-            <div class="ibox">
-                <div class="ibox-title">
-                    <h5>Statistik Peserta</h5>
-                </div>
-                <div class="ibox-content">
-                    <div class="row text-center">
-                        <div class="col-xs-6">
-                            <h2 class="font-bold text-navy"><?php echo $totalPeserta; ?></h2>
-                            <span>Total Peserta</span>
-                        </div>
-                        <div class="col-xs-6">
-                            <h2 class="font-bold text-primary"><?php echo $pesertaBerposisi; ?></h2>
-                            <span>Sudah Berposisi</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Action Panel -->
-            <div class="ibox">
+            <div class="ibox" style="min-height: 280px;">
                 <div class="ibox-title">
                     <h5>Aksi Kategori</h5>
                 </div>
@@ -90,9 +95,27 @@ include "../App/Control/FunctionKategoriDetail.php";
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Info Deskripsi Panel -->
+            <?php if (!empty($DeskripsiKategori)): ?>
+            <div class="ibox" style="min-height: 180px;">
+                <div class="ibox-title">
+                    <h5>Deskripsi Kategori</h5>
+                </div>
+                <div class="ibox-content">
+                    <p class="form-control-static"><?php echo nl2br($DeskripsiKategori); ?></p>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
 
+        <div class="col-lg-4">
             <!-- Info Masa Penjurian -->
-            <div class="ibox">
+            <div class="ibox" style="min-height: 180px;">
                 <div class="ibox-title">
                     <h5>Status Penjurian</h5>
                 </div>
@@ -122,12 +145,10 @@ include "../App/Control/FunctionKategoriDetail.php";
             <div class="ibox">
                 <div class="ibox-title">
                     <h5>Daftar Peserta Kategori <?php echo $NamaKategori; ?></h5>
-                    <div class="ibox-tools">
-                        <span class="label label-info"><?php echo $totalPeserta; ?> Peserta</span>
-                    </div>
+                    <!-- Label peserta dihapus -->
                 </div>
                 <div class="ibox-content">
-                    <?php if ($totalPeserta > 0): ?>
+                    <?php if ($totalPeserta > 0 && $QueryPeserta): ?>
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <thead>
@@ -213,6 +234,111 @@ include "../App/Control/FunctionKategoriDetail.php";
         </div>
     </div>
 </div>
+
+<style>
+/* Modern styling konsisten dengan AwardDetail.php */
+.wrapper-content {
+    background: #f8f9fa;
+}
+
+.ibox {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 2px solid #dee2e6;
+    overflow: visible;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.ibox-title {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.ibox-title h5 {
+    margin: 0;
+    color: #495057;
+    font-weight: 500;
+}
+
+.ibox-content {
+    padding: 20px;
+    overflow: visible;
+}
+
+/* Table styling dengan tema biru */
+.table th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    border-top: none;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f8f9fa;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Badge dan button styling konsisten */
+.badge-info {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.badge-primary {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.btn-primary {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+}
+
+.text-navy {
+    color: #007bff !important;
+}
+
+/* Alert styling */
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+/* Label styling konsisten dengan tema */
+.label-info {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .ibox {
+        margin-bottom: 20px;
+    }
+    
+    .table-responsive {
+        border: none;
+    }
+}
+</style>
 
 <!-- Modal Edit Kategori -->
 <div class="modal fade" id="modalEditKategori" tabindex="-1" role="dialog">

@@ -30,10 +30,10 @@ include "../App/Control/FunctionAwardDetail.php";
             <div class="ibox">
                 <div class="ibox-content">
                     <div class="text-center">
-                        <i class="fa fa-trophy" style="font-size: 80px; color: #1ab394; margin-bottom: 20px;"></i>
+                        <i class="fa fa-trophy" style="font-size: 80px; color: #FFD700; margin-bottom: 20px;"></i>
                         <h1 class="font-bold"><?php echo $JenisPenghargaan; ?></h1>
                         <div style="margin: 15px 0;">
-                            <span class="badge badge-primary badge-lg" style="font-size: 16px; padding: 8px 15px;">
+                            <span class="badge badge-primary badge-lg" style="font-size: 16px; padding: 8px 15px; background-color: #007bff; color: white;">
                                 Tahun <?php echo $TahunPenghargaan; ?>
                             </span>
                             <span class="badge <?php echo ($StatusAktif == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 16px; padding: 8px 15px; margin-left: 10px;">
@@ -135,7 +135,7 @@ include "../App/Control/FunctionAwardDetail.php";
         <div class="col-lg-12">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>Kategori dan Peserta Award</h5>
+                    <h5><i class="fa fa-list"></i> Kategori dan Peserta Award</h5>
                 </div>
                 <div class="ibox-content">
                     <?php include "../App/Control/FunctionAwardKategoriList.php"; ?>
@@ -144,6 +144,277 @@ include "../App/Control/FunctionAwardDetail.php";
         </div>
     </div>
 </div>
+
+<style>
+/* Modern Card List Styling - Sama seperti AwardView.php */
+.wrapper-content {
+    background: #f8f9fa;
+}
+
+.ibox {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid #e7eaec;
+    overflow: visible;
+    position: relative;
+}
+
+.ibox-title {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.ibox-title h5 {
+    margin: 0;
+    color: #495057;
+    font-weight: 500;
+}
+
+.ibox-content {
+    padding: 20px;
+    overflow: visible;
+}
+
+/* Styling untuk kategori items - mendekatkan jarak antara kolom */
+.kategori-item {
+    background: white;
+    margin-bottom: 20px !important;
+    padding: 20px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    border: 1px solid #e9ecef !important;
+    border-bottom: none !important;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.kategori-item:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+    transform: translateY(-3px);
+}
+
+/* Mendekatkan kolom nomor dengan kolom data lebih lagi */
+.kategori-item .col-md-1:first-child {
+    padding-right: 5px !important;
+    margin-right: 0 !important;
+    padding-left: 5px !important;
+}
+
+.kategori-item .col-md-1:nth-child(2) {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    margin-left: -20px !important;
+}
+
+.kategori-item .col-md-6 {
+    padding-left: 0px !important;
+    margin-left: -25px !important;
+}
+
+/* Nomor urut styling - kotak biru dengan nomor di tengah kiri */
+.kategori-item .col-md-1:first-child h4 {
+    background: #007bff !important;
+    color: white !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    text-align: center !important;
+    line-height: 10px !important;
+    vertical-align: middle !important;
+}
+
+/* Hapus icon piala di nomor urut */
+.kategori-item .col-md-1 .fa-trophy {
+    display: none !important;
+}
+
+/* Title styling - dengan icon medali tanpa nomor dan warna biru */
+.kategori-item .col-md-6 h4 {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #007bff !important;
+    margin-bottom: 10px !important;
+    text-decoration: none !important;
+}
+
+/* Add medal icon tanpa nomor - hanya emoji medali */
+.kategori-item .col-md-6 h4:before {
+    content: "🏅 ";
+    margin-right: 10px;
+}
+
+/* Info paragraphs styling */
+.kategori-item .col-md-6 p {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 5px !important;
+    color: #6c757d !important;
+}
+
+/* Deskripsi tanpa margin bottom */
+.kategori-item .col-md-6 p:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Icons FontAwesome */
+.kategori-item .col-md-6 p .fa {
+    margin-right: 8px;
+    color: #999;
+    width: 16px;
+    text-align: center;
+}
+
+/* Status badge positioning and styling - diperbaiki agar tidak terpotong */
+.kategori-item .col-md-2 {
+    position: absolute !important;
+    top: 25px !important;
+    right: 120px !important;
+    width: auto !important;
+    min-width: 100px !important;
+}
+
+.kategori-item .col-md-2 .label {
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+    border-radius: 20px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    min-width: 90px !important;
+    display: inline-block !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+    white-space: nowrap !important;
+}
+
+/* Action buttons positioning - dipindahkan lebih jauh */
+.kategori-item .col-md-2:last-child {
+    position: absolute !important;
+    top: 25px !important;
+    right: 15px !important;
+    width: auto !important;
+}
+
+/* Badge styling - konsisten dengan tema biru */
+.label-success {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.label-primary {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.label-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.label-danger {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.label-default {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+/* Dropdown styling */
+.dropdown-menu {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    z-index: 1050;
+    min-width: 150px;
+}
+
+.dropdown-item {
+    padding: 10px 16px;
+    color: #495057;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.btn-outline {
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+    color: #6c757d;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.btn-outline:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .kategori-item {
+        padding: 20px !important;
+    }
+    
+    .kategori-item .col-md-1:first-child h4 {
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 14px !important;
+    }
+    
+    .kategori-item .col-md-6 h4 {
+        font-size: 16px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .kategori-item .col-md-6 p {
+        font-size: 13px !important;
+    }
+    
+    .kategori-item .col-md-2 {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        margin-top: 15px;
+        text-align: left !important;
+    }
+}
+
+/* Remove default table styling if any */
+.ibox-content table,
+.ibox-content .table {
+    display: none;
+}
+
+/* Ensure kategori-item is visible */
+.ibox-content .kategori-item {
+    display: block !important;
+}
+
+/* Additional spacing */
+.ibox-content > div:first-child {
+    margin-top: 0;
+}
+
+.ibox-content > div:last-child {
+    margin-bottom: 0;
+}
+</style>
 
 <!-- Modal Add Kategori -->
 <div class="modal fade" id="modalAddKategori" tabindex="-1" role="dialog">
@@ -317,4 +588,33 @@ function confirmDelete(url, message) {
         window.location.href = url;
     }
 }
+
+$(document).ready(function() {
+    // Add hover effects to kategori items - sama seperti AwardView.php
+    $(document).on('mouseenter', '.kategori-item', function() {
+        $(this).css({
+            'box-shadow': '0 8px 20px rgba(0,0,0,0.15)',
+            'transform': 'translateY(-3px)'
+        });
+    });
+    
+    $(document).on('mouseleave', '.kategori-item', function() {
+        $(this).css({
+            'box-shadow': '0 4px 12px rgba(0,0,0,0.1)',
+            'transform': 'translateY(0)'
+        });
+    });
+    
+    // Fix dropdown positioning
+    $(document).on('show.bs.dropdown', '.dropdown', function() {
+        $(this).find('.dropdown-menu').css({
+            'position': 'absolute',
+            'z-index': '1050'
+        });
+    });
+    
+    // Fix overflow untuk dropdown
+    $('.ibox').css('overflow', 'visible');
+    $('.ibox-content').css('overflow', 'visible');
+});
 </script>

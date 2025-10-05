@@ -111,7 +111,7 @@ include "../App/Control/FunctionAwardEdit.php";
                                 <button class="btn btn-primary" type="submit" name="Edit">
                                     <i class="fa fa-save"></i> Update Award
                                 </button>
-                                <a href="?pg=AwardView" class="btn btn-secondary">
+                                <a href="?pg=AwardDetail&Kode=<?php echo $IdAward; ?>" class="btn btn-secondary">
                                     <i class="fa fa-times"></i> Batal
                                 </a>
                             </div>

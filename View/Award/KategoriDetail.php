@@ -57,9 +57,9 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
 </div>
 
 <div class="wrapper wrapper-content animated fadeInRight">
-    <div class="row">
+    <div class="row" style="display: flex; align-items: stretch;">
         <div class="col-lg-8">
-            <div class="ibox" style="min-height: 280px;">
+            <div class="ibox" style="min-height: 373px;">
                 <div class="ibox-content">
                     <div class="text-center">
                         <i class="fa fa-trophy" style="font-size: 80px; color: #FFD700; margin-bottom: 20px;"></i>
@@ -68,7 +68,9 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
                             <span class="badge badge-warning badge-lg" style="font-size: 16px; padding: 8px 15px; background-color: #007bff; color: white;">
                                 Kategori <?php echo $JenisPenghargaan; ?>
                             </span>
-                            <span class="badge <?php echo ($StatusAward == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 16px; padding: 8px 15px; margin-left: 10px;">
+                        </div>
+                        <div>
+                            <span class="badge <?php echo ($StatusAward == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 16px; padding: 8px 15px;">
                                 Award <?php echo $StatusAward; ?>
                             </span>
                         </div>
@@ -78,61 +80,49 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
         </div>
 
         <div class="col-lg-4">
-            <!-- Action Panel -->
-            <div class="ibox" style="min-height: 280px;">
-                <div class="ibox-title">
-                    <h5>Aksi Kategori</h5>
-                </div>
-                <div class="ibox-content">
-                    <div class="btn-group-vertical btn-block">
-                        <button type="button" class="btn btn-success" onclick="editKategori('<?php echo $IdKategoriAward; ?>')">
-                            <i class="fa fa-edit"></i> Edit Kategori
-                        </button>
-                        <a href="../App/Model/ExcKategoriAward.php?Act=Delete&Kode=<?php echo $IdKategoriAward; ?>" 
-                           onclick="return confirm('Yakin ingin menghapus kategori ini? Semua peserta dalam kategori ini akan ikut terhapus.');" class="btn btn-danger">
-                            <i class="fa fa-trash"></i> Hapus Kategori
-                        </a>
+            <div class="row">
+                <!-- Action Panel -->
+                <div class="col-lg-12">
+                    <div class="ibox" style="margin-bottom: 15px;">
+                        <div class="ibox-title">
+                            <h5>Aksi Kategori</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <div class="btn-group-vertical btn-block">
+                                <button type="button" class="btn btn-success" onclick="editKategori('<?php echo $IdKategoriAward; ?>')">
+                                    <i class="fa fa-edit"></i> Edit Kategori
+                                </button>
+                                <a href="../App/Model/ExcKategoriAward.php?Act=Delete&Kode=<?php echo $IdKategoriAward; ?>" 
+                                   onclick="return confirm('Yakin ingin menghapus kategori ini? Semua peserta dalam kategori ini akan ikut terhapus.');" class="btn btn-danger">
+                                    <i class="fa fa-trash"></i> Hapus Kategori
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-lg-8">
-            <!-- Info Deskripsi Panel -->
-            <?php if (!empty($DeskripsiKategori)): ?>
-            <div class="ibox" style="min-height: 180px;">
-                <div class="ibox-title">
-                    <h5>Deskripsi Kategori</h5>
-                </div>
-                <div class="ibox-content">
-                    <p class="form-control-static"><?php echo nl2br($DeskripsiKategori); ?></p>
-                </div>
-            </div>
-            <?php endif; ?>
-        </div>
-
-        <div class="col-lg-4">
-            <!-- Info Masa Penjurian -->
-            <div class="ibox" style="min-height: 180px;">
-                <div class="ibox-title">
-                    <h5>Status Penjurian</h5>
-                </div>
-                <div class="ibox-content">
-                    <?php if (!empty($MasaPenjurianMulai) && !empty($MasaPenjurianSelesai)): ?>
-                        <p><strong>Masa Penjurian:</strong><br>
-                        <?php echo date('d M Y', strtotime($MasaPenjurianMulai)) . ' - ' . date('d M Y', strtotime($MasaPenjurianSelesai)); ?></p>
-                    <?php endif; ?>
-                    
-                    <div class="alert <?php echo $isMasaPenjurian ? 'alert-success' : 'alert-warning'; ?>">
-                        <i class="fa <?php echo $isMasaPenjurian ? 'fa-check-circle' : 'fa-exclamation-triangle'; ?>"></i>
-                        <strong><?php echo $statusPenjurian; ?></strong>
-                        <?php if ($isMasaPenjurian): ?>
-                            <br>Admin dapat memilih pemenang saat ini.
-                        <?php else: ?>
-                            <br>Tidak dapat memilih pemenang di luar masa penjurian.
-                        <?php endif; ?>
+                
+                <!-- Info Masa Penjurian -->
+                <div class="col-lg-12">
+                    <div class="ibox">
+                        <div class="ibox-title">
+                            <h5>Status Penjurian</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <?php if (!empty($MasaPenjurianMulai) && !empty($MasaPenjurianSelesai)): ?>
+                                <p><strong>Masa Penjurian:</strong><br>
+                                <?php echo date('d M Y', strtotime($MasaPenjurianMulai)) . ' - ' . date('d M Y', strtotime($MasaPenjurianSelesai)); ?></p>
+                            <?php endif; ?>
+                            
+                            <div class="alert <?php echo $isMasaPenjurian ? 'alert-success' : 'alert-warning'; ?>">
+                                <i class="fa <?php echo $isMasaPenjurian ? 'fa-check-circle' : 'fa-exclamation-triangle'; ?>"></i>
+                                <strong><?php echo $statusPenjurian; ?></strong>
+                                <?php if ($isMasaPenjurian): ?>
+                                    <br>Admin dapat memilih pemenang saat ini.
+                                <?php else: ?>
+                                    <br>Tidak dapat memilih pemenang di luar masa penjurian.
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

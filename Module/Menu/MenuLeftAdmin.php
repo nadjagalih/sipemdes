@@ -361,6 +361,7 @@ echo '<style>
     }
 </style>';
 $activePages = ['UserViewAdminDesa', 'PegawaiViewAllAdminDesa', 'PegawaiBPDViewAllAdminDesa'];
+$isAwardDesaActive = in_array($pg, ['DaftarKarya', 'KaryaDesa', 'EditKarya', 'AwardViewAdminDesa']);
 $isDataKeluargaActive = in_array($pg, [
     'PegawaiViewSuamiIstriAdminDesa',
     'PegawaiViewAnakAdminDesa',
@@ -459,6 +460,21 @@ if ($rowPensiun = mysqli_fetch_assoc($queryPensiun)) {
                 </li>
                 <li class="<?php echo $pg == 'PegawaiBPDViewAllAdminDesa' ? 'active' : ''; ?>">
                     <a href="?pg=PegawaiBPDViewAllAdminDesa">BPD</a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="<?php echo $isAwardDesaActive ? 'active' : ''; ?>">
+            <a href="#">
+                <i class="fa fa-trophy"></i> 
+                <span class="nav-label">Award Desa</span>
+                <span class="fa arrow"></span>
+            </a>
+            <ul class="nav nav-second-level collapse <?php echo $isAwardDesaActive ? 'in' : ''; ?>">
+                <li class="<?php echo $pg == 'AwardViewAdminDesa' ? 'active' : ''; ?>">
+                    <a href="?pg=AwardViewAdminDesa">Daftar Award Desa</a>
+                <li class="<?php echo $pg == 'DaftarKarya' ? 'active' : ''; ?>">
+                    <a href="?pg=DaftarKarya">Daftar Karya Baru</a>
                 </li>
             </ul>
         </li>

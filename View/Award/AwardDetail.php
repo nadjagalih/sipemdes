@@ -105,10 +105,9 @@ include "../App/Control/FunctionAwardDetail.php";
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalAddKategori">
                             <i class="fa fa-plus"></i> Tambah Kategori
                         </button>
-                        <a href="../App/Model/ExcAward.php?Act=Delete&Kode=<?php echo $IdAward; ?>" 
-                           onclick="return confirm('Yakin ingin menghapus penghargaan ini?');" class="btn btn-danger">
+                        <button type="button" class="btn btn-danger" onclick="confirmDeleteAward('<?php echo $IdAward; ?>', '<?php echo addslashes($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>')">
                             <i class="fa fa-trash"></i> Hapus Penghargaan
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -546,6 +545,31 @@ include "../App/Control/FunctionAwardDetail.php";
     </div>
 </div>
 
+<!-- Modal Konfirmasi Hapus -->
+<div class="modal fade" id="modalConfirmDelete" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body" style="text-align: center; padding: 40px 30px;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f44336, #d32f2f); border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </div>
+                <h4 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 15px;">Yakin ingin menghapus penghargaan?</h4>
+                <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 25px;" id="deleteMessage">
+                    Penghargaan yang sudah dihapus tidak dapat dikembalikan.
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button type="button" class="btn" style="background: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;" onclick="closeDeleteModal()">
+                        Batal
+                    </button>
+                    <button type="button" class="btn" style="background: linear-gradient(135deg, #f44336, #d32f2f); color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;" id="confirmDeleteBtn">
+                        Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function editKategori(id) {
     $.get('../App/Model/ExcKategoriAward.php?Act=GetKategoriData&Kode=' + id, function(data) {
@@ -599,6 +623,25 @@ function confirmDelete(url, message) {
     if (confirm(message)) {
         window.location.href = url;
     }
+}
+
+// Function untuk konfirmasi hapus award
+function confirmDeleteAward(id, nama) {
+    document.getElementById('deleteMessage').innerHTML = 'Penghargaan "<strong>' + nama + '</strong>" akan dihapus permanen.<br><br>Semua kategori dan peserta dalam penghargaan ini juga akan ikut terhapus.';
+    
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        window.location.href = '../App/Model/ExcAward.php?Act=Delete&Kode=' + id;
+    };
+    
+    $('#modalConfirmDelete').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
+}
+
+// Function untuk close delete modal
+function closeDeleteModal() {
+    $('#modalConfirmDelete').modal('hide');
 }
 
 $(document).ready(function() {

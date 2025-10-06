@@ -196,8 +196,7 @@ if ($Act == 'Save') {
         // Validasi URL
         if (!filter_var($LinkKarya, FILTER_VALIDATE_URL)) {
             echo "<script>
-                alert('Format URL tidak valid!');
-                window.location.href = '../../View/v.php?pg=EditKaryaAward&kode=$IdPesertaAward&award=$IdAward';
+                window.location.href = '../../View/v.php?pg=EditKaryaAward&kode=$IdPesertaAward&award=$IdAward&alert=InvalidURL';
             </script>";
             exit;
         }
@@ -208,8 +207,7 @@ if ($Act == 'Save') {
         
         if (mysqli_num_rows($QueryCekOwner) == 0) {
             echo "<script>
-                alert('Anda tidak memiliki akses untuk mengedit karya ini!');
-                window.location.href = '../../View/v.php?pg=DetailAwardAdminDesa&id=$IdAward';
+                window.location.href = '../../View/v.php?pg=DetailAwardAdminDesa&id=$IdAward&alert=AccessDenied';
             </script>";
             exit;
         }
@@ -223,12 +221,10 @@ if ($Act == 'Save') {
         
         if ($QueryUpdate) {
             echo "<script>
-                alert('Karya berhasil diupdate!');
                 window.location.href = '../../View/v.php?pg=DetailAwardAdminDesa&id=$IdAward&alert=UpdateSuccess';
             </script>";
         } else {
             echo "<script>
-                alert('Gagal mengupdate karya: " . mysqli_error($db) . "');
                 window.location.href = '../../View/v.php?pg=EditKaryaAward&kode=$IdPesertaAward&award=$IdAward&alert=UpdateError';
             </script>";
         }
@@ -287,12 +283,10 @@ if ($Act == 'Save') {
             // Tentukan redirect berdasarkan parameter
             if ($redirect == 'DetailAwardAdminDesa' && !empty($IdAward)) {
                 echo "<script>
-                    alert('Karya berhasil dihapus!');
                     window.location.href = '../../View/v.php?pg=DetailAwardAdminDesa&id=$IdAward&alert=DeleteSuccess';
                 </script>";
             } else {
                 echo "<script>
-                    alert('Karya berhasil dihapus!');
                     window.location.href = '../../View/v.php?pg=KaryaDesa&alert=DeleteSuccess';
                 </script>";
             }
@@ -300,12 +294,10 @@ if ($Act == 'Save') {
             // Error redirect juga sesuai parameter
             if ($redirect == 'DetailAwardAdminDesa' && !empty($IdAward)) {
                 echo "<script>
-                    alert('Gagal menghapus karya: " . mysqli_error($db) . "');
                     window.location.href = '../../View/v.php?pg=DetailAwardAdminDesa&id=$IdAward&alert=DeleteError';
                 </script>";
             } else {
                 echo "<script>
-                    alert('Gagal menghapus karya: " . mysqli_error($db) . "');
                     window.location.href = '../../View/v.php?pg=KaryaDesa&alert=DeleteError';
                 </script>";
             }

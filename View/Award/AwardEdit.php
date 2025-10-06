@@ -1,6 +1,15 @@
 <?php
 // Form edit award
 include "../App/Control/FunctionAwardEdit.php";
+
+// Handle alert notifications
+if (isset($_GET['alert'])) {
+    $alertType = $_GET['alert'];
+    if ($alertType == 'EditError') {
+        $showErrorModal = true;
+        $errorMessage = 'Gagal mengupdate award. Silakan coba lagi.';
+    }
+}
 ?>
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
@@ -122,3 +131,44 @@ include "../App/Control/FunctionAwardEdit.php";
         </div>
     </div>
 </div>
+
+<!-- Modal Error -->
+<div class="modal fade" id="modalError" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body" style="text-align: center; padding: 40px 30px;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f44336, #d32f2f); border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);">
+                    <i class="fa fa-times"></i>
+                </div>
+                <h4 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 15px;">Terjadi Kesalahan</h4>
+                <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 25px;">
+                    <?php echo isset($errorMessage) ? $errorMessage : 'Terjadi kesalahan, silakan coba lagi.'; ?>
+                </p>
+                <button type="button" class="btn" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;" onclick="closeErrorModal()">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php if (isset($showErrorModal) && $showErrorModal): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('#modalError').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
+});
+
+function closeErrorModal() {
+    $('#modalError').modal('hide');
+    // Remove alert parameter from URL
+    if (window.history.replaceState) {
+        var url = new URL(window.location);
+        url.searchParams.delete('alert');
+        window.history.replaceState(null, null, url);
+    }
+}
+</script>
+<?php endif; ?>

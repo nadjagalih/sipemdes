@@ -49,6 +49,24 @@ if ($DataKarya['StatusAktif'] != 'Aktif') {
     </script>";
     exit;
 }
+
+// Handle alert notifications
+if (isset($_GET['alert'])) {
+    $alertType = $_GET['alert'];
+    if ($alertType == 'UpdateError') {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                alert('Gagal mengupdate karya. Silakan coba lagi.');
+            });
+        </script>";
+    } elseif ($alertType == 'InvalidURL') {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                alert('Format URL tidak valid! Pastikan URL dimulai dengan http:// atau https://');
+            });
+        </script>";
+    }
+}
 ?>
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">

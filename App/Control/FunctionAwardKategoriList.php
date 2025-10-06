@@ -36,7 +36,7 @@ if (mysqli_num_rows($QueryKategori) > 0) {
         // Format deskripsi yang panjang
         $deskripsiShort = !empty($DeskripsiKategori) ? (strlen($DeskripsiKategori) > 80 ? substr($DeskripsiKategori, 0, 80) . '...' : $DeskripsiKategori) : '';
 ?>
-        <div class="kategori-item" style="border-bottom: 1px solid #e7eaec; padding: 20px !important; margin-bottom: 20px !important; border-radius: 12px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; border: 1px solid #e9ecef !important; transition: all 0.3s ease; position: relative; background: white;">
+        <div class="item" style="border-bottom: 1px solid #e7eaec; padding: 20px !important; margin-bottom: 20px !important; border-radius: 12px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; border: 1px solid #e9ecef !important; transition: all 0.3s ease; position: relative; background: white;">
             <div class="row">
                 <!-- Content area dengan padding minimal -->
                 <div class="col-md-6" style="padding-left: 35px !important; margin-left: -25px !important;">

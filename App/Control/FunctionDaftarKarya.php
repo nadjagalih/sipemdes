@@ -42,7 +42,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'getKategori') {
         } elseif (mysqli_num_rows($QueryKategori) > 0) {
             echo '<option value="">-- Pilih Kategori --</option>';
             while ($DataKategori = mysqli_fetch_assoc($QueryKategori)) {
-                $deskripsi = !empty($DataKategori['DeskripsiKategori']) ? ' - ' . substr($DataKategori['DeskripsiKategori'], 0, 50) . '...' : '';
                 echo "<option value='{$DataKategori['IdKategoriAward']}'>{$DataKategori['NamaKategori']}{$deskripsi}</option>";
             }
         } else {

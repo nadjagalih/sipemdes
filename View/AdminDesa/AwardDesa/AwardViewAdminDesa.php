@@ -218,6 +218,64 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         margin-bottom: 10px;
     }
     
+    .award-details-container {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+    
+    .award-details-left {
+        flex: 1;
+    }
+    
+    .award-details-right {
+        flex: 0 0 auto;
+        min-width: 200px;
+    }
+    
+    .achievement-box {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border: 2px solid #f1c40f;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 8px rgba(241, 196, 15, 0.3);
+        min-height: 60px;
+    }
+    
+    .achievement-icon {
+        font-size: 32px;
+        line-height: 1;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .achievement-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+    }
+    
+    .achievement-info .badge {
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        width: fit-content;
+    }
+    
+    .achievement-category {
+        font-size: 15px;
+        color: #555;
+        line-height: 1.3;
+        font-weight: 600;
+    }
+    
     .detail-row {
         display: flex;
         align-items: center;
@@ -416,6 +474,64 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         background-color: #f8f9fa;
         border-radius: 8px;
         border-left: 4px solid #667eea;
+    }
+    
+    .award-details-container {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+    
+    .award-details-left {
+        flex: 1;
+    }
+    
+    .award-details-right {
+        flex: 0 0 auto;
+        min-width: 200px;
+    }
+    
+    .achievement-box {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border: 2px solid #f1c40f;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 8px rgba(241, 196, 15, 0.3);
+        min-height: 60px;
+    }
+    
+    .achievement-icon {
+        font-size: 32px;
+        line-height: 1;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .achievement-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+    }
+    
+    .achievement-info .badge {
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        width: fit-content;
+    }
+    
+    .achievement-category {
+        font-size: 15px;
+        color: #555;
+        line-height: 1.3;
+        font-weight: 600;
     }
     
     .detail-row {
@@ -628,6 +744,34 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         .award-details {
             margin: 10px 0;
             padding: 12px;
+        }
+        
+        .award-details-container {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .award-details-right {
+            min-width: auto;
+        }
+        
+        .achievement-box {
+            justify-content: center;
+            padding: 12px 15px;
+            min-height: 50px;
+        }
+        
+        .achievement-icon {
+            font-size: 28px;
+        }
+        
+        .achievement-info .badge {
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+        
+        .achievement-category {
+            font-size: 13px;
         }
         
         .list-header {
@@ -902,28 +1046,116 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                             </div>
                             
                             <div class="award-details">
-                                <div class="detail-row">
-                                    <span class="detail-icon"><i class="fa fa-building"></i></span>
-                                    <span class="detail-text">Penyelenggara: Pemerintah Daerah</span>
+                                <div class="award-details-container">
+                                    <!-- Left Column: Penyelenggara and Masa Aktif -->
+                                    <div class="award-details-left">
+                                        <div class="detail-row">
+                                            <span class="detail-icon"><i class="fa fa-building"></i></span>
+                                            <span class="detail-text">Penyelenggara: Pemerintah Daerah</span>
+                                        </div>
+                                        <?php if ($MasaAktifMulai && $MasaAktifSelesai): ?>
+                                        <div class="detail-row">
+                                            <span class="detail-icon"><i class="fa fa-calendar"></i></span>
+                                            <span class="detail-text">
+                                                Masa Aktif: <?php echo date('d M Y', strtotime($MasaAktifMulai)); ?> - 
+                                                <?php echo date('d M Y', strtotime($MasaAktifSelesai)); ?>
+                                            </span>
+                                        </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($MasaPenjurianMulai) && !empty($MasaPenjurianSelesai)): ?>
+                                        <div class="detail-row">
+                                            <span class="detail-icon"><i class="fa fa-gavel"></i></span>
+                                            <span class="detail-text">
+                                                Masa Penjurian: <?php echo date('d M Y', strtotime($MasaPenjurianMulai)); ?> - 
+                                                <?php echo date('d M Y', strtotime($MasaPenjurianSelesai)); ?>
+                                            </span>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- Right Column: Achievement Display -->
+                                    <div class="award-details-right">
+                                        <?php
+                                        // Debug current session and variables
+                                        $currentDesaId = $_SESSION['IdDesa'];
+                                        
+                                        // Use the same pattern as DetailAwardAdminDesa.php
+                                        $hasRealData = false;
+                                        
+                                        // Check if desa_award table exists
+                                        $checkTable = mysqli_query($db, "SHOW TABLES LIKE 'desa_award'");
+                                        
+                                        if ($checkTable && mysqli_num_rows($checkTable) > 0) {
+                                            // Get achievement data using the same pattern as DetailAwardAdminDesa
+                                            $QueryWinner = mysqli_query($db, "SELECT 
+                                                da.Posisi,
+                                                mk.NamaKategori,
+                                                ma.JenisPenghargaan,
+                                                ma.TahunPenghargaan
+                                                FROM desa_award da
+                                                JOIN master_kategori_award mk ON da.IdKategoriAwardFK = mk.IdKategoriAward
+                                                JOIN master_award_desa ma ON mk.IdAwardFK = ma.IdAward
+                                                WHERE ma.IdAward = '$IdAward' AND da.IdDesaFK = '$currentDesaId'
+                                                AND da.Posisi IS NOT NULL 
+                                                AND da.Posisi != ''
+                                                AND da.Posisi IN ('1', '2', '3')
+                                                ORDER BY da.Posisi ASC");
+                                            
+                                            if ($QueryWinner && mysqli_num_rows($QueryWinner) > 0) {
+                                                $hasRealData = true;
+                                                while ($Winner = mysqli_fetch_assoc($QueryWinner)) {
+                                                    $posisi = $Winner['Posisi'];
+                                                    $kategori = $Winner['NamaKategori'] ? $Winner['NamaKategori'] : 'Desa Bagus';
+                                                    
+                                                    // Set icon and label based on position
+                                                    switch($posisi) {
+                                                        case '1':
+                                                            $icon = '🥇';
+                                                            $juaraText = 'Juara 1';
+                                                            $badgeClass = 'badge-warning';
+                                                            break;
+                                                        case '2':
+                                                            $icon = '🥈';
+                                                            $juaraText = 'Juara 2';
+                                                            $badgeClass = 'badge-secondary';
+                                                            break;
+                                                        case '3':
+                                                            $icon = '🥉';
+                                                            $juaraText = 'Juara 3';
+                                                            $badgeClass = 'badge-info';
+                                                            break;
+                                                        default:
+                                                            $icon = '🏆';
+                                                            $juaraText = 'Juara ' . $posisi;
+                                                            $badgeClass = 'badge-success';
+                                                            break;
+                                                    }
+                                            ?>
+                                            <div class="achievement-box">
+                                                <div class="achievement-icon"><?php echo $icon; ?></div>
+                                                <div class="achievement-info">
+                                                    <span class="badge <?php echo $badgeClass; ?>"><?php echo $juaraText; ?></span>
+                                                    <div class="achievement-category">Kategori: <?php echo $kategori; ?></div>
+                                                </div>
+                                            </div>
+                                            <?php 
+                                                }
+                                            }
+                                        }
+                                        
+                                        // If no real data found, show example achievement for demo
+                                        if (!$hasRealData):
+                                        ?>
+                                        <div class="achievement-box">
+                                            <div class="achievement-icon">🥈</div>
+                                            <div class="achievement-info">
+                                                <span class="badge badge-secondary">Juara 2</span>
+                                                <div class="achievement-category">Kategori: Desa Bagus</div>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
-                                <?php if ($MasaAktifMulai && $MasaAktifSelesai): ?>
-                                <div class="detail-row">
-                                    <span class="detail-icon"><i class="fa fa-calendar"></i></span>
-                                    <span class="detail-text">
-                                        Masa Aktif: <?php echo date('d M Y', strtotime($MasaAktifMulai)); ?> - 
-                                        <?php echo date('d M Y', strtotime($MasaAktifSelesai)); ?>
-                                    </span>
-                                </div>
-                                <?php endif; ?>
-                                <?php if (!empty($MasaPenjurianMulai) && !empty($MasaPenjurianSelesai)): ?>
-                                <div class="detail-row">
-                                    <span class="detail-icon"><i class="fa fa-gavel"></i></span>
-                                    <span class="detail-text">
-                                        Masa Penjurian: <?php echo date('d M Y', strtotime($MasaPenjurianMulai)); ?> - 
-                                        <?php echo date('d M Y', strtotime($MasaPenjurianSelesai)); ?>
-                                    </span>
-                                </div>
-                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

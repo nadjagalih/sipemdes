@@ -726,28 +726,43 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
     }
 
         /* Animation untuk notification bar */
-    @keyframes slideDown {
-        from {
-            transform: translateY(-100%);
-            opacity: 0;
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
-        to {
-            transform: translateY(0);
-            opacity: 1;
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
         }
-    }
-    
-    @keyframes slideUp {
-        from {
-            transform: translateY(0);
-            opacity: 1;
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
         }
-        to {
-            transform: translateY(-100%);
-            opacity: 0;
-        }
-    }
-    
+        
     /* Responsive untuk notification bar */
     @media (max-width: 768px) {
         .notification-bar {
@@ -850,7 +865,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             <!-- Notification Bar Tipis -->
             <?php if ($totalNotifications > 0): ?>
             <div class="notification-bar" style="
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #0a0a37 0%, #1845b3 100%);
                 color: white;
                 padding: 6px 20px;
                 margin: -15px -15px 15px -15px;
@@ -900,7 +915,30 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                             • <span style="color: #87CEEB;">⏰ <?= $notifStats['menunggu_penjurian'] ?> Karya Menunggu Penjurian</span>
                         <?php endif; ?>
                         <?php if ($notifStats['menang'] > 0): ?>
-                            • <span style="color: #90EE90;">🎉 <?= $notifStats['menang'] ?> Award Dimenangkan!</span>
+                            <?php 
+                            // Ambil ID award pertama yang dimenangkan untuk link
+                            $firstWonAward = null;
+                            foreach ($awardNotifications as $notif) {
+                                if ($notif['type'] == 'menang') {
+                                    $firstWonAward = $notif['data'];
+                                    break;
+                                }
+                            }
+                            
+                            if ($firstWonAward) {
+                                // Cari ID award untuk link detail
+                                $IdAwardQuery = mysqli_query($db, "SELECT ma.IdAward FROM master_award_desa ma JOIN master_kategori_award mk ON ma.IdAward = mk.IdAwardFK WHERE mk.IdKategoriAward = '{$firstWonAward['IdKategoriAwardFK']}'");
+                                $IdAwardData = mysqli_fetch_assoc($IdAwardQuery);
+                                $IdAward = $IdAwardData['IdAward'] ?? '';
+                            }
+                            ?>
+                            • <span style="color: #90EE90;">🎉 Selamat Desa anda mendapatkan Juara <?= $firstWonAward['Posisi'] ?? '' ?> di <?= $firstWonAward['JenisPenghargaan'] ?? '' ?> <?= $firstWonAward['TahunPenghargaan'] ?? '' ?>
+                            <?php if (!empty($IdAward)): ?>
+                                <a href="?pg=DetailAwardAdminDesa&kode=<?= $IdAward ?>" style="color: #FFD700; text-decoration: underline; cursor: pointer;">
+                                    silahkan cek di sini <i class="fas fa-external-link-alt" style="font-size: 10px; margin-left: 3px;"></i>
+                                </a>
+                            <?php endif; ?>
+                            </span>
                         <?php endif; ?>
                         <?php if ($notifStats['tidak_menang'] > 0): ?>
                             • <span style="color: #FFB6C1;">📋 <?= $notifStats['tidak_menang'] ?> Terimakasih telah Berpartisipasi</span>

@@ -25,7 +25,7 @@ if (empty($IdDesa)) {
 }
 
 // Get ID award dari parameter
-$IdAward = $_GET['id'] ?? '';
+$IdAward = $_GET['kode'] ?? $_GET['id'] ?? '';
 
 if (empty($IdAward)) {
     echo "<script>

@@ -57,7 +57,9 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             }
 
             if ($Save) {
-                header("location:../../View/v?pg=AwardView&alert=Save");
+                header("location:../../View/v?pg=AwardView&alert=SaveSuccess");
+            } else {
+                header("location:../../View/v?pg=AwardAdd&alert=SaveError");
             }
         }
     } elseif ($_GET['Act'] == 'Edit') {
@@ -111,7 +113,9 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             }
 
             if ($Update) {
-                header("location:../../View/v?pg=AwardDetail&Kode=$IdAward&alert=Edit");
+                header("location:../../View/v?pg=AwardView&alert=EditSuccess");
+            } else {
+                header("location:../../View/v?pg=AwardEdit&Kode=$IdAward&alert=EditError");
             }
         }
     } elseif ($_GET['Act'] == 'Delete') {
@@ -127,7 +131,9 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $Delete = mysqli_query($db, "DELETE FROM master_award_desa WHERE IdAward = '$IdAward'");
             
             if ($Delete) {
-                header("location:../../View/v?pg=AwardView&alert=Delete");
+                header("location:../../View/v?pg=AwardView&alert=DeleteSuccess");
+            } else {
+                header("location:../../View/v?pg=AwardView&alert=DeleteError");
             }
         }
     }

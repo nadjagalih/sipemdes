@@ -3,6 +3,44 @@
 include "../App/Control/FunctionDetailAwardAdminDesa.php";
 ?>
 
+<?php
+// Handle alert notifications
+if (isset($_GET['alert'])) {
+    $alertType = $_GET['alert'];
+    if ($alertType == 'DeleteSuccess') {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showSuccessModal('Karya berhasil dihapus!');
+            });
+        </script>";
+    } elseif ($alertType == 'UpdateSuccess') {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showSuccessModal('Karya berhasil diupdate!');
+            });
+        </script>";
+    } elseif ($alertType == 'DeleteError') {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                alert('Gagal menghapus karya. Silakan coba lagi.');
+            });
+        </script>";
+    } elseif ($alertType == 'UpdateError') {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                alert('Gagal mengupdate karya. Silakan coba lagi.');
+            });
+        </script>";
+    } elseif ($alertType == 'AccessDenied') {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                alert('Anda tidak memiliki akses untuk mengedit karya ini!');
+            });
+        </script>";
+    }
+}
+?>
+
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
         <h2>Detail Award</h2>
@@ -417,6 +455,51 @@ include "../App/Control/FunctionDetailAwardAdminDesa.php";
     </div>
 </div>
 
+<!-- Modal Konfirmasi Hapus Karya Award -->
+<div class="modal fade" id="modalConfirmDeleteAward" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body" style="text-align: center; padding: 40px 30px;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f44336, #d32f2f); border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </div>
+                <h4 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 15px;">Yakin ingin menghapus karya?</h4>
+                <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 25px;" id="deleteAwardMessage">
+                    Karya yang sudah dihapus tidak dapat dikembalikan.
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button type="button" class="btn" style="background: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;" onclick="closeDeleteAwardModal()">
+                        Batal
+                    </button>
+                    <button type="button" class="btn" style="background: linear-gradient(135deg, #f44336, #d32f2f); color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;" id="confirmDeleteAwardBtn">
+                        Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Success Custom -->
+<div class="modal fade modal-success" id="modalSuccess" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body" style="text-align: center; padding: 40px 30px;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #4CAF50, #45a049); border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);">
+                    <i class="fa fa-check"></i>
+                </div>
+                <h4 style="font-size: 24px; font-weight: 600; color: #333; margin-bottom: 15px;">Berhasil!</h4>
+                <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 25px;" id="successMessage">
+                    Data berhasil disimpan
+                </p>
+                <button type="button" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-weight: 600; font-size: 16px;" onclick="closeSuccessModal()">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function detailKaryaAward(id, judul, deskripsi, link, kategori) {
     document.getElementById('detailJudulKaryaAward').textContent = judul;
@@ -428,10 +511,35 @@ function detailKaryaAward(id, judul, deskripsi, link, kategori) {
 }
 
 function hapusKaryaAward(id, judul) {
-    if (confirm('Yakin ingin menghapus karya "' + judul + '"?\n\nKarya yang sudah dihapus tidak dapat dikembalikan.')) {
+    document.getElementById('deleteAwardMessage').innerHTML = 'Karya "<strong>' + judul + '</strong>" akan dihapus permanen.<br><br>Karya yang sudah dihapus tidak dapat dikembalikan.';
+    
+    document.getElementById('confirmDeleteAwardBtn').onclick = function() {
         // Redirect ke halaman delete dengan parameter yang tepat
         window.location.href = '../App/Model/ExcKaryaDesa.php?Act=Delete&Kode=' + id + '&redirect=DetailAwardAdminDesa&award=<?php echo $IdAward; ?>';
-    }
+    };
+    
+    $('#modalConfirmDeleteAward').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
+}
+
+function closeDeleteAwardModal() {
+    $('#modalConfirmDeleteAward').modal('hide');
+}
+
+// Function untuk show success modal
+function showSuccessModal(message) {
+    document.getElementById('successMessage').innerHTML = message.replace(/\n/g, '<br>');
+    $('#modalSuccess').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
+}
+
+// Function untuk close success modal
+function closeSuccessModal() {
+    $('#modalSuccess').modal('hide');
 }
 </script>
 

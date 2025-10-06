@@ -128,8 +128,7 @@ if (mysqli_num_rows($QueryAward) > 0) {
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a href="../App/Model/ExcAward.php?Act=Delete&Kode=<?php echo $IdAward; ?>" 
-                                   onclick="return confirm('Yakin ingin menghapus penghargaan ini?');">
+                                <a href="#" onclick="confirmDeleteAward('<?php echo $IdAward; ?>', '<?php echo addslashes($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>')">
                                     <i class="fa fa-trash text-danger"></i> Hapus
                                 </a>
                             </li>

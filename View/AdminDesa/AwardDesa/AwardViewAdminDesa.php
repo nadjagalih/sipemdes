@@ -10,10 +10,55 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         min-height: calc(100vh - 60px);
     }
     
+    /* Statistics Cards dengan border yang jelas */
+    .ibox {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 2px solid #dee2e6;
+        overflow: hidden;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .ibox:hover {
+        border-color: #007bff;
+        box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+        transform: translateY(-2px);
+    }
+    
+    .ibox-content {
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .ibox-content h5 {
+        margin: 0 0 10px 0;
+        color: #495057;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .ibox-content h1 {
+        margin: 10px 0;
+        font-size: 36px;
+        font-weight: bold;
+    }
+    
+    .ibox-content small {
+        color: #6c757d;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
     .list-section {
         background: white;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 2px solid #dee2e6;
         overflow: hidden;
     }
     
@@ -233,15 +278,11 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         align-items: flex-start;
         padding: 25px;
         border-bottom: 1px solid #f1f3f4;
-        transition: all 0.3s ease;
         background: white;
+        /* Removed: cursor: pointer, transition, and hover transform */
     }
     
-    .award-item-row:hover {
-        background-color: #f8f9fa;
-        transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+    /* Removed hover effects for award-item-row */
     
     .award-item-row:last-child {
         border-bottom: none;
@@ -347,12 +388,26 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         font-weight: 500;
         transition: all 0.3s ease;
         box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        cursor: pointer;
     }
     
     .btn-pilih-award:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         color: white;
+    }
+    
+    /* Tambahan untuk tombol detail dan daftar karya */
+    .btn-outline-info,
+    .btn-outline-primary {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-info:hover,
+    .btn-outline-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
     
     .award-details {
@@ -620,6 +675,74 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         border: 1px solid #17a2b8;
         color: white;
     }
+    
+    /* Modal Success Styling */
+    .modal-success {
+        z-index: 1060;
+    }
+    
+    .modal-success .modal-dialog {
+        max-width: 400px;
+        margin: 30vh auto;
+    }
+    
+    .modal-success .modal-content {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        text-align: center;
+        padding: 0;
+    }
+    
+    .modal-success .modal-body {
+        padding: 40px 30px 30px 30px;
+    }
+    
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        border-radius: 50%;
+        margin: 0 auto 20px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: white;
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .success-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+    }
+    
+    .success-message {
+        color: #666;
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 25px;
+    }
+    
+    .btn-success-ok {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+    }
+    
+    .btn-success-ok:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        color: white;
+    }
 </style>
 
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -644,58 +767,6 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
     </div>
 </div>
 
-<div class="wrapper wrapper-content animated fadeInRight">
-    <!-- Filter Section -->
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <form method="GET" action="">
-                        <input type="hidden" name="pg" value="AwardViewAdminDesa">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <label>Status</label>
-                                    <select name="status" class="form-control">
-                                        <option value="">Semua Status</option>
-                                        <option value="Aktif" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Aktif') ? 'selected' : ''; ?>>Aktif</option>
-                                        <option value="Berlangsung" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Berlangsung') ? 'selected' : ''; ?>>Sedang Berlangsung</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <label>Tahun</label>
-                                    <select name="tahun" class="form-control">
-                                        <option value="">Semua Tahun</option>
-                                        <?php for($i = date('Y'); $i >= 2015; $i--): ?>
-                                            <option value="<?php echo $i; ?>" <?php echo (isset($_GET['tahun']) && $_GET['tahun'] == $i) ? 'selected' : ''; ?>><?php echo $i; ?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label>Cari Penghargaan</label>
-                                    <input type="text" name="search" class="form-control" placeholder="Nama penghargaan..." value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
-                                </div>
-                            </div>
-                            <div class="col-sm-2">
-                                <div class="form-group">
-                                    <label>&nbsp;</label>
-                                    <div>
-                                        <button type="submit" class="btn btn-primary btn-block">
-                                            <i class="fa fa-search"></i> Filter
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Statistics Cards -->
     <div class="row">
@@ -971,6 +1042,26 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
     </div>
 </div>
 
+<!-- Modal Success Custom -->
+<div class="modal fade modal-success" id="modalSuccess" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="success-icon">
+                    <i class="fa fa-check"></i>
+                </div>
+                <h4 class="success-title">Berhasil!</h4>
+                <p class="success-message" id="successMessage">
+                    Data berhasil disimpan
+                </p>
+                <button type="button" class="btn btn-success-ok" onclick="closeSuccessModal()">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function openDaftarModal(idAward, namaPenghargaan) {
     // Set nilai award
@@ -1046,9 +1137,8 @@ document.getElementById('formDaftarKarya').addEventListener('submit', function(e
     .then(data => {
         console.log('Submit response data:', data);
         if (data.success) {
-            alert('Karya berhasil didaftarkan!\n\nID Karya: ' + data.data.id);
+            showSuccessModal('Karya berhasil didaftarkan!\n\nID Karya: ' + data.data.id);
             $('#modalDaftarKarya').modal('hide');
-            location.reload(); // Refresh halaman
         } else {
             alert('Error: ' + data.message);
         }
@@ -1063,6 +1153,23 @@ document.getElementById('formDaftarKarya').addEventListener('submit', function(e
         submitBtn.disabled = false;
     });
 });
+
+// Function untuk show success modal
+function showSuccessModal(message) {
+    document.getElementById('successMessage').innerHTML = message.replace(/\n/g, '<br>');
+    $('#modalSuccess').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
+}
+
+// Function untuk close success modal
+function closeSuccessModal() {
+    $('#modalSuccess').modal('hide');
+    setTimeout(() => {
+        location.reload(); // Refresh halaman setelah modal tertutup
+    }, 300);
+}
 </script>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->

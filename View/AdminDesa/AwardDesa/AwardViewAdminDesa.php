@@ -534,6 +534,34 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         font-weight: 600;
     }
     
+    /* Recent achievement highlighting - konsisten dengan dashboard */
+    .recent-achievement {
+        border: 2px solid #28a745 !important;
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%) !important;
+        animation: pulse-glow 2s infinite alternate;
+    }
+    
+    @keyframes pulse-glow {
+        from {
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+        to {
+            box-shadow: 0 6px 12px rgba(40, 167, 69, 0.5);
+        }
+    }
+    
+    .achievement-date {
+        font-size: 10px;
+        color: #999;
+        margin-top: 2px;
+        font-style: italic;
+    }
+    
+    .badge-sm {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    
     .detail-row {
         display: flex;
         align-items: center;
@@ -1075,36 +1103,74 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                                         <?php
                                         // Debug current session and variables
                                         $currentDesaId = $_SESSION['IdDesa'];
+                                        $currentDate = date('Y-m-d');
                                         
-                                        // Use the same pattern as DetailAwardAdminDesa.php
+                                        // Use the same query logic as dashboard notification for consistency
                                         $hasRealData = false;
                                         
                                         // Check if desa_award table exists
                                         $checkTable = mysqli_query($db, "SHOW TABLES LIKE 'desa_award'");
                                         
                                         if ($checkTable && mysqli_num_rows($checkTable) > 0) {
-                                            // Get achievement data using the same pattern as DetailAwardAdminDesa
+                                            // Get achievement data using the SAME pattern as FunctionNotifikasiAward.php
+                                            // This ensures consistency with dashboard notifications
                                             $QueryWinner = mysqli_query($db, "SELECT 
+                                                da.IdPesertaAward,
+                                                da.NamaKarya AS JudulKarya,
                                                 da.Posisi,
+                                                da.TanggalInput,
+                                                da.IdKategoriAwardFK,
                                                 mk.NamaKategori,
                                                 ma.JenisPenghargaan,
                                                 ma.TahunPenghargaan,
-                                                da.JudulKarya
+                                                ma.MasaPenjurianSelesai,
+                                                ma.MasaAktifSelesai,
+                                                ma.StatusAktif
                                                 FROM desa_award da
                                                 JOIN master_kategori_award mk ON da.IdKategoriAwardFK = mk.IdKategoriAward
                                                 JOIN master_award_desa ma ON mk.IdAwardFK = ma.IdAward
                                                 WHERE ma.IdAward = '$IdAward' AND da.IdDesaFK = '$currentDesaId'
                                                 AND da.Posisi IS NOT NULL 
-                                                AND da.Posisi != ''
-                                                AND da.Posisi != '0'
-                                                ORDER BY CAST(da.Posisi AS UNSIGNED) ASC");
+                                                AND da.Posisi > 0 
+                                                AND da.Posisi <= 3
+                                                AND (
+                                                    -- Jika award masih aktif: tampilkan dalam 30 hari
+                                                    (ma.StatusAktif = 'Aktif' AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 30 DAY))
+                                                    OR
+                                                    -- Jika award sudah selesai: tampilkan dalam 90 hari (lebih lama)
+                                                    (ma.StatusAktif = 'Non-Aktif' AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 90 DAY))
+                                                    OR
+                                                    -- Jika masa aktif sudah berakhir: tampilkan dalam 90 hari
+                                                    (ma.MasaAktifSelesai IS NOT NULL AND ma.MasaAktifSelesai < '$currentDate' 
+                                                     AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 90 DAY))
+                                                )
+                                                ORDER BY da.Posisi ASC, da.TanggalInput DESC");
                                             
                                             if ($QueryWinner) {
                                                 if (mysqli_num_rows($QueryWinner) > 0) {
                                                     $hasRealData = true;
+                                                    
+                                                    // Track displayed achievements to prevent duplicates
+                                                    $displayedAchievements = [];
+                                                    
                                                     while ($Winner = mysqli_fetch_assoc($QueryWinner)) {
                                                     $posisi = $Winner['Posisi'];
-                                                    $kategori = $Winner['NamaKategori'] ? $Winner['NamaKategori'] : 'Desa Bagus';
+                                                    $kategoriId = $Winner['IdKategoriAwardFK'];
+                                                    $uniqueKey = $kategoriId . '_' . $posisi;
+                                                    
+                                                    // Skip if already displayed (prevent duplicates)
+                                                    if (in_array($uniqueKey, $displayedAchievements)) {
+                                                        continue;
+                                                    }
+                                                    $displayedAchievements[] = $uniqueKey;
+                                                    
+                                                    $kategori = $Winner['NamaKategori'] ? $Winner['NamaKategori'] : 'Kategori Award';
+                                                    
+                                                    // Check if this is a recent achievement (last 7 days)
+                                                    $isRecent = false;
+                                                    if (!empty($Winner['TanggalInput'])) {
+                                                        $isRecent = (strtotime($Winner['TanggalInput']) > strtotime('-7 days'));
+                                                    }
                                                     
                                                     // Set icon and label based on position
                                                     $posisiInt = intval($posisi);
@@ -1125,26 +1191,31 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                                                             $badgeClass = 'badge-info';
                                                             break;
                                                         default:
-                                                            if ($posisiInt > 0 && $posisiInt <= 10) {
-                                                                $icon = '🏆';
-                                                                $juaraText = 'Juara ' . $posisi;
-                                                                $badgeClass = 'badge-success';
-                                                            } else {
-                                                                $icon = '🎖️';
-                                                                $juaraText = 'Peserta';
-                                                                $badgeClass = 'badge-primary';
-                                                            }
+                                                            // Only positions 1-3 should appear based on our query
+                                                            $icon = '🏆';
+                                                            $juaraText = 'Juara ' . $posisi;
+                                                            $badgeClass = 'badge-success';
                                                             break;
                                                     }
                                             ?>
-                                            <div class="achievement-box">
+                                            <div class="achievement-box <?php echo $isRecent ? 'recent-achievement' : ''; ?>">
                                                 <div class="achievement-icon"><?php echo $icon; ?></div>
                                                 <div class="achievement-info">
-                                                    <span class="badge <?php echo $badgeClass; ?>"><?php echo $juaraText; ?></span>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge <?php echo $badgeClass; ?>"><?php echo $juaraText; ?></span>
+                                                        <?php if ($isRecent): ?>
+                                                        <!--<span class="badge badge-success badge-sm ml-2">BARU</span>-->
+                                                        <?php endif; ?>
+                                                    </div>
                                                     <div class="achievement-category">Kategori: <?php echo htmlspecialchars($kategori); ?></div>
                                                     <?php if (!empty($Winner['JudulKarya'])): ?>
                                                     <div class="achievement-title" style="font-size: 12px; color: #666; margin-top: 3px;">
                                                         <?php echo htmlspecialchars($Winner['JudulKarya']); ?>
+                                                    </div>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($Winner['TanggalInput'])): ?>
+                                                    <div class="achievement-date" style="font-size: 10px; color: #999; margin-top: 2px;">
+                                                        <?php echo date('d/m/Y', strtotime($Winner['TanggalInput'])); ?>
                                                     </div>
                                                     <?php endif; ?>
                                                 </div>

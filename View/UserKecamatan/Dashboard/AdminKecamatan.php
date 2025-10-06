@@ -726,101 +726,114 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
             <!-- Profile Kecamatan Card -->
             <div class="row">
                 <div class="col-md-6 grid-margin stretch-card">
-                    <div class="card" style="height: 315px;">
-                        <div class="card-header" style="padding: 15px;">
-                            <h4 class="card-title" style="font-size: 1.1rem; margin: 0;">Sistem Informasi Pemerintahan Desa</h4>
+                    <div class="card" style="height: 350px;">
+                        <div class="card-header" style="padding: 18px;">
+                            <h4 class="card-title" style="font-size: 1.2rem; margin: 0; font-weight: 600;">Sistem Informasi Pemerintahan Desa</h4>
                         </div>
-                        <div class="card-body" style="padding: 15px; height: calc(100% - 60px);">
+                       <div class="card-body" style="padding: 18px; height: calc(100% - 70px);">
                             <!-- Profil Header Style -->
-                            <div class="profil-header" style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
-                                <div class="profil-avatar" style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); flex-shrink: 0;">
+                            <div class="profil-header" style="display: flex; align-items: flex-start; gap: 18px; margin-bottom: 18px;">
+                                <div class="profil-avatar" style="width: 85px; height: 85px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); flex-shrink: 0;">
                                     <img src="../Vendor/Media/Logo/Pria.png" alt="Foto Default Kecamatan"
                                         style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
 
                                 <div class="profil-info" style="flex-grow: 1; min-width: 0;">
-                                    <h1 style="margin: 0 0 5px 0; font-size: 1.4em; color: var(--purple-primary); font-weight: bold; line-height: 1.2;">KECAMATAN <?php echo strtoupper($NamaKecamatanHeader); ?></h1>
-                                    <p style="margin: 0 0 10px 0; font-size: 0.9em; color: #6c757d;">Admin Kecamatan</p>
+                                    <h1 style="margin: 0 0 8px 0; font-size: 1.5em; color: var(--purple-primary); font-weight: 700; line-height: 1.3;">KECAMATAN <?php echo strtoupper($NamaKecamatanHeader); ?></h1>
+                                    <p style="margin: 0 0 12px 0; font-size: 1em; color: #6c757d; font-weight: 500;">Admin Kecamatan</p>
                                 </div>
                             </div>
 
-                            <!-- Detail Area Style -->
-                            <div class="detail-area" style="border-top: 1px solid #dee2e6; padding-top: 15px;">
-                                <div style="display: flex; gap: 20px;">
+                            <!-- Detail Area Style with 2 Column Layout -->
+                            <div class="detail-area" style="border-top: 1px solid #dee2e6; padding-top: 18px;">
+                                <div style="display: flex; gap: 25px;">
                                     <!-- Kolom Kiri: Wilayah -->
-                                    <div style="flex: 1; min-width: 0;">
-                                        <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
-                                            <span class="detail-label" style="width: 80px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Provinsi</span>
-                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.85em;">Jawa Timur</span>
+                                    <div style="min-width: 0;">
+                                        <div class="detail-baris" style="display: flex; padding: 2px 0; align-items: center;">
+                                            <span class="detail-label" style="width: 85px; color: #6c757d; font-weight: 600; font-size: 0.8rem; flex-shrink: 0;">Provinsi</span>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: #343a40; font-weight: 500; font-size: 0.8rem;">Jawa Timur</span>
                                         </div>
-                                        <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
-                                            <span class="detail-label" style="width: 80px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Kabupaten</span>
-                                            <?php
+                                        <div class="detail-baris" style="display: flex; padding: 2px 0; align-items: center;">
+                                            <span class="detail-label" style="width: 85px; color: #6c757d; font-weight: 600; font-size: 0.8rem; flex-shrink: 0;">Kabupaten</span>
+                                            <?php 
                                             $isKabupatenEmpty = ($Kabupaten == 'Data Tidak Ditemukan' || empty($Kabupaten));
                                             $kabupatenColor = $isKabupatenEmpty ? 'red' : '#343a40';
                                             $kabupatenStyle = $isKabupatenEmpty ? 'font-style: italic;' : '';
                                             $kabupatenText = $isKabupatenEmpty ? 'Belum di set' : $Kabupaten;
                                             ?>
-                                            <span class="detail-nilai" style="flex-grow: 1; color: <?php echo $kabupatenColor; ?>; font-weight: 500; font-size: 0.85em; <?php echo $kabupatenStyle; ?>">
+                                            <span class="detail-nilai" style="flex-grow: 1; color: <?php echo $kabupatenColor; ?>; font-weight: 500; font-size: 0.8rem; <?php echo $kabupatenStyle; ?>">
                                                 <?php echo $kabupatenText; ?>
                                             </span>
                                         </div>
+                                        <div class="detail-baris" style="display: flex; padding: 2px 0; align-items: center;">
+                                            <span class="detail-label" style="width: 85px; color: #6c757d; font-weight: 600; font-size: 0.8rem; flex-shrink: 0;">Kecamatan</span>
+                                            <?php 
+                                            $isKecamatanEmpty = ($NamaKecamatanHeader == 'Data Tidak Ditemukan' || empty($NamaKecamatanHeader));
+                                            $kecamatanColor = $isKecamatanEmpty ? 'red' : '#343a40';
+                                            $kecamatanStyle = $isKecamatanEmpty ? 'font-style: italic;' : '';
+                                            $kecamatanText = $isKecamatanEmpty ? 'Belum di set' : $NamaKecamatanHeader;
+                                            ?>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: <?php echo $kecamatanColor; ?>; font-weight: 500; font-size: 0.8rem; <?php echo $kecamatanStyle; ?>">
+                                                <?php echo $kecamatanText; ?>
+                                            </span>
+                                        </div>
+                                        <div class="detail-baris" style="display: flex; padding: 2px 0; align-items: center;">
+                                            <span class="detail-label" style="width: 75px; color: #6c757d; font-weight: 600; font-size: 0.8rem; flex-shrink: 0;">Telepon</span>
+                                            <?php 
+                                            $isTeleponEmpty = ($NoTelepon == 'Data Tidak Ditemukan' || empty($NoTelepon));
+                                            $teleponColor = $isTeleponEmpty ? 'red' : '#343a40';
+                                            $teleponStyle = $isTeleponEmpty ? 'font-style: italic;' : '';
+                                            $teleponText = $isTeleponEmpty ? 'Belum di set' : $NoTelepon;
+                                            ?>
+                                            <span class="detail-nilai" style="flex-grow: 1; color: <?php echo $teleponColor; ?>; font-weight: 500; font-size: 0.8rem; <?php echo $teleponStyle; ?>">
+                                                <?php echo $teleponText; ?>
+                                            </span>
+                                        </div>
+                                        <div class="detail-baris" style="display: flex; padding: 2px 0; align-items: flex-start;">
+                                            <span class="detail-label" style="width: 75px; color: #6c757d; font-weight: 600; font-size: 0.8rem; flex-shrink: 0; margin-top: 2px;">Alamat</span>
+                                            <?php 
+                                            $isAlamatEmpty = ($AlamatKecamatan == 'Data Tidak Ditemukan' || empty($AlamatKecamatan));
+                                            $alamatColor = $isAlamatEmpty ? 'red' : '#343a40';
+                                            $alamatStyle = $isAlamatEmpty ? 'font-style: italic;' : '';
+                                            $alamatTitle = $isAlamatEmpty ? 'Belum di set' : $AlamatKecamatan;
+                                            $alamatText = $isAlamatEmpty ? 'Belum di set' : $AlamatKecamatan;
+                                            ?>
+                                            <span class="detail-nilai" 
+                                                  style="flex-grow: 1; color: <?php echo $alamatColor; ?>; font-weight: 500; font-size: 0.8rem; line-height: 1.5; <?php echo $alamatStyle; ?>" 
+                                                  title="<?php echo $alamatTitle; ?>">
+                                                <?php echo $alamatText; ?>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: center;">
-                                    <span class="detail-label" style="width: 70px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0;">Telepon</span>
-                                    <?php
-                                    $isTeleponEmpty = ($NoTelepon == 'Data Tidak Ditemukan' || empty($NoTelepon));
-                                    $teleponColor = $isTeleponEmpty ? 'red' : '#343a40';
-                                    $teleponStyle = $isTeleponEmpty ? 'font-style: italic;' : '';
-                                    $teleponText = $isTeleponEmpty ? 'Belum di set' : $NoTelepon;
-                                    ?>
-                                    <span class="detail-nilai" style="flex-grow: 1; color: <?php echo $teleponColor; ?>; font-weight: 500; font-size: 0.85em; <?php echo $teleponStyle; ?>">
-                                        <?php echo $teleponText; ?>
-                                    </span>
-                                </div>
-                                <div class="detail-baris" style="display: flex; padding: 6px 0; align-items: flex-start;">
-                                    <span class="detail-label" style="width: 70px; color: #6c757d; font-weight: bold; font-size: 0.85em; flex-shrink: 0; margin-top: 2px;">Alamat Kantor</span>
-                                    <?php
-                                    $isAlamatEmpty = ($AlamatKecamatan == 'Data Tidak Ditemukan' || empty($AlamatKecamatan));
-                                    $alamatColor = $isAlamatEmpty ? 'red' : '#343a40';
-                                    $alamatStyle = $isAlamatEmpty ? 'font-style: italic;' : '';
-                                    $alamatTitle = $isAlamatEmpty ? 'Belum di set' : $AlamatKecamatan;
-                                    $alamatText = $isAlamatEmpty ? 'Belum di set' : $AlamatKecamatan;
-                                    ?>
-                                    <span class="detail-nilai"
-                                        style="flex-grow: 1; color: <?php echo $alamatColor; ?>; font-weight: 500; font-size: 0.85em; line-height: 1.4; <?php echo $alamatStyle; ?>"
-                                        title="<?php echo $alamatTitle; ?>">
-                                        <?php echo $alamatText; ?>
-                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Map Card -->
+                <!-- Map Card - Updated to match AdminDesa -->
                 <div class="col-md-6 grid-margin stretch-card">
-                    <div class="card" style="height: 315px;">
+                    <div class="card" style="height: 350px;">
                         <div class="card-header" style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <h4 class="card-title" style="font-size: 1.1rem; margin: 0;">Peta Wilayah Desa</h4>
+                            <div style="flex-grow: 1;">
+                                <h4 class="card-title" style="font-size: 1.1rem; margin: 0;">Peta Wilayah Kecamatan</h4>
+                            </div>
+                            <div style="flex-grow: 1;">
                                 <p class="card-subtitle" style="font-size: 0.85rem; color: #666; margin: 5px 0 0 0;">
-                                    Lokasi geografis <?php echo $NamaDesaHeader; ?>
                                     <?php if (empty($Latitude) || empty($Longitude)): ?>
-                                        <span style="color: red; font-weight: 500;"> - Alamat Desa belum diset</span>
+                                    <span style="color: red; font-weight: 500;"> | Alamat Kecamatan belum diset</span>
                                     <?php else: ?>
-                                        <span style="color: #28a745; font-weight: 500;"> - Koordinat aktual</span>
+                                    <span style="color: #28a745; font-weight: 500;"> | Lokasi geografis <?php echo $NamaKecamatanHeader; ?></span>
                                     <?php endif; ?>
                                 </p>
                             </div>
                             <?php if (empty($Latitude) || empty($Longitude)): ?>
-                                <a href="v?pg=SettingProfileDesa"
-                                    class="btn btn-warning btn-sm"
-                                    style="border-radius: 20px; padding: 6px 15px; font-size: 11px; font-weight: 600;"
-                                    title="Atur koordinat desa">
-                                    <i class="fas fa-cog"></i> Set Alamat
-                                </a>
+                            <a href="v?pg=SettingProfileKecamatan" 
+                               class="btn btn-warning btn-sm" 
+                               style="border-radius: 20px; padding: 6px 15px; font-size: 11px; font-weight: 600;"
+                               title="Atur koordinat kecamatan">
+                                <i class="fas fa-cog"></i> Set Alamat
+                            </a>
                             <?php endif; ?>
                         </div>
                         <div class="card-body" style="padding: 0; height: calc(100% - 80px);">

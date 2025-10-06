@@ -421,7 +421,6 @@ include "../App/Control/FunctionAwardDetail.php";
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Tambah Kategori Award</h4>
             </div>
             <form action="../App/Model/ExcKategoriAward.php?Act=Add" method="POST">
@@ -446,8 +445,8 @@ include "../App/Control/FunctionAwardDetail.php";
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Simpan Kategori</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
                 </div>
             </form>
         </div>
@@ -459,7 +458,6 @@ include "../App/Control/FunctionAwardDetail.php";
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Edit Kategori Award</h4>
             </div>
             <form action="../App/Model/ExcKategoriAward.php?Act=Edit" method="POST">
@@ -482,8 +480,8 @@ include "../App/Control/FunctionAwardDetail.php";
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Update Kategori</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
                 </div>
             </form>
         </div>
@@ -495,7 +493,6 @@ include "../App/Control/FunctionAwardDetail.php";
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Update Posisi/Juara</h4>
             </div>
             <form action="../App/Model/ExcPesertaAward.php?Act=UpdatePosisi" method="POST">
@@ -537,8 +534,8 @@ include "../App/Control/FunctionAwardDetail.php";
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Update Posisi</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
                 </div>
             </form>
         </div>

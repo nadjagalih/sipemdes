@@ -1,0 +1,228 @@
+/*!
+ * SIPEMDES Secure CSS Framework
+ * Version: 1.0.0
+ * Description: CSS dengan tag !important untuk mengurangi kerentanan styling
+ * Created: October 2025
+ */
+
+/* ==========================================================================
+   SECURITY ENHANCEMENTS
+   ========================================================================== */
+
+/* Mencegah CSS injection dan menormalkan base styling */
+* {
+    box-sizing: border-box !important;
+}
+
+/* Content Security Policy Enhancement */
+.sipemdes-container {
+    position: relative !important;
+    overflow: hidden !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+}
+
+/* ==========================================================================
+   AWARD VIEW SPECIFIC STYLING
+   ========================================================================== */
+
+/* Achievement Box Styling - Override inline styles */
+.achievement-box {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    padding: 15px 20px !important;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%) !important;
+    border: 2px solid #f1c40f !important;
+    border-radius: 10px !important;
+    margin-bottom: 10px !important;
+    box-shadow: 0 4px 8px rgba(241, 196, 15, 0.3) !important;
+    min-height: 60px !important;
+}
+
+.achievement-icon {
+    font-size: 32px !important;
+    line-height: 1 !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    flex-shrink: 0 !important;
+}
+
+.achievement-info {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+    flex: 1 !important;
+}
+
+.achievement-info .badge {
+    font-size: 14px !important;
+    padding: 5px 10px !important;
+    border-radius: 5px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    width: fit-content !important;
+}
+
+.achievement-category {
+    font-size: 15px !important;
+    color: #555 !important;
+    line-height: 1.3 !important;
+    font-weight: 600 !important;
+}
+
+.achievement-title {
+    font-size: 12px !important;
+    color: #666 !important;
+    margin-top: 3px !important;
+    font-style: italic !important;
+    line-height: 1.2 !important;
+}
+
+/* Badge Colors - Secure overrides */
+.badge-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+    border: 1px solid #ffc107 !important;
+}
+
+.badge-secondary {
+    background-color: #6c757d !important;
+    color: #fff !important;
+    border: 1px solid #6c757d !important;
+}
+
+.badge-info {
+    background-color: #17a2b8 !important;
+    color: #fff !important;
+    border: 1px solid #17a2b8 !important;
+}
+
+.badge-success {
+    background-color: #28a745 !important;
+    color: #fff !important;
+    border: 1px solid #28a745 !important;
+}
+
+.badge-primary {
+    background-color: #007bff !important;
+    color: #fff !important;
+    border: 1px solid #007bff !important;
+}
+
+/* Text utilities */
+.text-muted {
+    color: #6c757d !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+/* Empty state styling */
+.text-muted.text-center {
+    padding: 20px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+.text-muted.text-center i {
+    margin-right: 5px !important;
+    color: #adb5bd !important;
+}
+
+/* Award details styling */
+.award-details-right {
+    flex: 0 0 auto !important;
+    min-width: 200px !important;
+}
+
+.award-details-container {
+    display: flex !important;
+    gap: 20px !important;
+    align-items: flex-start !important;
+}
+
+.award-details-left {
+    flex: 1 !important;
+}
+
+/* Security for user-generated content */
+.achievement-category,
+.achievement-title {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .award-details-container {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+    
+    .award-details-right {
+        min-width: auto !important;
+    }
+    
+    .achievement-box {
+        justify-content: center !important;
+        padding: 12px 15px !important;
+        min-height: 50px !important;
+    }
+    
+    .achievement-icon {
+        font-size: 28px !important;
+    }
+    
+    .achievement-info .badge {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+    }
+    
+    .achievement-category {
+        font-size: 13px !important;
+    }
+    
+    .achievement-title {
+        font-size: 11px !important;
+    }
+}
+
+/* Print security */
+@media print {
+    .achievement-box {
+        background: white !important;
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    .achievement-icon {
+        color: #000 !important;
+        text-shadow: none !important;
+    }
+    
+    .badge {
+        background: white !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .achievement-box {
+        background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%) !important;
+        border-color: #555 !important;
+        color: #fff !important;
+    }
+    
+    .achievement-category,
+    .achievement-title {
+        color: #ccc !important;
+    }
+    
+    .text-muted {
+        color: #aaa !important;
+    }
+}

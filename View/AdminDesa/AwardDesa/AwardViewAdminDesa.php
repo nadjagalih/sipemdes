@@ -980,15 +980,12 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                             
                             if ($StatusAktif == 'Aktif') {
                                 if (!empty($MasaPenjurianMulai) && !empty($MasaPenjurianSelesai)) {
-                                    if ($currentDate >= $MasaPenjurianMulai && $currentDate <= $MasaPenjurianSelesai) {
-                                        $statusClass = 'status-berlangsung';
-                                        $statusText = 'MASA PENJURIAN';
-                                    } elseif ($currentDate > $MasaPenjurianSelesai) {
+                                    if ($currentDate > $MasaPenjurianSelesai) {
                                         $statusClass = 'status-selesai';
                                         $statusText = 'SELESAI';
                                     } else {
-                                        $statusClass = 'status-pendaftaran';
-                                        $statusText = 'PENDAFTARAN';
+                                        $statusClass = 'status-aktif';
+                                        $statusText = 'AKTIF';
                                     }
                                 } else {
                                     $statusClass = 'status-aktif';
@@ -1091,43 +1088,52 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                                                 da.Posisi,
                                                 mk.NamaKategori,
                                                 ma.JenisPenghargaan,
-                                                ma.TahunPenghargaan
+                                                ma.TahunPenghargaan,
+                                                da.JudulKarya
                                                 FROM desa_award da
                                                 JOIN master_kategori_award mk ON da.IdKategoriAwardFK = mk.IdKategoriAward
                                                 JOIN master_award_desa ma ON mk.IdAwardFK = ma.IdAward
                                                 WHERE ma.IdAward = '$IdAward' AND da.IdDesaFK = '$currentDesaId'
                                                 AND da.Posisi IS NOT NULL 
                                                 AND da.Posisi != ''
-                                                AND da.Posisi IN ('1', '2', '3')
-                                                ORDER BY da.Posisi ASC");
+                                                AND da.Posisi != '0'
+                                                ORDER BY CAST(da.Posisi AS UNSIGNED) ASC");
                                             
-                                            if ($QueryWinner && mysqli_num_rows($QueryWinner) > 0) {
-                                                $hasRealData = true;
-                                                while ($Winner = mysqli_fetch_assoc($QueryWinner)) {
+                                            if ($QueryWinner) {
+                                                if (mysqli_num_rows($QueryWinner) > 0) {
+                                                    $hasRealData = true;
+                                                    while ($Winner = mysqli_fetch_assoc($QueryWinner)) {
                                                     $posisi = $Winner['Posisi'];
                                                     $kategori = $Winner['NamaKategori'] ? $Winner['NamaKategori'] : 'Desa Bagus';
                                                     
                                                     // Set icon and label based on position
-                                                    switch($posisi) {
-                                                        case '1':
+                                                    $posisiInt = intval($posisi);
+                                                    switch($posisiInt) {
+                                                        case 1:
                                                             $icon = '🥇';
                                                             $juaraText = 'Juara 1';
                                                             $badgeClass = 'badge-warning';
                                                             break;
-                                                        case '2':
+                                                        case 2:
                                                             $icon = '🥈';
                                                             $juaraText = 'Juara 2';
                                                             $badgeClass = 'badge-secondary';
                                                             break;
-                                                        case '3':
+                                                        case 3:
                                                             $icon = '🥉';
                                                             $juaraText = 'Juara 3';
                                                             $badgeClass = 'badge-info';
                                                             break;
                                                         default:
-                                                            $icon = '🏆';
-                                                            $juaraText = 'Juara ' . $posisi;
-                                                            $badgeClass = 'badge-success';
+                                                            if ($posisiInt > 0 && $posisiInt <= 10) {
+                                                                $icon = '🏆';
+                                                                $juaraText = 'Juara ' . $posisi;
+                                                                $badgeClass = 'badge-success';
+                                                            } else {
+                                                                $icon = '🎖️';
+                                                                $juaraText = 'Peserta';
+                                                                $badgeClass = 'badge-primary';
+                                                            }
                                                             break;
                                                     }
                                             ?>
@@ -1135,23 +1141,33 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                                                 <div class="achievement-icon"><?php echo $icon; ?></div>
                                                 <div class="achievement-info">
                                                     <span class="badge <?php echo $badgeClass; ?>"><?php echo $juaraText; ?></span>
-                                                    <div class="achievement-category">Kategori: <?php echo $kategori; ?></div>
+                                                    <div class="achievement-category">Kategori: <?php echo htmlspecialchars($kategori); ?></div>
+                                                    <?php if (!empty($Winner['JudulKarya'])): ?>
+                                                    <div class="achievement-title" style="font-size: 12px; color: #666; margin-top: 3px;">
+                                                        <?php echo htmlspecialchars($Winner['JudulKarya']); ?>
+                                                    </div>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                             <?php 
+                                                    }
+                                                } else {
+                                                    // Jika tidak ada achievement data
+                                                    $hasRealData = false;
                                                 }
+                                            } else {
+                                                // Error pada query
+                                                error_log("Query error in AwardViewAdminDesa: " . mysqli_error($db));
+                                                $hasRealData = false;
                                             }
                                         }
                                         
-                                        // If no real data found, show example achievement for demo
+                                        // Jika tidak ada data achievement, tampilkan pesan kosong
                                         if (!$hasRealData):
                                         ?>
-                                        <div class="achievement-box">
-                                            <div class="achievement-icon">🥈</div>
-                                            <div class="achievement-info">
-                                                <span class="badge badge-secondary">Juara 2</span>
-                                                <div class="achievement-category">Kategori: Desa Bagus</div>
-                                            </div>
+                                        <div class="text-muted text-center">
+                                            <i class="fa fa-info-circle"></i>
+                                            <small>Belum ada pencapaian untuk award ini</small>
                                         </div>
                                         <?php endif; ?>
                                     </div>

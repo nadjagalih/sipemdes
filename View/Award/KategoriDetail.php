@@ -30,11 +30,15 @@ $isMasaPenjurian = isset($isMasaPenjurian) ? $isMasaPenjurian : false;
 $statusPenjurian = isset($statusPenjurian) ? $statusPenjurian : 'Status tidak diketahui';
 $QueryPeserta = isset($QueryPeserta) ? $QueryPeserta : null;
 
-// Inisialisasi variabel juara1
+// Inisialisasi variabel juara
 $juara1 = null;
+$juara2 = null;
+$juara3 = null;
+$posisiTerisi = array(); // Array untuk menyimpan posisi yang sudah terisi
 
-// Query untuk mendapatkan juara 1 jika IdKategoriAward tersedia
+// Query untuk mendapatkan semua juara jika IdKategoriAward tersedia
 if (!empty($IdKategoriAward)) {
+    // Query untuk mendapatkan juara 1
     $QueryJuara1 = mysqli_query($db, "SELECT 
         pa.IdPesertaAward,
         pa.NamaPeserta,
@@ -52,6 +56,49 @@ if (!empty($IdKategoriAward)) {
 
     if ($QueryJuara1 && mysqli_num_rows($QueryJuara1) > 0) {
         $juara1 = mysqli_fetch_assoc($QueryJuara1);
+        $posisiTerisi[1] = $juara1['IdPesertaAward'];
+    }
+
+    // Query untuk mendapatkan juara 2
+    $QueryJuara2 = mysqli_query($db, "SELECT 
+        pa.IdPesertaAward,
+        pa.NamaPeserta,
+        pa.NamaKarya,
+        pa.LinkKarya,
+        pa.Posisi,
+        md.NamaDesa,
+        mk.Kecamatan
+        FROM desa_award pa
+        INNER JOIN master_desa md ON pa.IdDesaFK = md.IdDesa
+        INNER JOIN master_kecamatan mk ON md.IdKecamatanFK = mk.IdKecamatan
+        WHERE pa.IdKategoriAwardFK = '$IdKategoriAward' 
+        AND pa.Posisi = 2
+        LIMIT 1");
+
+    if ($QueryJuara2 && mysqli_num_rows($QueryJuara2) > 0) {
+        $juara2 = mysqli_fetch_assoc($QueryJuara2);
+        $posisiTerisi[2] = $juara2['IdPesertaAward'];
+    }
+
+    // Query untuk mendapatkan juara 3
+    $QueryJuara3 = mysqli_query($db, "SELECT 
+        pa.IdPesertaAward,
+        pa.NamaPeserta,
+        pa.NamaKarya,
+        pa.LinkKarya,
+        pa.Posisi,
+        md.NamaDesa,
+        mk.Kecamatan
+        FROM desa_award pa
+        INNER JOIN master_desa md ON pa.IdDesaFK = md.IdDesa
+        INNER JOIN master_kecamatan mk ON md.IdKecamatanFK = mk.IdKecamatan
+        WHERE pa.IdKategoriAwardFK = '$IdKategoriAward' 
+        AND pa.Posisi = 3
+        LIMIT 1");
+
+    if ($QueryJuara3 && mysqli_num_rows($QueryJuara3) > 0) {
+        $juara3 = mysqli_fetch_assoc($QueryJuara3);
+        $posisiTerisi[3] = $juara3['IdPesertaAward'];
     }
 }
 
@@ -87,7 +134,7 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
     <div class="row" style="display: flex; align-items: stretch;">
         <div class="col-lg-8">
             <div class="ibox" style="min-height: 430px;">
-                <div class="ibox-content">
+                <div class="ibox-content" style="min-height: 430px;">
                     <div class="text-center">
                         <i class="fa fa-trophy" style="font-size: 80px; color: #FFD700; margin-bottom: 20px;"></i>
                         <h1 class="font-bold"><?php echo $NamaKategori; ?></h1>
@@ -142,7 +189,7 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
                         <div class="ibox-title">
                             <h5>Status Penjurian</h5>
                         </div>
-                        <div class="ibox-content">
+                        <div class="ibox-content" style="min-height: 200px;">
                             <?php if (!empty($MasaPenjurianMulai) && !empty($MasaPenjurianSelesai)): ?>
                                 <p><strong>Masa Penjurian:</strong><br>
                                     <?php echo date('d M Y', strtotime($MasaPenjurianMulai)) . ' - ' . date('d M Y', strtotime($MasaPenjurianSelesai)); ?></p>
@@ -200,7 +247,7 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
                                         $Posisi = $DataPeserta['Posisi'];
                                         $TanggalSubmit = date('d M Y', strtotime($DataPeserta['TanggalSubmit']));
                                     ?>
-                                        <tr>
+                                        <tr <?php echo (!empty($Posisi) && in_array($Posisi, [1, 2, 3])) ? 'class="juara-highlight"' : ''; ?>>
                                             <td class="text-center"><?php echo $no; ?></td>
                                             <td>
                                                 <strong><?php echo $NamaPeserta; ?></strong>
@@ -244,9 +291,16 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
                                             </td>
                                             <td class="text-center">
                                                 <?php if ($isMasaPenjurian): ?>
-                                                    <button type="button" class="btn btn-xs btn-primary"
-                                                        onclick="updatePosisi('<?php echo $IdPesertaAward; ?>', '<?php echo addslashes($NamaPeserta); ?>', '<?php echo addslashes($NamaKarya); ?>', '<?php echo $Posisi; ?>', '<?php echo addslashes($LinkKarya); ?>')">
-                                                        <i class="fa fa-trophy"></i> Update Posisi
+                                                    <?php
+                                                    // Tentukan class button berdasarkan apakah sudah memiliki posisi atau tidak
+                                                    $buttonClass = !empty($Posisi) ? 'btn-success' : 'btn-primary';
+                                                    $buttonIcon = !empty($Posisi) ? 'fa-edit' : 'fa-trophy';
+                                                    $buttonText = !empty($Posisi) ? 'Edit Posisi' : 'Set Posisi';
+                                                    ?>
+                                                    <button type="button" class="btn btn-xs <?php echo $buttonClass; ?>"
+                                                        onclick="updatePosisi('<?php echo $IdPesertaAward; ?>', '<?php echo addslashes($NamaPeserta); ?>', '<?php echo addslashes($NamaKarya); ?>', '<?php echo $Posisi; ?>', '<?php echo addslashes($LinkKarya); ?>')"
+                                                        title="<?php echo $buttonText; ?>">
+                                                        <i class="fa <?php echo $buttonIcon; ?>"></i> <?php echo $buttonText; ?>
                                                     </button>
                                                 <?php else: ?>
                                                     <button type="button" class="btn btn-xs btn-secondary" disabled
@@ -381,6 +435,41 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
         color: white !important;
     }
 
+    /* Style untuk posisi dropdown */
+    #updatePosisiDropdown option:disabled {
+        background-color: #f8f9fa !important;
+        color: #6c757d !important;
+        font-style: italic;
+    }
+
+    /* Alert styling untuk informasi posisi */
+    .alert-info {
+        border-left: 4px solid #17a2b8;
+        font-size: 13px;
+    }
+
+    /* Button variations */
+    .btn-success.btn-xs {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-success.btn-xs:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    /* Highlight untuk juara yang sudah ditetapkan */
+    .juara-highlight {
+        background-color: #fff3cd !important;
+        border-left: 4px solid #ffc107;
+    }
+
+    /* Style untuk modal info */
+    .modal .alert-info {
+        margin-bottom: 15px;
+    }
+
     /* Responsive design */
     @media (max-width: 768px) {
         .ibox {
@@ -389,6 +478,10 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
 
         .table-responsive {
             border: none;
+        }
+        
+        .alert-info {
+            font-size: 12px;
         }
     }
 </style>
@@ -467,12 +560,40 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
                     <div class="form-group">
                         <label>Posisi/Juara</label>
                         <select name="Posisi" id="updatePosisiDropdown" class="form-control">
-                            <option value="">-- Tidak Mendapat Juara --</option>
-                            <option value="1">🥇 Juara 1</option>
-                            <option value="2">🥈 Juara 2</option>
-                            <option value="3">🥉 Juara 3</option>
+                            <!-- Options akan di-generate oleh JavaScript -->
                         </select>
-                        <small class="text-muted">Hanya tersedia juara 1, 2, dan 3. Peserta lain tidak mendapat juara.</small>
+                        <small class="text-muted">
+                            <i class="fa fa-info-circle text-info"></i>
+                            Hanya tersedia juara 1, 2, dan 3. Setiap posisi hanya bisa dipilih oleh satu peserta.
+                            <br><strong>Posisi yang sudah terisi akan ditandai sebagai "Sudah Terisi".</strong>
+                        </small>
+                    </div>
+                    
+                    <!-- Informasi posisi yang sudah terisi -->
+                    <div class="alert alert-info" style="font-size: 12px;">
+                        <strong>Status Posisi Kategori:</strong>
+                        <br>
+                        <?php if ($juara1): ?>
+                            🥇 <strong>Juara 1:</strong> <?php echo htmlspecialchars($juara1['NamaDesa']); ?> - <?php echo htmlspecialchars($juara1['NamaKarya']); ?>
+                            <br>
+                        <?php else: ?>
+                            � <strong>Juara 1:</strong> <span class="text-muted">Belum ada</span>
+                            <br>
+                        <?php endif; ?>
+                        
+                        <?php if ($juara2): ?>
+                            � <strong>Juara 2:</strong> <?php echo htmlspecialchars($juara2['NamaDesa']); ?> - <?php echo htmlspecialchars($juara2['NamaKarya']); ?>
+                            <br>
+                        <?php else: ?>
+                            🥈 <strong>Juara 2:</strong> <span class="text-muted">Belum ada</span>
+                            <br>
+                        <?php endif; ?>
+                        
+                        <?php if ($juara3): ?>
+                            🥉 <strong>Juara 3:</strong> <?php echo htmlspecialchars($juara3['NamaDesa']); ?> - <?php echo htmlspecialchars($juara3['NamaKarya']); ?>
+                        <?php else: ?>
+                            🥉 <strong>Juara 3:</strong> <span class="text-muted">Belum ada</span>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -505,9 +626,6 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
         $('#updatePosisiNamaPeserta').val(namaPeserta);
         $('#updatePosisiNamaKarya').val(namaKarya);
 
-        // Set dropdown value
-        $('#updatePosisiDropdown').val(posisi || '');
-
         // Handle link karya
         if (linkKarya && linkKarya.trim() !== '') {
             $('#updatePosisiLinkKarya').val(linkKarya);
@@ -517,24 +635,108 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
             $('#btnLihatKarya').hide();
         }
 
+        // Clear dropdown dan rebuild options berdasarkan posisi yang tersedia
+        rebuildPosisiDropdown(id, posisi);
+
         $('#modalUpdatePosisi').modal('show');
+    }
+
+    function rebuildPosisiDropdown(currentPesertaId, currentPosisi) {
+        var dropdown = $('#updatePosisiDropdown');
+        dropdown.empty();
+        
+        // Always add "Tidak Mendapat Juara" option
+        dropdown.append('<option value="">-- Tidak Mendapat Juara --</option>');
+        
+        // Data posisi yang sudah terisi dari PHP
+        var posisiTerisi = <?php echo json_encode($posisiTerisi); ?>;
+        
+        // Cek setiap posisi (1, 2, 3)
+        for (var i = 1; i <= 3; i++) {
+            var isAvailable = true;
+            var optionText = '';
+            var icon = '';
+            
+            // Tentukan icon dan text
+            switch(i) {
+                case 1:
+                    icon = '🥇';
+                    optionText = 'Juara 1';
+                    break;
+                case 2:
+                    icon = '🥈';
+                    optionText = 'Juara 2';
+                    break;
+                case 3:
+                    icon = '🥉';
+                    optionText = 'Juara 3';
+                    break;
+            }
+            
+            // Cek apakah posisi sudah terisi oleh peserta lain
+            if (posisiTerisi[i] && posisiTerisi[i] !== currentPesertaId) {
+                isAvailable = false;
+            }
+            
+            // Tambahkan option
+            if (isAvailable) {
+                var option = $('<option></option>')
+                    .attr('value', i)
+                    .text(icon + ' ' + optionText);
+                dropdown.append(option);
+            } else {
+                // Jika tidak tersedia, tambahkan option disabled
+                var option = $('<option></option>')
+                    .attr('value', i)
+                    .attr('disabled', true)
+                    .text(icon + ' ' + optionText + ' (Sudah Terisi)')
+                    .css('color', '#999');
+                dropdown.append(option);
+            }
+        }
+        
+        // Set current value
+        dropdown.val(currentPosisi || '');
     }
 
     function submitUpdatePosisi() {
         var posisiValue = $('#updatePosisiDropdown').val();
+        var namaPeserta = $('#updatePosisiNamaPeserta').val();
 
         // If no juara selected, just submit
         if (!posisiValue || posisiValue === '') {
-            document.getElementById('formUpdatePosisi').submit();
-            return;
+            if (confirm('Apakah Anda yakin ingin menghapus posisi juara dari ' + namaPeserta + '?')) {
+                return true; // Let form submit normally
+            }
+            return false;
         }
 
-        // Simple confirmation for juara selection
-        var juaraText = posisiValue == '1' ? 'Juara 1' : (posisiValue == '2' ? 'Juara 2' : 'Juara 3');
-        if (confirm('Apakah Anda yakin ingin menetapkan posisi ' + juaraText + ' untuk peserta ini?')) {
-            document.getElementById('formUpdatePosisi').submit();
+        // Check if position is disabled (shouldn't happen with proper UI, but just in case)
+        var selectedOption = $('#updatePosisiDropdown option:selected');
+        if (selectedOption.is(':disabled')) {
+            alert('Posisi yang dipilih sudah terisi oleh peserta lain!');
+            return false;
         }
+
+        // Confirmation for juara selection
+        var juaraText = posisiValue == '1' ? 'Juara 1' : (posisiValue == '2' ? 'Juara 2' : 'Juara 3');
+        var icon = posisiValue == '1' ? '🥇' : (posisiValue == '2' ? '🥈' : '🥉');
+        
+        if (confirm(icon + ' Apakah Anda yakin ingin menetapkan posisi ' + juaraText + ' untuk ' + namaPeserta + '?\n\nCatatan: Posisi ini akan menggantikan posisi sebelumnya jika ada.')) {
+            return true; // Let form submit normally
+        }
+        return false;
     }
+
+    // Override form submission to use our validation
+    $(document).ready(function() {
+        $('#modalUpdatePosisi form').on('submit', function(e) {
+            e.preventDefault();
+            if (submitUpdatePosisi()) {
+                this.submit();
+            }
+        });
+    });
 
     function confirmDelete(url, message) {
         if (confirm(message)) {

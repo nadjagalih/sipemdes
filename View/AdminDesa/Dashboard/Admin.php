@@ -864,7 +864,15 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
         <div class="container-fluid">
             <!-- Notification Bar Tipis -->
             <?php if ($totalNotifications > 0): ?>
-            <div class="notification-bar" style="
+            <?php 
+            // Cek apakah ada notifikasi award baru (persistent)
+            $hasAwardBaru = $notifStats['award_baru'] > 0;
+            $isPersistent = $hasAwardBaru ? 'true' : 'false';
+            ?>
+            <div class="notification-bar" 
+                 data-persistent="<?= $isPersistent ?>" 
+                 data-award-baru="<?= $hasAwardBaru ? 'true' : 'false' ?>"
+                 style="
                 background: linear-gradient(135deg, #0a0a37 0%, #1845b3 100%);
                 background: linear-gradient(135deg, #0a0a37 0%, #1845b3 100%);
                 color: white;
@@ -1822,26 +1830,122 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
         }, 2000); // Wait 2 seconds after DOM ready
     });
     
-    // Function untuk close notification bar
+    // Function untuk close notification bar dengan handling persistent notifications
     function closeNotificationBar() {
         const notifBar = document.querySelector('.notification-bar');
         if (notifBar) {
+            const isPersistent = notifBar.getAttribute('data-persistent') === 'true';
+            const hasAwardBaru = notifBar.getAttribute('data-award-baru') === 'true';
+            
             notifBar.style.animation = 'slideUp 0.3s ease-out forwards';
             setTimeout(() => {
                 notifBar.style.display = 'none';
-                // Store in localStorage untuk session ini
-                localStorage.setItem('notifBarClosed', 'true');
+                
+                // Jika bukan persistent atau tidak ada award baru, simpan status close
+                if (!isPersistent && !hasAwardBaru) {
+                    const notifContent = notifBar.querySelector('.notification-text');
+                    if (notifContent) {
+                        const contentHash = btoa(notifContent.textContent.trim()).substring(0, 20);
+                        const timestamp = Date.now();
+                        
+                        // Store dengan timestamp, akan expired dalam 1 jam
+                        const closeData = {
+                            hash: contentHash,
+                            timestamp: timestamp,
+                            expired: timestamp + (60 * 60 * 1000) // 1 jam
+                        };
+                        
+                        localStorage.setItem('notifBarClosed_' + contentHash, JSON.stringify(closeData));
+                    }
+                } else {
+                    // Untuk award baru, hanya hide sementara untuk session ini
+                    // Akan muncul lagi saat refresh halaman jika masih ada award baru
+                    sessionStorage.setItem('awardBarTempClosed', 'true');
+                }
             }, 300);
         }
     }
     
-    // Check apakah notification bar sudah di-close sebelumnya
+    // Check apakah notification bar dengan konten yang sama sudah di-close dan belum expired
     document.addEventListener('DOMContentLoaded', function() {
-        if (localStorage.getItem('notifBarClosed') === 'true') {
-            const notifBar = document.querySelector('.notification-bar');
-            if (notifBar) {
+        const notifBar = document.querySelector('.notification-bar');
+        if (notifBar) {
+            const isPersistent = notifBar.getAttribute('data-persistent') === 'true';
+            const hasAwardBaru = notifBar.getAttribute('data-award-baru') === 'true';
+            
+            // Untuk award baru (persistent), cek session storage
+            if (hasAwardBaru && sessionStorage.getItem('awardBarTempClosed') === 'true') {
                 notifBar.style.display = 'none';
+                return;
             }
+            
+            // Untuk notifikasi lain, cek localStorage
+            if (!isPersistent) {
+                const notifContent = notifBar.querySelector('.notification-text');
+                if (notifContent) {
+                    const contentHash = btoa(notifContent.textContent.trim()).substring(0, 20);
+                    const storedData = localStorage.getItem('notifBarClosed_' + contentHash);
+                    
+                    if (storedData) {
+                        try {
+                            const closeData = JSON.parse(storedData);
+                            const now = Date.now();
+                            
+                            // Cek apakah masih dalam periode yang di-close dan belum expired
+                            if (closeData.timestamp && closeData.expired && now < closeData.expired) {
+                                notifBar.style.display = 'none';
+                            } else {
+                                // Hapus data expired
+                                localStorage.removeItem('notifBarClosed_' + contentHash);
+                            }
+                        } catch (e) {
+                            // Hapus data yang corrupt
+                            localStorage.removeItem('notifBarClosed_' + contentHash);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Cleanup expired close data
+        cleanupExpiredCloseData();
+    });
+    
+    // Function untuk cleanup data close yang sudah expired
+    function cleanupExpiredCloseData() {
+        const now = Date.now();
+        const keysToRemove = [];
+        
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('notifBarClosed_')) {
+                try {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    if (data.expired && now > data.expired) {
+                        keysToRemove.push(key);
+                    }
+                } catch (e) {
+                    keysToRemove.push(key);
+                }
+            }
+        }
+        
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+    }
+    
+    // Clear session storage untuk award bar jika user navigasi ke halaman award
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a');
+        if (link && (link.href.includes('pg=AwardViewAdminDesa') || link.href.includes('Award'))) {
+            sessionStorage.removeItem('awardBarTempClosed');
+        }
+    });
+    
+    // Clear session storage saat halaman di-unload (refresh atau navigasi)
+    window.addEventListener('beforeunload', function() {
+        // Hanya clear jika user sudah mengklik link award
+        if (document.querySelector('a[href*="AwardViewAdminDesa"]:active')) {
+            sessionStorage.removeItem('awardBarTempClosed');
         }
     });
 </script>

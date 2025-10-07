@@ -32,8 +32,20 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $hasJuryColumns = mysqli_num_rows($checkColumns) > 0;
             
             if ($hasJuryColumns) {
-                $MasaPenjurianMulai = !empty($_POST['MasaPenjurianMulai']) ? "'" . sql_injeksi($_POST['MasaPenjurianMulai']) . "'" : 'NULL';
-                $MasaPenjurianSelesai = !empty($_POST['MasaPenjurianSelesai']) ? "'" . sql_injeksi($_POST['MasaPenjurianSelesai']) . "'" : 'NULL';
+                // Set tanggal awal penjurian sama dengan tanggal awal penghargaan
+                $MasaPenjurianMulai = !empty($MasaAktifMulai) ? "'" . $MasaAktifMulai . "'" : 'NULL';
+                
+                // Set tanggal akhir penjurian dari input, tapi minimal sama dengan tanggal akhir penghargaan
+                $inputPenjurianSelesai = !empty($_POST['MasaPenjurianSelesai']) ? $_POST['MasaPenjurianSelesai'] : $MasaAktifSelesai;
+                if (!empty($MasaAktifSelesai) && !empty($inputPenjurianSelesai)) {
+                    if ($inputPenjurianSelesai < $MasaAktifSelesai) {
+                        $MasaPenjurianSelesai = "'" . $MasaAktifSelesai . "'";
+                    } else {
+                        $MasaPenjurianSelesai = "'" . sql_injeksi($inputPenjurianSelesai) . "'";
+                    }
+                } else {
+                    $MasaPenjurianSelesai = !empty($MasaAktifSelesai) ? "'" . $MasaAktifSelesai . "'" : 'NULL';
+                }
             }
             
             // Tentukan status otomatis berdasarkan masa aktif
@@ -76,8 +88,20 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $hasJuryColumns = mysqli_num_rows($checkColumns) > 0;
             
             if ($hasJuryColumns) {
-                $MasaPenjurianMulai = !empty($_POST['MasaPenjurianMulai']) ? "'" . sql_injeksi($_POST['MasaPenjurianMulai']) . "'" : 'NULL';
-                $MasaPenjurianSelesai = !empty($_POST['MasaPenjurianSelesai']) ? "'" . sql_injeksi($_POST['MasaPenjurianSelesai']) . "'" : 'NULL';
+                // Set tanggal awal penjurian sama dengan tanggal awal penghargaan
+                $MasaPenjurianMulai = !empty($MasaAktifMulai) ? "'" . $MasaAktifMulai . "'" : 'NULL';
+                
+                // Set tanggal akhir penjurian dari input, tapi minimal sama dengan tanggal akhir penghargaan
+                $inputPenjurianSelesai = !empty($_POST['MasaPenjurianSelesai']) ? $_POST['MasaPenjurianSelesai'] : $MasaAktifSelesai;
+                if (!empty($MasaAktifSelesai) && !empty($inputPenjurianSelesai)) {
+                    if ($inputPenjurianSelesai < $MasaAktifSelesai) {
+                        $MasaPenjurianSelesai = "'" . $MasaAktifSelesai . "'";
+                    } else {
+                        $MasaPenjurianSelesai = "'" . sql_injeksi($inputPenjurianSelesai) . "'";
+                    }
+                } else {
+                    $MasaPenjurianSelesai = !empty($MasaAktifSelesai) ? "'" . $MasaAktifSelesai . "'" : 'NULL';
+                }
             }
             
             // Tentukan status otomatis berdasarkan masa aktif

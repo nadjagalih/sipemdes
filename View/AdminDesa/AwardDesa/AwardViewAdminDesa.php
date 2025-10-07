@@ -939,7 +939,7 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
     </div>
 </div>
 
-
+<div class="wrapper wrapper-content animated fadeInRight">
     <!-- Statistics Cards -->
     <div class="row">
         <div class="col-lg-3">

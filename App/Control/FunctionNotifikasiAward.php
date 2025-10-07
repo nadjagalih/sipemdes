@@ -28,7 +28,7 @@ function getAwardNotifications($db, $IdDesa) {
     
     $currentDate = date('Y-m-d');
     
-    // 1. Award Baru (Belum mendaftar) - Hanya tampilkan jika award masih aktif
+    // 1. Award Baru (Belum mendaftar) - Prioritas tertinggi, selalu tampilkan jika award masih aktif
     $QueryAwardBaru = mysqli_query($db, "SELECT 
         ma.IdAward,
         ma.JenisPenghargaan,
@@ -37,6 +37,7 @@ function getAwardNotifications($db, $IdDesa) {
         ma.MasaAktifSelesai,
         ma.MasaPenjurianSelesai,
         ma.StatusAktif,
+        ma.TanggalInput,
         COUNT(da.IdPesertaAward) as SudahDaftar
         FROM master_award_desa ma
         LEFT JOIN master_kategori_award mk ON ma.IdAward = mk.IdAwardFK
@@ -61,15 +62,18 @@ function getAwardNotifications($db, $IdDesa) {
                 'action' => "window.location.href='?pg=AwardViewAdminDesa'",
                 'action_text' => 'Daftar Sekarang',
                 'time' => 'Baru',
+                'priority' => 'high', // Prioritas tinggi untuk award baru
+                'persistent' => true, // Selalu muncul meskipun di-close
                 'data' => $award
             ];
         }
     }
     
-    // 2. Sudah Daftar - Menunggu Penjurian (Semua karya yang sudah disubmit tapi belum ada hasil)
+    // 2. Menunggu Penjurian (Semua karya yang masih dalam proses, termasuk yang sudah ada posisi tapi penjurian belum selesai)
     $QueryMenungguPenjurian = mysqli_query($db, "SELECT 
         da.IdPesertaAward,
         da.NamaKarya,
+        da.Posisi,
         da.TanggalInput,
         mk.NamaKategori,
         ma.JenisPenghargaan,
@@ -82,9 +86,15 @@ function getAwardNotifications($db, $IdDesa) {
         JOIN master_kategori_award mk ON da.IdKategoriAwardFK = mk.IdKategoriAward
         JOIN master_award_desa ma ON mk.IdAwardFK = ma.IdAward
         WHERE da.IdDesaFK = '$IdDesa'
-        AND (da.Posisi IS NULL OR da.Posisi = 0)
         AND (
-            -- Tampilkan jika award masih aktif dan belum ada hasil
+            -- Kondisi 1: Belum ada posisi sama sekali
+            (da.Posisi IS NULL OR da.Posisi = 0)
+            OR
+            -- Kondisi 2: Sudah ada posisi TAPI masa penjurian belum selesai
+            (da.Posisi IS NOT NULL AND da.Posisi > 0 AND ma.MasaPenjurianSelesai IS NOT NULL AND '$currentDate' <= ma.MasaPenjurianSelesai)
+        )
+        AND (
+            -- Tampilkan jika award masih aktif dan masa penjurian belum selesai
             (ma.StatusAktif = 'Aktif' AND (ma.MasaPenjurianSelesai IS NULL OR ma.MasaPenjurianSelesai >= '$currentDate'))
             OR
             -- Tampilkan jika masa penjurian sedang berlangsung
@@ -100,16 +110,40 @@ function getAwardNotifications($db, $IdDesa) {
         while ($karya = mysqli_fetch_assoc($QueryMenungguPenjurian)) {
             $status = '';
             $iconText = '';
-            if (!empty($karya['MasaPenjurianMulai']) && $currentDate < $karya['MasaPenjurianMulai']) {
-                $status = 'Menunggu Penjurian Dimulai';
-                $iconText = '⏳';
-            } elseif (!empty($karya['MasaPenjurianMulai']) && !empty($karya['MasaPenjurianSelesai']) 
-                     && $currentDate >= $karya['MasaPenjurianMulai'] && $currentDate <= $karya['MasaPenjurianSelesai']) {
-                $status = 'Sedang Dinilai Juri';
-                $iconText = '⚖️';
+            
+            // Cek apakah sudah ada posisi tapi masih dalam masa penjurian
+            $sudahAdaPosisi = !empty($karya['Posisi']) && $karya['Posisi'] > 0;
+            $masihDalamPenjurian = !empty($karya['MasaPenjurianSelesai']) && $currentDate <= $karya['MasaPenjurianSelesai'];
+            
+            if ($sudahAdaPosisi && $masihDalamPenjurian) {
+                // Jika sudah ada posisi tapi masa penjurian belum selesai
+                if ($karya['Posisi'] <= 3) {
+                    $posisiText = '';
+                    switch($karya['Posisi']) {
+                        case 1: $posisiText = 'Juara 1'; break;
+                        case 2: $posisiText = 'Juara 2'; break;
+                        case 3: $posisiText = 'Juara 3'; break;
+                        default: $posisiText = 'Peringkat ' . $karya['Posisi']; break;
+                    }
+                    $status = 'Sementara Mendapat ' . $posisiText . ' - Menunggu Pengumuman Resmi';
+                    $iconText = '🏆⏳';
+                } else {
+                    $status = 'Sementara Peringkat ' . $karya['Posisi'] . ' - Menunggu Pengumuman Resmi';
+                    $iconText = '🏅⏳';
+                }
             } else {
-                $status = 'Menunggu Hasil Penjurian';
-                $iconText = '🕐';
+                // Logika normal untuk yang belum ada posisi
+                if (!empty($karya['MasaPenjurianMulai']) && $currentDate < $karya['MasaPenjurianMulai']) {
+                    $status = 'Menunggu Penjurian Dimulai';
+                    $iconText = '⏳';
+                } elseif (!empty($karya['MasaPenjurianMulai']) && !empty($karya['MasaPenjurianSelesai']) 
+                         && $currentDate >= $karya['MasaPenjurianMulai'] && $currentDate <= $karya['MasaPenjurianSelesai']) {
+                    $status = 'Sedang Dinilai Juri';
+                    $iconText = '⚖️';
+                } else {
+                    $status = 'Menunggu Hasil Penjurian';
+                    $iconText = '🕐';
+                }
             }
             
             $notifications[] = [
@@ -127,7 +161,7 @@ function getAwardNotifications($db, $IdDesa) {
         }
     }
     
-    // 3. Menang (Posisi 1-3) - Tampilkan lebih lama jika award sudah selesai
+    // 3. Menang (Posisi 1-3) - HANYA tampilkan setelah masa penjurian benar-benar selesai
     $QueryMenang = mysqli_query($db, "SELECT 
         da.IdPesertaAward,
         da.NamaKarya,
@@ -148,57 +182,84 @@ function getAwardNotifications($db, $IdDesa) {
         AND da.Posisi > 0 
         AND da.Posisi <= 3
         AND (
-            -- Jika award masih aktif: tampilkan dalam 30 hari
-            (ma.StatusAktif = 'Aktif' AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 30 DAY))
+            -- PRIORITAS 1: Jika ada masa penjurian, HARUS sudah selesai (tanggal hari ini > tanggal selesai)
+            (ma.MasaPenjurianSelesai IS NOT NULL AND '$currentDate' > ma.MasaPenjurianSelesai)
             OR
-            -- Jika award sudah selesai: tampilkan dalam 90 hari (lebih lama)
-            (ma.StatusAktif = 'Non-Aktif' AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 90 DAY))
+            -- PRIORITAS 2: Jika tidak ada masa penjurian, award harus sudah tidak aktif DAN masa aktif sudah berakhir
+            (ma.MasaPenjurianSelesai IS NULL 
+             AND ma.StatusAktif = 'Non-Aktif' 
+             AND ma.MasaAktifSelesai IS NOT NULL 
+             AND '$currentDate' > ma.MasaAktifSelesai)
+        )
+        AND (
+            -- Tampilkan dalam 90 hari setelah masa penjurian selesai
+            (ma.MasaPenjurianSelesai IS NOT NULL AND ma.MasaPenjurianSelesai >= DATE_SUB('$currentDate', INTERVAL 90 DAY))
             OR
-            -- Jika masa aktif sudah berakhir: tampilkan dalam 90 hari
-            (ma.MasaAktifSelesai IS NOT NULL AND ma.MasaAktifSelesai < '$currentDate' 
-             AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 90 DAY))
+            -- Atau dalam 90 hari setelah award selesai jika tidak ada masa penjurian
+            (ma.MasaPenjurianSelesai IS NULL AND ma.MasaAktifSelesai IS NOT NULL 
+             AND ma.MasaAktifSelesai >= DATE_SUB('$currentDate', INTERVAL 90 DAY))
         )
         ORDER BY da.Posisi ASC, da.TanggalInput DESC");
     
     if ($QueryMenang && mysqli_num_rows($QueryMenang) > 0) {
         while ($karya = mysqli_fetch_assoc($QueryMenang)) {
-            $posisiText = '';
-            $iconText = '';
-            switch($karya['Posisi']) {
-                case 1: 
-                    $posisiText = 'Juara 1'; 
-                    $iconText = '🥇';
-                    break;
-                case 2: 
-                    $posisiText = 'Juara 2'; 
-                    $iconText = '🥈';
-                    break;
-                case 3: 
-                    $posisiText = 'Juara 3'; 
-                    $iconText = '🥉';
-                    break;
-                default: 
-                    $posisiText = 'Peringkat ' . $karya['Posisi']; 
-                    $iconText = '🏆';
-                    break;
+            // DOUBLE CHECK: Validasi tambahan bahwa masa penjurian benar-benar sudah selesai
+            $showNotification = false;
+            
+            if (!empty($karya['MasaPenjurianSelesai'])) {
+                // Jika ada masa penjurian, harus sudah selesai (tanggal hari ini > tanggal selesai penjurian)
+                if ($currentDate > $karya['MasaPenjurianSelesai']) {
+                    $showNotification = true;
+                }
+            } else {
+                // Jika tidak ada masa penjurian, cek status award dan masa aktif
+                if ($karya['StatusAktif'] == 'Non-Aktif' && 
+                    !empty($karya['MasaAktifSelesai']) && 
+                    $currentDate > $karya['MasaAktifSelesai']) {
+                    $showNotification = true;
+                }
             }
             
-            $notifications[] = [
-                'type' => 'menang',
-                'icon' => 'fa-trophy',
-                'color' => 'text-success',
-                'badge' => 'badge-success',
-                'title' => 'Selamat Desa anda mendapatkan ' . $posisiText . ' di Award ' . $karya['JenisPenghargaan'] . ' ' . $karya['TahunPenghargaan'],
-                'message' => 'silahkan cek di sini',
-                'action' => "window.location.href='?pg=KaryaDesa'",
-                'action_text' => 'Lihat Detail',
-                'time' => time_elapsed_string($karya['TanggalInput']),
-                'data' => $karya
-            ];
+            // Hanya tampilkan jika validasi lolos
+            if ($showNotification) {
+                $posisiText = '';
+                $iconText = '';
+                switch($karya['Posisi']) {
+                    case 1: 
+                        $posisiText = 'Juara 1'; 
+                        $iconText = '🥇';
+                        break;
+                    case 2: 
+                        $posisiText = 'Juara 2'; 
+                        $iconText = '🥈';
+                        break;
+                    case 3: 
+                        $posisiText = 'Juara 3'; 
+                        $iconText = '🥉';
+                        break;
+                    default: 
+                        $posisiText = 'Peringkat ' . $karya['Posisi']; 
+                        $iconText = '🏆';
+                        break;
+                }
+                
+                $notifications[] = [
+                    'type' => 'menang',
+                    'icon' => 'fa-trophy',
+                    'color' => 'text-success',
+                    'badge' => 'badge-success',
+                    'title' => 'Selamat Desa anda mendapatkan ' . $posisiText . ' di Award ' . $karya['JenisPenghargaan'] . ' ' . $karya['TahunPenghargaan'],
+                    'message' => 'silahkan cek di sini',
+                    'action' => "window.location.href='?pg=KaryaDesa'",
+                    'action_text' => 'Lihat Detail',
+                    'time' => time_elapsed_string($karya['TanggalInput']),
+                    'data' => $karya
+                ];
+            }
         }
     }
     
-    // 4. Tidak Menang - Hanya tampilkan dalam 7 hari setelah input, dan sembunyikan jika award sudah berakhir lama
+    // 4. Tidak Menang - HANYA tampilkan setelah masa penjurian benar-benar selesai
     $QueryTidakMenang = mysqli_query($db, "SELECT 
         da.IdPesertaAward,
         da.NamaKarya,
@@ -222,42 +283,69 @@ function getAwardNotifications($db, $IdDesa) {
             (da.Posisi IS NULL AND ma.MasaPenjurianSelesai IS NOT NULL AND '$currentDate' > ma.MasaPenjurianSelesai)
         )
         AND (
-            -- Hanya tampilkan jika award belum berakhir atau baru berakhir dalam 7 hari
-            (ma.MasaAktifSelesai IS NULL) OR
-            (ma.MasaAktifSelesai >= DATE_SUB('$currentDate', INTERVAL 7 DAY))
+            -- PRIORITAS 1: Jika ada masa penjurian, HARUS sudah selesai (tanggal hari ini > tanggal selesai)
+            (ma.MasaPenjurianSelesai IS NOT NULL AND '$currentDate' > ma.MasaPenjurianSelesai)
+            OR
+            -- PRIORITAS 2: Jika tidak ada masa penjurian, award harus sudah tidak aktif DAN masa aktif sudah berakhir
+            (ma.MasaPenjurianSelesai IS NULL 
+             AND ma.StatusAktif = 'Non-Aktif' 
+             AND ma.MasaAktifSelesai IS NOT NULL 
+             AND '$currentDate' > ma.MasaAktifSelesai)
         )
-        AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 7 DAY)
+        AND (
+            -- Tampilkan dalam 30 hari setelah masa penjurian selesai
+            (ma.MasaPenjurianSelesai IS NOT NULL AND ma.MasaPenjurianSelesai >= DATE_SUB('$currentDate', INTERVAL 30 DAY))
+            OR
+            -- Atau dalam 30 hari setelah award selesai jika tidak ada masa penjurian
+            (ma.MasaPenjurianSelesai IS NULL AND ma.MasaAktifSelesai IS NOT NULL 
+             AND ma.MasaAktifSelesai >= DATE_SUB('$currentDate', INTERVAL 30 DAY))
+        )
         ORDER BY da.TanggalInput DESC");
     
     if ($QueryTidakMenang && mysqli_num_rows($QueryTidakMenang) > 0) {
         while ($karya = mysqli_fetch_assoc($QueryTidakMenang)) {
-            // Skip jika award sudah berakhir lebih dari 7 hari
-            if (!empty($karya['MasaAktifSelesai']) && strtotime($karya['MasaAktifSelesai']) < strtotime('-7 days')) {
-                continue;
-            }
+            // DOUBLE CHECK: Validasi tambahan bahwa masa penjurian benar-benar sudah selesai
+            $showNotification = false;
             
-            $statusText = '';
-            $iconText = '';
-            if (empty($karya['Posisi'])) {
-                $statusText = 'Tidak Lolos Seleksi';
-                $iconText = '📋';
+            if (!empty($karya['MasaPenjurianSelesai'])) {
+                // Jika ada masa penjurian, harus sudah selesai (tanggal hari ini > tanggal selesai penjurian)
+                if ($currentDate > $karya['MasaPenjurianSelesai']) {
+                    $showNotification = true;
+                }
             } else {
-                $statusText = 'Peringkat ' . $karya['Posisi'];
-                $iconText = '🏅';
+                // Jika tidak ada masa penjurian, cek status award dan masa aktif
+                if ($karya['StatusAktif'] == 'Non-Aktif' && 
+                    !empty($karya['MasaAktifSelesai']) && 
+                    $currentDate > $karya['MasaAktifSelesai']) {
+                    $showNotification = true;
+                }
             }
             
-            $notifications[] = [
-                'type' => 'tidak_menang',
-                'icon' => 'fa-info-circle',
-                'color' => 'text-muted',
-                'badge' => 'badge-secondary',
-                'title' => $iconText . ' ' . $statusText,
-                'message' => 'Penghargaan: ' . $karya['JenisPenghargaan'] . ' ' . $karya['TahunPenghargaan'] . ' - Kategori: ' . $karya['NamaKategori'] . ' - Karya: ' . $karya['NamaKarya'],
-                'action' => "window.location.href='?pg=KaryaDesa'",
-                'action_text' => 'Lihat Detail',
-                'time' => time_elapsed_string($karya['TanggalInput']),
-                'data' => $karya
-            ];
+            // Hanya tampilkan jika validasi lolos
+            if ($showNotification) {
+                $statusText = '';
+                $iconText = '';
+                if (empty($karya['Posisi'])) {
+                    $statusText = 'Tidak Lolos Seleksi';
+                    $iconText = '📋';
+                } else {
+                    $statusText = 'Peringkat ' . $karya['Posisi'];
+                    $iconText = '🏅';
+                }
+                
+                $notifications[] = [
+                    'type' => 'tidak_menang',
+                    'icon' => 'fa-info-circle',
+                    'color' => 'text-muted',
+                    'badge' => 'badge-secondary',
+                    'title' => $iconText . ' ' . $statusText,
+                    'message' => 'Penghargaan: ' . $karya['JenisPenghargaan'] . ' ' . $karya['TahunPenghargaan'] . ' - Kategori: ' . $karya['NamaKategori'] . ' - Karya: ' . $karya['NamaKarya'],
+                    'action' => "window.location.href='?pg=KaryaDesa'",
+                    'action_text' => 'Lihat Detail',
+                    'time' => time_elapsed_string($karya['TanggalInput']),
+                    'data' => $karya
+                ];
+            }
         }
     }
     

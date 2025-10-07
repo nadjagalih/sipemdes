@@ -106,7 +106,7 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
 ?>
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
-        <h2>Detail Kategori - <?php echo $NamaKategori; ?></h2>
+        <h2><?php echo $NamaKategori; ?></h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a href="?pg=SAdmin">Dashboard</a>
@@ -116,9 +116,6 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
             </li>
             <li class="breadcrumb-item">
                 <a href="?pg=AwardDetail&Kode=<?php echo $IdAward; ?>">Detail Award</a>
-            </li>
-            <li class="breadcrumb-item active">
-                <strong><?php echo $NamaKategori; ?></strong>
             </li>
         </ol>
     </div>
@@ -132,58 +129,11 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row" style="display: flex; align-items: stretch;">
-        <div class="col-lg-8">
-            <div class="ibox" style="min-height: 430px;">
-                <div class="ibox-content" style="min-height: 430px;">
-                    <div class="text-center">
-                        <i class="fa fa-trophy" style="font-size: 80px; color: #FFD700; margin-bottom: 20px;"></i>
-                        <h1 class="font-bold"><?php echo $NamaKategori; ?></h1>
-                        <div style="margin: 15px 0;">
-                            <span class="badge badge-warning badge-lg" style="font-size: 16px; padding: 8px 15px; background-color: #007bff; color: white;">
-                                Kategori <?php echo $JenisPenghargaan; ?>
-                            </span>
-                        </div>
-                        <div>
-                            <span class="badge <?php echo ($StatusAward == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 16px; padding: 8px 15px;">
-                                Award <?php echo $StatusAward; ?>
-                            </span>
-                        </div>
-                        <!-- Tampilan Juara 1 -->
-                        <?php if ($juara1): ?>
-                            <div class="badge badge-warning" style="margin-top: 20px;">
-                                <h1>🥇 Juara 1 Kategori <br><?php echo $NamaKategori; ?>: 
-                                    <strong><?php echo $juara1['NamaDesa']; ?></strong> - <?php echo $juara1['NamaKarya']; ?>
-                                </h1>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="col-lg-4">
             <div class="row">
                 <!-- Action Panel -->
-                <div class="col-lg-12">
-                    <div class="ibox" style="margin-bottom: 15px;">
-                        <div class="ibox-title">
-                            <h5>Aksi Kategori</h5>
-                        </div>
-                        <div class="ibox-content">
-                            <div class="btn-group-vertical btn-block">
-                                <button type="button" class="btn btn-success" onclick="editKategori('<?php echo $IdKategoriAward; ?>')">
-                                    <i class="fa fa-edit"></i> Edit Kategori
-                                </button>
-                                <a href="../App/Model/ExcKategoriAward.php?Act=Delete&Kode=<?php echo $IdKategoriAward; ?>"
-                                    onclick="return confirm('Yakin ingin menghapus kategori ini? Semua peserta dalam kategori ini akan ikut terhapus.');" class="btn btn-danger">
-                                    <i class="fa fa-trash"></i> Hapus Kategori
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Info Masa Penjurian -->
+                <!-- Info Masa Penjurian
                 <div class="col-lg-12">
                     <div class="ibox" style="min-height: 255px;">
                         <div class="ibox-title">
@@ -206,7 +156,7 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -218,7 +168,7 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
         <div class="col-lg-12">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>Daftar Peserta Kategori <?php echo $NamaKategori; ?></h5>
+                    <h5>Daftar Peserta</h5>
                     <!-- Label peserta dihapus -->
                 </div>
                 <div class="ibox-content">
@@ -229,7 +179,6 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
                                     <tr>
                                         <th width="4%" class="text-center">No</th>
                                         <th width="18%">Nama Peserta (Desa)</th>
-                                        <th width="15%">Kategori</th>
                                         <th width="20%">Nama Karya</th>
                                         <th width="18%">Link Karya</th>
                                         <th width="12%" class="text-center">Posisi/Juara</th>
@@ -252,9 +201,6 @@ echo "<!-- Debug: Variabel sudah disiapkan -->";
                                             <td>
                                                 <strong><?php echo $NamaPeserta; ?></strong>
                                                 <br><small class="text-muted">Submit: <?php echo $TanggalSubmit; ?></small>
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-info"><?php echo $NamaKategori; ?></span>
                                             </td>
                                             <td>
                                                 <span class="text-navy"><?php echo $NamaKarya; ?></span>

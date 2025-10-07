@@ -75,13 +75,13 @@ if (isset($_GET['alert'])) {
                             <label class="col-lg-2 col-form-label">Masa Penjurian</label>
                             <div class="col-lg-5">
                                 <label class="control-label">Tanggal Mulai</label>
-                                <input type="date" class="form-control" name="MasaPenjurianMulai">
-                                <small class="form-text text-muted">Kapan penjurian dimulai (opsional)</small>
+                                <input type="date" class="form-control" name="MasaPenjurianMulai" readonly>
+                                <small class="form-text text-muted">Otomatis sama dengan tanggal mulai aktif award</small>
                             </div>
                             <div class="col-lg-5">
                                 <label class="control-label">Tanggal Selesai</label>
                                 <input type="date" class="form-control" name="MasaPenjurianSelesai">
-                                <small class="form-text text-muted">Kapan penjurian berakhir (opsional)</small>
+                                <small class="form-text text-muted">Minimal sama dengan tanggal akhir aktif award</small>
                             </div>
                         </div>
                         
@@ -92,7 +92,10 @@ if (isset($_GET['alert'])) {
                                     <i class="fa fa-info-circle"></i> Status award akan otomatis ditentukan berdasarkan masa aktif penghargaan.
                                     <br><strong>Aktif:</strong> Jika tanggal hari ini berada dalam rentang masa aktif.
                                     <br><strong>Non-Aktif:</strong> Jika di luar masa aktif atau belum/sudah berakhir.
-                                    <br><strong>Masa Penjurian:</strong> Jika diatur, admin hanya bisa memilih pemenang selama masa penjurian berlangsung.
+                                    <br><strong>Masa Penjurian:</strong> 
+                                    <br>• Tanggal mulai penjurian = tanggal mulai penghargaan
+                                    <br>• Tanggal akhir penjurian minimal sama dengan tanggal akhir penghargaan (bisa lebih lama)
+                                    <br>• Admin hanya bisa memilih pemenang selama masa penjurian berlangsung
                                 </div>
                             </div>
                         </div>
@@ -161,5 +164,54 @@ function closeErrorModal() {
         window.history.replaceState(null, null, url);
     }
 }
+
+// Auto-fill dan validasi masa penjurian
+document.addEventListener('DOMContentLoaded', function() {
+    const masaAktifMulai = document.querySelector('input[name="MasaAktifMulai"]');
+    const masaAktifSelesai = document.querySelector('input[name="MasaAktifSelesai"]');
+    const masaPenjurianMulai = document.querySelector('input[name="MasaPenjurianMulai"]');
+    const masaPenjurianSelesai = document.querySelector('input[name="MasaPenjurianSelesai"]');
+    
+    // Auto-fill tanggal mulai penjurian berdasarkan tanggal mulai aktif
+    if (masaAktifMulai && masaPenjurianMulai) {
+        masaAktifMulai.addEventListener('change', function() {
+            masaPenjurianMulai.value = this.value;
+        });
+        
+        // Set initial value if masa aktif mulai already has value
+        if (masaAktifMulai.value) {
+            masaPenjurianMulai.value = masaAktifMulai.value;
+        }
+    }
+    
+    // Set min date untuk tanggal akhir penjurian dan validasi
+    if (masaAktifSelesai && masaPenjurianSelesai) {
+        masaAktifSelesai.addEventListener('change', function() {
+            // Set minimum date untuk penjurian selesai
+            masaPenjurianSelesai.min = this.value;
+            
+            // Set default value jika belum ada atau kurang dari minimum
+            if (!masaPenjurianSelesai.value || masaPenjurianSelesai.value < this.value) {
+                masaPenjurianSelesai.value = this.value;
+            }
+        });
+        
+        // Set initial min date and value
+        if (masaAktifSelesai.value) {
+            masaPenjurianSelesai.min = masaAktifSelesai.value;
+            if (!masaPenjurianSelesai.value || masaPenjurianSelesai.value < masaAktifSelesai.value) {
+                masaPenjurianSelesai.value = masaAktifSelesai.value;
+            }
+        }
+        
+        // Validasi saat input tanggal akhir penjurian diubah
+        masaPenjurianSelesai.addEventListener('change', function() {
+            if (masaAktifSelesai.value && this.value < masaAktifSelesai.value) {
+                alert('Tanggal akhir penjurian tidak boleh kurang dari tanggal akhir penghargaan!');
+                this.value = masaAktifSelesai.value;
+            }
+        });
+    }
+});
 </script>
 <?php endif; ?>

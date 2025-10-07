@@ -42,7 +42,7 @@ if (mysqli_num_rows($QueryKategori) > 0) {
                 <div class="col-md-6" style="padding-left: 35px !important; margin-left: -25px !important;">
                     <div>
                         <h4 style="margin: 0 0 10px 0; color: #007bff !important; font-weight: 700 !important; font-size: 18px !important;">
-                            🏅 <?php echo $NamaKategori; ?>
+                            🏅 <a href="?pg=KategoriDetail&Kode=<?php echo $IdKategoriAward; ?>"><?php echo $NamaKategori; ?></a>
                         </h4>
                         <?php if (!empty($deskripsiShort)): ?>
                             <p style="margin: 0 0 5px 0; color: #6c757d !important; font-size: 14px !important; line-height: 1.4 !important;">

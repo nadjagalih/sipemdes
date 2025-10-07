@@ -28,7 +28,7 @@ include "../App/Control/FunctionAwardDetail.php";
     <div class="row">
         <div class="col-lg-8">
             <div class="ibox">
-                <div class="ibox-content">
+                <div class="ibox-content" style="min-height: 375px;">
                     <div class="text-center">
                         <i class="fa fa-trophy" style="font-size: 80px; color: #FFD700; margin-bottom: 20px;"></i>
                         <h1 class="font-bold"><?php echo $JenisPenghargaan; ?></h1>
@@ -36,9 +36,9 @@ include "../App/Control/FunctionAwardDetail.php";
                             <span class="badge badge-primary badge-lg" style="font-size: 16px; padding: 8px 15px; background-color: #007bff; color: white;">
                                 Tahun <?php echo $TahunPenghargaan; ?>
                             </span>
-                            <span class="badge <?php echo ($StatusAktif == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 16px; padding: 8px 15px; margin-left: 10px;">
+                            <!--<span class="badge <?php echo ($StatusAktif == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 16px; padding: 8px 15px; margin-left: 10px;">
                                 <?php echo $StatusAktif; ?>
-                            </span>
+                            </span>-->
                         </div>
                     </div>
 

@@ -80,9 +80,6 @@ if (isset($_GET['alert'])) {
                             <span class="badge badge-primary badge-lg" style="font-size: 16px; padding: 8px 15px; background-color: #007bff; color: white;">
                                 Tahun <?php echo $DataAward['TahunPenghargaan']; ?>
                             </span>
-                            <span class="badge <?php echo ($DataAward['StatusAktif'] == 'Aktif') ? 'badge-success' : 'badge-secondary'; ?> badge-lg" style="font-size: 16px; padding: 8px 15px; margin-left: 10px;">
-                                <?php echo $DataAward['StatusAktif']; ?>
-                            </span>
                         </div>
                     </div>
 
@@ -268,9 +265,11 @@ if (isset($_GET['alert'])) {
                                                     <i class="fa fa-eye"></i>
                                                 </button>
                                                 <?php if ($DataKaryaAward['StatusAward'] == 'Aktif'): ?>
+                                                <!--
                                                 <a href="?pg=EditKaryaAward&kode=<?php echo $DataKaryaAward['IdPesertaAward']; ?>&award=<?php echo $IdAward; ?>" class="btn btn-sm btn-warning">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
+                                                -->
                                                 <button type="button" class="btn btn-sm btn-danger" onclick="hapusKaryaAward('<?php echo $DataKaryaAward['IdPesertaAward']; ?>', '<?php echo addslashes($DataKaryaAward['JudulKarya']); ?>')">
                                                     <i class="fa fa-trash"></i>
                                                 </button>

@@ -1133,6 +1133,8 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                                                 AND da.Posisi IS NOT NULL 
                                                 AND da.Posisi > 0 
                                                 AND da.Posisi <= 3
+                                                -- Hanya tampilkan jika masa penjurian sudah selesai
+                                                AND (ma.MasaPenjurianSelesai IS NULL OR ma.MasaPenjurianSelesai < '$currentDate')
                                                 AND (
                                                     -- Jika award masih aktif: tampilkan dalam 30 hari
                                                     (ma.StatusAktif = 'Aktif' AND da.TanggalInput >= DATE_SUB('$currentDate', INTERVAL 30 DAY))

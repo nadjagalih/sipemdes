@@ -1,3 +1,5 @@
+<?php require_once "../Module/Security/Security.php"; ?>
+
 <script>
     function checkAvailability() {
         // $( "#loaderIcon" ).show();
@@ -71,6 +73,7 @@
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcUser?Act=Save" method="POST" enctype="multipart/form-data">
+                        <?php echo CSRFProtection::getTokenField(); ?>
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Username</label>
                             <div class="col-lg-8">
                                 <input type="text" name="UserNama" id="UserNama" onkeyup="checkAvailability()" placeholder="Masukkan Username" class="form-control" required autocomplete="off">

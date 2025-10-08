@@ -3,30 +3,40 @@ session_start();
 error_reporting(E_ALL ^ E_NOTICE);
 
 include "../../Module/Config/Env.php";
+require_once "../../Module/Security/Security.php";
 
 if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
 } else {
-    if ($_GET['Act'] == 'Save') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
+            // Validate CSRF token
+            CSRFProtection::validateOrDie();
             $ViewTanggal   = date('YmdHis');
-            $UserNama = sql_injeksi($_POST['UserNama']);
-            $Pass  = sql_injeksi(password_hash($_POST['Pass'], PASSWORD_DEFAULT));
-            $Akses = sql_injeksi($_POST['Akses']);
-            // $NIK = sql_injeksi($_POST['NIK']);
-            $Nama = sql_injeksi($_POST['Nama']);
-            $UnitKerja = sql_injeksi($_POST['UnitKerja']);
-            $StatusLogin = sql_injeksi($_POST['Status']);
+            $UserNama = XSSProtection::sanitizeInput($_POST['UserNama']);
+            $Pass  = password_hash(XSSProtection::sanitizeInput($_POST['Pass']), PASSWORD_DEFAULT);
+            $Akses = XSSProtection::sanitizeInput($_POST['Akses']);
+            // $NIK = XSSProtection::sanitizeInput($_POST['NIK']);
+            $Nama = XSSProtection::sanitizeInput($_POST['Nama']);
+            $UnitKerja = XSSProtection::sanitizeInput($_POST['UnitKerja']);
+            $StatusLogin = XSSProtection::sanitizeInput($_POST['Status']);
             $Setting = 1;
 
-            $CekUser = mysqli_query($db, "SELECT NameAkses FROM main_user WHERE NameAkses='$UserNama' ");
-            $Row = mysqli_num_rows($CekUser);
-            if ($Row <> 0) {
-                header("location:../../View/v?pg=UserView&alert=CekUser");
-            } else {
-                $CekPassword = sql_injeksi($_POST['Pass']);
-                if (strlen($CekPassword) >= 5) {
+            // Check if user exists using prepared statement
+            $checkQuery = "SELECT NameAkses FROM main_user WHERE NameAkses = ?";
+            if ($checkStmt = mysqli_prepare($db, $checkQuery)) {
+                mysqli_stmt_bind_param($checkStmt, "s", $UserNama);
+                mysqli_stmt_execute($checkStmt);
+                $checkResult = mysqli_stmt_get_result($checkStmt);
+                $Row = mysqli_num_rows($checkResult);
+                mysqli_stmt_close($checkStmt);
+                
+                if ($Row <> 0) {
+                    header("location:../../View/v?pg=UserView&alert=CekUser");
+                } else {
+                    $CekPassword = $_POST['Pass'];
+                    if (strlen($CekPassword) >= 5) {
 
                     // $QUser = mysqli_query($db, "SELECT * FROM main_user");
                     // $Count = mysqli_num_rows($QUser);
@@ -38,25 +48,35 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     //     $IdUser = $ViewTanggal . "" . $TempId;
                     // }
 
-                    $tanggal        = date('Ymd');
-                    $waktuid        = date('His');
-                    $IdUser = $tanggal . "" . $waktuid . "" . substr($UserNama, -3);
+                        $tanggal        = date('Ymd');
+                        $waktuid        = date('His');
+                        $IdUser = $tanggal . "" . $waktuid . "" . substr($UserNama, -3);
 
-                    $Save = mysqli_query($db, "INSERT INTO main_user(IdUser, NameAkses, NamePassword, IdLevelUserFK, Status, IdPegawai, StatusLogin)
-                    VALUE('$IdUser','$UserNama','$Pass','$Akses','$Setting','$IdUser','$StatusLogin')");
+                        // Insert user using prepared statement
+                        $insertUserQuery = "INSERT INTO main_user(IdUser, NameAkses, NamePassword, IdLevelUserFK, Status, IdPegawai, StatusLogin) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                        if ($insertUserStmt = mysqli_prepare($db, $insertUserQuery)) {
+                            mysqli_stmt_bind_param($insertUserStmt, "sssssss", $IdUser, $UserNama, $Pass, $Akses, $Setting, $IdUser, $StatusLogin);
+                            $Save = mysqli_stmt_execute($insertUserStmt);
+                            mysqli_stmt_close($insertUserStmt);
+                        }
 
-                    $SavePegawai = mysqli_query($db, "INSERT INTO master_pegawai(IdPegawaiFK, Nama, IdDesaFK, Setting)
-                    VALUE('$IdUser','$Nama','$UnitKerja','$Setting')");
+                        // Insert pegawai using prepared statement
+                        $insertPegawaiQuery = "INSERT INTO master_pegawai(IdPegawaiFK, Nama, IdDesaFK, Setting) VALUES (?, ?, ?, ?)";
+                        if ($insertPegawaiStmt = mysqli_prepare($db, $insertPegawaiQuery)) {
+                            mysqli_stmt_bind_param($insertPegawaiStmt, "ssss", $IdUser, $Nama, $UnitKerja, $Setting);
+                            $SavePegawai = mysqli_stmt_execute($insertPegawaiStmt);
+                            mysqli_stmt_close($insertPegawaiStmt);
+                        }
 
-                    if ($Save) {
-                        header("location:../../View/v?pg=UserView&alert=Save");
-                    }
+                        if ($Save) {
+                            header("location:../../View/v?pg=UserView&alert=Save");
+                        }
                 } elseif (strlen($CekPassword) < 5) {
                     header("location:../../View/v?pg=UserView&alert=Karakter");
                 }
             }
         }
-    } elseif ($_GET['Act'] == 'Edit') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
 
             $IdPegawaiFK = sql_injeksi($_POST['IdPegawaiFK']);
@@ -89,7 +109,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=UserView&alert=Edit");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdUser = sql_injeksi(($_GET['Kode']));
 
@@ -119,7 +139,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 }
             }
         }
-    } elseif ($_GET['Act'] == 'Reset') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Reset') {
         if (isset($_POST['Reset'])) {
 
             $IdUser = sql_injeksi($_POST['IdUser']);
@@ -132,4 +152,5 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             }
         }
     }
+}
 }

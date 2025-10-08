@@ -1,10 +1,13 @@
 <?php
+// Include security configuration
+require_once "../Module/Security/Security.php";
+
 // Form edit award
 include "../App/Control/FunctionAwardEdit.php";
 
-// Handle alert notifications
+// Handle alert notifications with XSS protection
 if (isset($_GET['alert'])) {
-    $alertType = $_GET['alert'];
+    $alertType = isset($_GET['alert']) ? XSSProtection::sanitizeInput($_GET['alert']) : '';
     if ($alertType == 'EditError') {
         $showErrorModal = true;
         $errorMessage = 'Gagal mengupdate award. Silakan coba lagi.';
@@ -43,12 +46,13 @@ if (isset($_GET['alert'])) {
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcAward.php?Act=Edit" method="POST">
-                        <input type="hidden" name="IdAward" value="<?php echo $IdAward; ?>">
+                        <?php echo CSRFProtection::getTokenField(); ?>
+                        <input type="hidden" name="IdAward" value="<?php echo XSSProtection::escapeAttr($IdAward); ?>">
                         
                         <div class="form-group row">
                             <label class="col-lg-2 col-form-label">Jenis Penghargaan <span class="text-danger">*</span></label>
                             <div class="col-lg-10">
-                                <input type="text" class="form-control" name="JenisPenghargaan" value="<?php echo $JenisPenghargaan; ?>" required>
+                                <input type="text" class="form-control" name="JenisPenghargaan" value="<?php echo XSSProtection::escapeAttr($JenisPenghargaan); ?>" required>
                                 <small class="form-text text-muted">Contoh: Lomba Desa Inovatif, Desa Wisata Terbaik, Penghargaan Kalpataru</small>
                             </div>
                         </div>
@@ -56,7 +60,7 @@ if (isset($_GET['alert'])) {
                         <div class="form-group row">
                             <label class="col-lg-2 col-form-label">Tahun <span class="text-danger">*</span></label>
                             <div class="col-lg-10">
-                                <input type="number" class="form-control" name="TahunPenghargaan" min="2000" max="<?php echo date('Y')+1; ?>" value="<?php echo $TahunPenghargaan; ?>" required>
+                                <input type="number" class="form-control" name="TahunPenghargaan" min="2000" max="<?php echo date('Y')+1; ?>" value="<?php echo XSSProtection::escapeAttr($TahunPenghargaan); ?>" required>
                             </div>
                         </div>
                         
@@ -64,12 +68,12 @@ if (isset($_GET['alert'])) {
                             <label class="col-lg-2 col-form-label">Masa Aktif <span class="text-danger">*</span></label>
                             <div class="col-lg-5">
                                 <label class="control-label">Tanggal Mulai</label>
-                                <input type="date" class="form-control" name="MasaAktifMulai" value="<?php echo $MasaAktifMulai; ?>" required>
+                                <input type="date" class="form-control" name="MasaAktifMulai" value="<?php echo XSSProtection::escapeAttr($MasaAktifMulai); ?>" required>
                                 <small class="form-text text-muted">Kapan penghargaan mulai berlaku</small>
                             </div>
                             <div class="col-lg-5">
                                 <label class="control-label">Tanggal Selesai</label>
-                                <input type="date" class="form-control" name="MasaAktifSelesai" value="<?php echo $MasaAktifSelesai; ?>" required>
+                                <input type="date" class="form-control" name="MasaAktifSelesai" value="<?php echo XSSProtection::escapeAttr($MasaAktifSelesai); ?>" required>
                                 <small class="form-text text-muted">Kapan penghargaan berakhir</small>
                             </div>
                         </div>
@@ -224,3 +228,32 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php endif; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const masaAktifSelesai = document.querySelector('input[name="MasaAktifSelesai"]');
+    const masaPenjurianSelesai = document.querySelector('input[name="MasaPenjurianSelesai"]');
+    const form = document.querySelector('form');
+
+    // Validasi langsung saat user mengetik atau memilih tanggal
+    masaPenjurianSelesai.addEventListener('input', function() {
+        if (masaAktifSelesai.value && this.value < masaAktifSelesai.value) {
+            this.setCustomValidity('Tanggal akhir penjurian tidak boleh kurang dari tanggal akhir penghargaan.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Validasi tambahan saat submit ditekan
+    form.addEventListener('submit', function(e) {
+        if (masaAktifSelesai.value && masaPenjurianSelesai.value < masaAktifSelesai.value) {
+            masaPenjurianSelesai.setCustomValidity('Tanggal akhir penjurian tidak boleh kurang dari tanggal akhir penghargaan.');
+            masaPenjurianSelesai.reportValidity();
+            e.preventDefault(); // hentikan submit form
+        } else {
+            masaPenjurianSelesai.setCustomValidity('');
+        }
+    });
+});
+</script>
+

@@ -5,22 +5,34 @@
  */
 
 require_once "../Module/Config/Env.php";
+require_once "../Module/Security/Security.php";
 
 $message = '';
 $messageType = '';
 $showForm = true;
 
+// Rate limiting
+$clientIP = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+if (!RateLimiter::checkLimit('login_desa_' . $clientIP, 5, 900)) { // 5 attempts per 15 minutes
+    $message = 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.';
+    $messageType = 'error';
+    $showForm = false;
+}
+
 // Proses login jika ada POST data
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST)) {
-    $username = sql_injeksi($_POST['NameAkses'] ?? '');
-    $password = sql_injeksi($_POST['NamePassword'] ?? '');
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST) && $showForm) {
+    // Validate CSRF token
+    CSRFProtection::validateOrDie();
+    
+    $username = XSSProtection::sanitizeInput($_POST['NameAkses'] ?? '');
+    $password = XSSProtection::sanitizeInput($_POST['NamePassword'] ?? '');
 
     if (empty(trim($username)) || empty(trim($password))) {
         $message = 'Username atau password tidak boleh kosong!';
         $messageType = 'error';
     } else {
-        // Query database
-        $sql = mysqli_query($db, "SELECT
+        // Query database using prepared statement
+        $query = "SELECT
             main_user.IdUser,
             main_user.NameAkses,
             main_user.NamePassword,
@@ -33,10 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST)) {
             master_pegawai.Nama
             FROM main_user
             INNER JOIN master_pegawai ON main_user.IdPegawai = master_pegawai.IdPegawaiFK
-            WHERE main_user.NameAkses = '$username'");
-
-        if (mysqli_num_rows($sql) > 0) {
-            $data = mysqli_fetch_assoc($sql);
+            WHERE main_user.NameAkses = ?";
+            
+        if ($stmt = mysqli_prepare($db, $query)) {
+            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            
+            if ($data = mysqli_fetch_assoc($result)) {
 
             if (password_verify($password, $data['NamePassword'])) {
                 if ($data['StatusLogin'] == 0) {
@@ -72,8 +88,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST)) {
                 $message = 'Password salah!';
                 $messageType = 'error';
             }
+            } else {
+                $message = 'Username tidak ditemukan!';
+                $messageType = 'error';
+            }
+            mysqli_stmt_close($stmt);
         } else {
-            $message = 'Username tidak ditemukan!';
+            $message = 'Terjadi kesalahan sistem!';
             $messageType = 'error';
         }
     }
@@ -332,6 +353,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST)) {
         <?php endif; ?>
 
         <form method="POST" action="" id="loginForm">
+            <?php echo CSRFProtection::getTokenField(); ?>
             <div class="form-group">
                 <i class="fa fa-user input-icon"></i>
                 <input type="text"
@@ -339,7 +361,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST)) {
                        name="NameAkses"
                        id="username"
                        placeholder="Masukkan Username"
-                       value="<?php echo isset($_POST['NameAkses']) ? htmlspecialchars($_POST['NameAkses']) : ''; ?>"
+                       value="<?php echo isset($_POST['NameAkses']) ? XSSProtection::escape($_POST['NameAkses']) : ''; ?>"
                        autocomplete="off"
                        required>
             </div>

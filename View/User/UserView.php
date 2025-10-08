@@ -1,5 +1,5 @@
 <?php
-if ($_GET['alert'] == 'Save') {
+if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -11,7 +11,7 @@ if ($_GET['alert'] == 'Save') {
             });
         },10);
     </script>";
-} elseif ($_GET['alert'] == 'Edit') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Edit') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -23,7 +23,7 @@ if ($_GET['alert'] == 'Save') {
             });
         },10);
     </script>";
-} elseif ($_GET['alert'] == 'Delete') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Delete') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -35,7 +35,7 @@ if ($_GET['alert'] == 'Save') {
             });
         },10);
     </script>";
-} elseif ($_GET['alert'] == 'CekUser') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'CekUser') {
     echo "<script type='text/javascript'>
                     setTimeout(function () {
                     swal({
@@ -46,7 +46,7 @@ if ($_GET['alert'] == 'Save') {
                      });
                     },10);
             </script>";
-} elseif ($_GET['alert'] == 'Karakter') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Karakter') {
     echo
         "<script type='text/javascript'>
                     setTimeout(function () {
@@ -58,7 +58,7 @@ if ($_GET['alert'] == 'Save') {
                      });
                     },10);
         </script>";
-} elseif ($_GET['alert'] == 'Reset') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Reset') {
     echo
         "<script type='text/javascript'>
                     setTimeout(function () {
@@ -70,7 +70,7 @@ if ($_GET['alert'] == 'Save') {
                      });
                     },10);
         </script>";
-} elseif ($_GET['alert'] == 'CekDelete') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'CekDelete') {
     echo
         "<script type='text/javascript'>
                     setTimeout(function () {

@@ -15,14 +15,12 @@ class cek_sql_injeksi
 				$str = strip_tags($str);
 				$str = preg_replace('/[^A-Za-z0-9]/', '', $str);
 				return intval($str);
-				break;
 			case 'xss':
 				$str = stripcslashes($str);
 				$str = htmlspecialchars($str);
 				$str = strip_tags($str);
 				$str = preg_replace('/[\W]/', '', $str);
 				return $str;
-				break;
 		}
 	}
 

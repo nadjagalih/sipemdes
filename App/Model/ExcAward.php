@@ -9,7 +9,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     header("location: $logout_redirect_url");
 } else {
 
-    if ($_GET['Act'] == 'Save') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
             $ViewTanggal = date('YmdHis');
             $QAward = mysqli_query($db, "SELECT * FROM master_award_desa");
@@ -74,7 +74,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=AwardAdd&alert=SaveError");
             }
         }
-    } elseif ($_GET['Act'] == 'Edit') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
             $IdAward = sql_injeksi($_POST['IdAward']);
             $JenisPenghargaan = sql_injeksi($_POST['JenisPenghargaan']);
@@ -142,7 +142,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=AwardEdit&Kode=$IdAward&alert=EditError");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdAward = sql_url($_GET['Kode']);
             

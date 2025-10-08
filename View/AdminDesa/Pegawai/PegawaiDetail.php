@@ -7,7 +7,7 @@
  <?php
  // Sistem Notifikasi Universal untuk semua operasi CRUD
  if (isset($_GET['alert'])) {
-     $alert = $_GET['alert'];
+     $$alert = isset($_GET['alert']) ? sql_injeksi($_GET['alert']) : '';
      
      // Konfigurasi pesan berdasarkan jenis alert
      $notifications = [

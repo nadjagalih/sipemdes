@@ -1,9 +1,12 @@
 <?php
+// Include security configuration
+require_once "../Module/Security/Security.php";
+
 // Main view page untuk list award dalam format card
 
-// Handle alert notifications
+// Handle alert notifications with XSS protection
 if (isset($_GET['alert'])) {
-    $alertType = $_GET['alert'];
+    $alertType = isset($_GET['alert']) ? XSSProtection::sanitizeInput($_GET['alert']) : '';
     if ($alertType == 'SaveSuccess') {
         echo "<script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -67,8 +70,8 @@ if (isset($_GET['alert'])) {
                                     <label>Status</label>
                                     <select name="status" class="form-control">
                                         <option value="">Semua Status</option>
-                                        <option value="Aktif" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Aktif') ? 'selected' : ''; ?>>Aktif</option>
-                                        <option value="Nonaktif" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Nonaktif') ? 'selected' : ''; ?>>Nonaktif</option>
+                                        <option value="Aktif" <?php echo (isset($_GET['status']) && XSSProtection::escapeAttr($_GET['status']) == 'Aktif') ? 'selected' : ''; ?>>Aktif</option>
+                                        <option value="Nonaktif" <?php echo (isset($_GET['status']) && XSSProtection::escapeAttr($_GET['status']) == 'Nonaktif') ? 'selected' : ''; ?>>Nonaktif</option>
                                     </select>
                                 </div>
                             </div>
@@ -78,7 +81,7 @@ if (isset($_GET['alert'])) {
                                     <select name="tahun" class="form-control">
                                         <option value="">Semua Tahun</option>
                                         <?php for($i = date('Y'); $i >= 2015; $i--): ?>
-                                            <option value="<?php echo $i; ?>" <?php echo (isset($_GET['tahun']) && $_GET['tahun'] == $i) ? 'selected' : ''; ?>><?php echo $i; ?></option>
+                                            <option value="<?php echo XSSProtection::escapeAttr($i); ?>" <?php echo (isset($_GET['tahun']) && XSSProtection::escapeAttr($_GET['tahun']) == $i) ? 'selected' : ''; ?>><?php echo XSSProtection::escape($i); ?></option>
                                         <?php endfor; ?>
                                     </select>
                                 </div>
@@ -86,7 +89,7 @@ if (isset($_GET['alert'])) {
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>Cari Penghargaan</label>
-                                    <input type="text" name="search" class="form-control" placeholder="Nama penghargaan..." value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+                                    <input type="text" name="search" class="form-control" placeholder="Nama penghargaan..." value="<?php echo isset($_GET['search']) ? XSSProtection::escapeAttr($_GET['search']) : ''; ?>">
                                 </div>
                             </div>
                             <div class="col-sm-2">

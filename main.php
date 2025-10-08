@@ -1,7 +1,6 @@
 <?php
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
-error_reporting(E_ERROR | E_WARNING);
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 require_once "Module/Config/Env.php";
 
@@ -39,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Redirect to AuthKabupaten/Cek.php
                 header("Location: AuthKabupaten/Cek.php");
                 exit;
-                break;
 
             case 'desa':
                 // Set session for credentials
@@ -50,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Redirect to AuthDesa/Cek.php
                 header("Location: AuthDesa/Cek.php");
                 exit;
-                break;
 
             case 'kecamatan':
                 // Set session for credentials
@@ -61,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Redirect to AuthKecamatan/Cek.php
                 header("Location: AuthKecamatan/Cek.php");
                 exit;
-                break;
 
             default:
                 $alertMessage = 'Unit akses tidak valid';

@@ -5,10 +5,10 @@ error_reporting(E_ALL);
 
 include '../../Module/Config/Env.php';
 
-$kategori = $_POST['kategori'];
-$nama = $_POST['namafile'];
-$iddesa = $_POST['iddesa'];
-$idkecamatan = $_POST['idkecamatan'];
+$$kategori = isset($_POST['kategori']) ? sql_injeksi($_POST['kategori']) : '';
+$$nama = isset($_POST['namafile']) ? sql_injeksi($_POST['namafile']) : '';
+$$iddesa = isset($_POST['iddesa']) ? sql_injeksi($_POST['iddesa']) : '';
+$$idkecamatan = isset($_POST['idkecamatan']) ? sql_injeksi($_POST['idkecamatan']) : '';
 $file = $_FILES['file'];
 
 // Get desa name and kecamatan id

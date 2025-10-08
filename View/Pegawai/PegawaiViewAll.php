@@ -1,5 +1,5 @@
 <?php
-if ($_GET['alert'] == 'Cek') {
+if (isset($_GET['alert']) && $_GET['alert'] == 'Cek') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -11,7 +11,7 @@ if ($_GET['alert'] == 'Cek') {
             });
         },10);
     </script>";
-} elseif ($_GET['alert'] == 'Edit') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Edit') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -23,7 +23,7 @@ if ($_GET['alert'] == 'Cek') {
             });
         },10);
     </script>";
-} elseif ($_GET['alert'] == 'Delete') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Delete') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -35,7 +35,7 @@ if ($_GET['alert'] == 'Cek') {
             });
         },10);
     </script>";
-} elseif ($_GET['alert'] == 'Kosong') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Kosong') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -47,7 +47,7 @@ if ($_GET['alert'] == 'Cek') {
             });
         },10);
     </script>";
-} elseif ($_GET['alert'] == 'FileMax') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'FileMax') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -59,7 +59,7 @@ if ($_GET['alert'] == 'Cek') {
             });
         },10);
     </script>";
-} elseif ($_GET['alert'] == 'CekDelete') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'CekDelete') {
     echo
         "<script type='text/javascript'>
                     setTimeout(function () {

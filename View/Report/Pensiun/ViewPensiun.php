@@ -1,7 +1,7 @@
 <?php
 if (empty($_GET['alert'])) {
     echo "";
-} elseif ($_GET['alert'] == 'UploadSukses') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadSukses') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -12,7 +12,7 @@ if (empty($_GET['alert'])) {
             }, 1000);
           </script>";
 
-} elseif ($_GET['alert'] == 'UploadGagalPegawai') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadGagalPegawai') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -22,7 +22,7 @@ if (empty($_GET['alert'])) {
                 });
             }, 1000);
           </script>";
-} elseif ($_GET['alert'] == 'UploadGagalDB') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadGagalDB') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -32,7 +32,7 @@ if (empty($_GET['alert'])) {
                 });
             }, 1000);
           </script>";
-} elseif ($_GET['alert'] == 'UploadGagal') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadGagal') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({

@@ -8,7 +8,7 @@ if (isset($_GET['Kode'])) {
 } ?>
 
 <?php
-if ($_GET['alert'] == 'Save') {
+if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {

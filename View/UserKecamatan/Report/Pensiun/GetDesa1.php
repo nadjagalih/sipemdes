@@ -1,6 +1,6 @@
 <?php
 include '../../../Module/Config/Env.php';
-$Kecamatan = $_POST['Kecamatan'];
+$Kecamatan = isset($_POST['Kecamatan']) ? sql_injeksi($_POST['Kecamatan']) : '';
 
 echo "<option value=''> --Pilih Desa-- </option>";
 $QueryDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdKecamatanFK = '$Kecamatan' ORDER BY NamaDesa ASC");

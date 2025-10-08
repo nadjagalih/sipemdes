@@ -52,7 +52,7 @@ if ($DataKarya['StatusAktif'] != 'Aktif') {
 
 // Handle alert notifications
 if (isset($_GET['alert'])) {
-    $alertType = $_GET['alert'];
+    $$alertType = isset($_GET['alert']) ? sql_injeksi($_GET['alert']) : '';
     if ($alertType == 'UpdateError') {
         echo "<script>
             document.addEventListener('DOMContentLoaded', function() {

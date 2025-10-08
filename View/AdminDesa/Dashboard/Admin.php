@@ -1,7 +1,7 @@
 <?php
 if (empty($_GET['alert'])) {
     echo "";
-} elseif ($_GET['alert'] == 'Sukses') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -11,7 +11,7 @@ if (empty($_GET['alert'])) {
                 });
             }, 100);
           </script>";
-} elseif ($_GET['alert'] == 'Gagal') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -202,9 +202,7 @@ if (!$QKepDesa) {
     error_log("Kepala Desa Query Error: " . mysqli_error($db));
 }
 
-// Log query hasil
-echo "<!-- Kepala Desa Query: " . ($QKepDesa ? mysqli_num_rows($QKepDesa) : 0) . " rows found -->";
-echo "<!-- Query: " . $kepdes_sql . " -->";
+// Log query hasil - debug code removed for production
 
 // Cek apakah query berhasil dan ada hasil
 if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {

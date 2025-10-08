@@ -1,7 +1,7 @@
 <?php
 include "../App/Control/FunctionProfileDinasView.php";
 
-if ($_GET['alert'] == 'Edit') {
+if (isset($_GET['alert']) && $_GET['alert'] == 'Edit') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {

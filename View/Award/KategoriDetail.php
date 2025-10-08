@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 
 // Debug parameter
-echo "<!-- Debug: Kode parameter = " . (isset($_GET['Kode']) ? $_GET['Kode'] : 'TIDAK ADA') . " -->";
+// Debug code removed for production
 
 try {
     include "../App/Control/FunctionKategoriDetail.php";
@@ -102,7 +102,7 @@ if (!empty($IdKategoriAward)) {
     }
 }
 
-echo "<!-- Debug: Variabel sudah disiapkan -->";
+// Debug code removed for production
 ?>
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">

@@ -1,0 +1,14 @@
+# Deny access to log files
+<Files "*.log">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Deny access to sensitive files
+<Files "*.txt">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Prevent directory listing
+Options -Indexes

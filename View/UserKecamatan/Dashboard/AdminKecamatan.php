@@ -4,7 +4,7 @@
 // ===============================================
 if (empty($_GET['alert'])) {
     echo "";
-} elseif ($_GET['alert'] == 'Sukses') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -14,7 +14,7 @@ if (empty($_GET['alert'])) {
                 });
             }, 100);
           </script>";
-} elseif ($_GET['alert'] == 'Gagal') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({

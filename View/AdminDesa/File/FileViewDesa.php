@@ -1,7 +1,7 @@
 <?php
 if (empty($_GET['alert'])) {
     echo "";
-} elseif ($_GET['alert'] == 'UploadSukses') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadSukses') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -11,7 +11,7 @@ if (empty($_GET['alert'])) {
                 });
             }, 100);
           </script>";
-} elseif ($_GET['alert'] == 'FileMax') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'FileMax') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -21,7 +21,7 @@ if (empty($_GET['alert'])) {
                 });
             }, 100);
           </script>";
-} elseif ($_GET['alert'] == 'FileExt') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'FileExt') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({

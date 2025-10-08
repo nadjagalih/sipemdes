@@ -1,9 +1,9 @@
 <?php
 include '../../../Module/Config/Env.php';
 
-$kategori = $_POST['kategori'];   // idfilekategorifk
-$nama = $_POST['namafile'];   // nama (user input)
-$iddesa = $_POST['iddesa'];     // iddesafk
+$$kategori = isset($_POST['kategori']) ? sql_injeksi($_POST['kategori']) : '';   // idfilekategorifk
+$$nama = isset($_POST['namafile']) ? sql_injeksi($_POST['namafile']) : '';   // nama (user input)
+$$iddesa = isset($_POST['iddesa']) ? sql_injeksi($_POST['iddesa']) : '';     // iddesafk
 $file = $_FILES['file'];
 
 // Get desa name and kecamatan ID

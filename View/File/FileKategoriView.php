@@ -1,5 +1,5 @@
 <?php
-if ($_GET['alert'] == 'Edit') {
+if (isset($_GET['alert']) && $_GET['alert'] == 'Edit') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -11,7 +11,7 @@ if ($_GET['alert'] == 'Edit') {
             });
         },1000);
     </script>";
-} elseif ($_GET['alert'] == 'Save') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -23,7 +23,7 @@ if ($_GET['alert'] == 'Edit') {
             });
         },1000);
     </script>";
-} elseif ($_GET['alert'] == 'Delete') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Delete') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {
@@ -35,7 +35,7 @@ if ($_GET['alert'] == 'Edit') {
             });
         },1000);
     </script>";
-} elseif ($_GET['alert'] == 'Cek') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Cek') {
     echo
         "<script type='text/javascript'>
         setTimeout(function () {

@@ -1,7 +1,12 @@
 <?php
-$QHeader = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$IdKecamatan'");
-$DataHeader = mysqli_fetch_assoc($QHeader);
-$NamaKecamatan = $DataHeader['Kecamatan'];
+// Include security configuration
+require_once "../Module/Security/Security.php";
+
+// Use prepared statement for security
+$stmt = SQLProtection::prepare($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = ?", [$IdKecamatan]);
+$result = SQLProtection::execute($stmt);
+$DataHeader = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+$NamaKecamatan = XSSProtection::escape($DataHeader['Kecamatan']);
 ?>
 
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -26,6 +31,7 @@ $NamaKecamatan = $DataHeader['Kecamatan'];
                 <div class="ibox-content">
                     <form action="File/ProsesUpload.php" method="POST" enctype="multipart/form-data"
                         onsubmit="return validateFile()">
+                        <?php echo CSRFProtection::getTokenField(); ?>
                         <div class="form-group row">
                             <label class="col-lg-4 col-form-label">Kategori File</label>
                             <div class="col-lg-8">
@@ -34,7 +40,7 @@ $NamaKecamatan = $DataHeader['Kecamatan'];
                                     <?php
                                     $q = mysqli_query($db, "SELECT * FROM master_file_kategori");
                                     while ($row = mysqli_fetch_assoc($q)) {
-                                        echo "<option value='{$row['IdFileKategori']}'>{$row['KategoriFile']}</option>";
+                                        echo "<option value='" . XSSProtection::escapeAttr($row['IdFileKategori']) . "'>" . XSSProtection::escape($row['KategoriFile']) . "</option>";
                                     }
                                     ?>
                                 </select>

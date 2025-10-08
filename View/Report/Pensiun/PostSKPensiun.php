@@ -7,11 +7,11 @@ error_reporting(E_ALL);
 include "../../../Module/Config/Env.php";
 
 if (isset($_POST['upload'])) {
-    $idPegawai = $_POST['idpegawai'];
-    $nama = $_POST['namapegawai'];
-    $nik = $_POST['nik'];
-    $unitKerja = $_POST['unitkerja'];
-    $idDesa = $_POST['iddesa'];
+    $$idPegawai = isset($_POST['idpegawai']) ? sql_injeksi($_POST['idpegawai']) : '';
+    $$nama = isset($_POST['namapegawai']) ? sql_injeksi($_POST['namapegawai']) : '';
+    $$nik = isset($_POST['nik']) ? sql_injeksi($_POST['nik']) : '';
+    $$unitKerja = isset($_POST['unitkerja']) ? sql_injeksi($_POST['unitkerja']) : '';
+    $$idDesa = isset($_POST['iddesa']) ? sql_injeksi($_POST['iddesa']) : '';
 
     $file = $_FILES['file'];
     $filename = $file['name'];

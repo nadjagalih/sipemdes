@@ -9,7 +9,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
 } else {
-    if ($_GET['Act'] == 'Add') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Add') {
         if (isset($_POST['Save'])) {
 
             // $ViewTanggal   = date('YmdHis');
@@ -59,7 +59,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=PegawaiBPDViewAll&alert=Save");
             }
         }
-    } elseif ($_GET['Act'] == 'Edit') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
 
             $IdPegawaiFK = sql_injeksi($_POST['IdPegawaiFK']);
@@ -111,7 +111,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=PegawaiBPDViewAll&alert=Edit");
             }
         }
-    } elseif ($_GET['Act'] == 'Foto') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Foto') {
         if (isset($_POST['Foto'])) {
             $IdPegawaiFK = sql_injeksi($_POST['IdPegawaiFK']);
             // $IdPegawaiFK = sql_injeksi($_POST['FUpload']);
@@ -148,7 +148,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=PegawaiBPDViewAll&alert=Cek");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdPegawaiBPD = sql_injeksi(($_GET['Kode']));
 

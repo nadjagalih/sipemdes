@@ -8,7 +8,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
 } else {
-    if ($_GET['Act'] == 'Save') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
 
             $ViewTanggal   = date('YmdHis');
@@ -35,7 +35,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=DesaView&alert=Save");
             }
         }
-    } elseif ($_GET['Act'] == 'Edit') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
             $IdDesa = sql_injeksi($_POST['IdDesa']);
             $KodeDesa = sql_injeksi($_POST['KodeDesa']);
@@ -54,7 +54,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=DesaView&alert=Edit");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdDesa = sql_injeksi(($_GET['Kode']));
 

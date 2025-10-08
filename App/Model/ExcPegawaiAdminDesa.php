@@ -4,18 +4,22 @@ error_reporting(E_ALL ^ E_NOTICE);
 
 include "../../Module/Config/Env.php";
 include "../../Module/Variabel/FileUpload.php";
+require_once "../../Module/Security/Security.php";
 
 if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
 } else {
-    if ($_GET['Act'] == 'Edit') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
 
-            $IdPegawaiFK = sql_injeksi($_POST['IdPegawaiFK']);
-            $NIK = sql_injeksi($_POST['NIK']);
-            $Nama = sql_injeksi($_POST['Nama']);
-            $TempatLahir = sql_injeksi($_POST['TempatLahir']);
+            // Validate CSRF token
+            CSRFProtection::validateOrDie();
+
+            $IdPegawaiFK = XSSProtection::sanitizeInput($_POST['IdPegawaiFK']);
+            $NIK = XSSProtection::sanitizeInput($_POST['NIK']);
+            $Nama = XSSProtection::sanitizeInput($_POST['Nama']);
+            $TempatLahir = XSSProtection::sanitizeInput($_POST['TempatLahir']);
 
             //HITUNG TANGGAL PENSIUN DATA DASAR TAHUN
             $TanggalLahir = sql_injeksi($_POST['TanggalLahir']);
@@ -82,7 +86,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=PegawaiViewAllAdminDesa&alert=Edit");
             }
         }
-    } elseif ($_GET['Act'] == 'Foto') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Foto') {
         if (isset($_POST['Foto'])) {
             $IdPegawaiFK = sql_injeksi($_POST['IdPegawaiFK']);
             // $IdPegawaiFK = sql_injeksi($_POST['FUpload']);
@@ -119,7 +123,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=PegawaiViewAllAdminDesa&alert=Cek");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdPegawai = sql_injeksi(($_GET['Kode']));
 

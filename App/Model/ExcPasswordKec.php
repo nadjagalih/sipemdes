@@ -10,10 +10,10 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     header("location: $logout_redirect_url");
 } else {
 
-    if ($_GET['Act'] == 'Pass') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Pass') {
         if (isset($_POST['Save'])) {
             if (isset($_POST['IdUser'])) {
-                $PasswordBaru = $_POST['PasswordBaru'];
+                $$PasswordBaru = isset($_POST['PasswordBaru']) ? sql_injeksi($_POST['PasswordBaru']) : '';
 
                 if (strlen($PasswordBaru) >= 5) {
                     $IdUser = sql_injeksi($_POST['IdUser']);

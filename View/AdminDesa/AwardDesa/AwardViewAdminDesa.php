@@ -1230,7 +1230,7 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                                                 }
                                             } else {
                                                 // Error pada query
-                                                error_log("Query error in AwardViewAdminDesa: " . mysqli_error($db));
+                                                // Error log removed for production
                                                 $hasRealData = false;
                                             }
                                         }

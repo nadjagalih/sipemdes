@@ -1,5 +1,5 @@
 <?php
-if ($_GET['alert'] == 'Sukses') {
+if (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
     echo
         "<script type='text/javascript'>
                     setTimeout(function () {
@@ -16,7 +16,7 @@ if ($_GET['alert'] == 'Sukses') {
                     },10);
         </script>";
 } else
-if ($_GET['alert'] == 'Panjang') {
+if (isset($_GET['alert']) && $_GET['alert'] == 'Panjang') {
     echo
         "<script type='text/javascript'>
                     setTimeout(function () {

@@ -1,7 +1,7 @@
 <?php
 if (empty($_GET['alert'])) {
     echo "";
-} elseif ($_GET['alert'] == 'Ditolak') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Ditolak') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -12,7 +12,7 @@ if (empty($_GET['alert'])) {
             }, 1000);
           </script>";
 
-} elseif ($_GET['alert'] == 'Gagal') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({

@@ -1,9 +1,12 @@
 <?php
+// Include security configuration
+require_once "../Module/Security/Security.php";
+
 // Form tambah award baru
 
-// Handle alert notifications
+// Handle alert notifications with XSS protection
 if (isset($_GET['alert'])) {
-    $alertType = $_GET['alert'];
+    $alertType = isset($_GET['alert']) ? XSSProtection::sanitizeInput($_GET['alert']) : '';
     if ($alertType == 'SaveError') {
         $showErrorModal = true;
         $errorMessage = 'Gagal menyimpan award. Silakan coba lagi.';
@@ -42,6 +45,7 @@ if (isset($_GET['alert'])) {
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcAward.php?Act=Save" method="POST">
+                        <?php echo CSRFProtection::getTokenField(); ?>
                         <div class="form-group row">
                             <label class="col-lg-2 col-form-label">Jenis Penghargaan <span class="text-danger">*</span></label>
                             <div class="col-lg-10">
@@ -157,7 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function closeErrorModal() {
     $('#modalError').modal('hide');
-    // Remove alert parameter from URL
     if (window.history.replaceState) {
         var url = new URL(window.location);
         url.searchParams.delete('alert');
@@ -215,3 +218,32 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php endif; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const masaAktifSelesai = document.querySelector('input[name="MasaAktifSelesai"]');
+    const masaPenjurianSelesai = document.querySelector('input[name="MasaPenjurianSelesai"]');
+    const form = document.querySelector('form');
+
+    // Validasi langsung saat user mengubah tanggal
+    masaPenjurianSelesai.addEventListener('input', function() {
+        if (masaAktifSelesai.value && this.value < masaAktifSelesai.value) {
+            this.setCustomValidity('Tanggal akhir penjurian tidak boleh kurang dari tanggal akhir penghargaan.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Cek lagi saat submit (jaga-jaga kalau user belum memicu event input)
+    form.addEventListener('submit', function(e) {
+        if (masaAktifSelesai.value && masaPenjurianSelesai.value < masaAktifSelesai.value) {
+            masaPenjurianSelesai.setCustomValidity('Tanggal akhir penjurian tidak boleh kurang dari tanggal akhir penghargaan.');
+            masaPenjurianSelesai.reportValidity(); // munculkan pesan seperti browser
+            e.preventDefault(); // hentikan submit
+        } else {
+            masaPenjurianSelesai.setCustomValidity('');
+        }
+    });
+});
+</script>
+

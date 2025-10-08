@@ -1,8 +1,8 @@
 <?php
 include '../../../Module/Config/Env.php';
 
-$idDesa = $_POST['iddesa'];
-$idPegawai = $_POST['idpegawai'];
+$$idDesa = isset($_POST['iddesa']) ? sql_injeksi($_POST['iddesa']) : '';
+$$idPegawai = isset($_POST['idpegawai']) ? sql_injeksi($_POST['idpegawai']) : '';
 
 $qNama = mysqli_query($db, "SELECT p.Nama, p.NIK, d.NamaDesa, d.IdKecamatanFK, k.Kecamatan 
 FROM master_Pegawai p 

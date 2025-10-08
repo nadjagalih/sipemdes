@@ -1,5 +1,6 @@
 <?php
 include "../App/Control/FunctionUserEdit.php";
+require_once "../Module/Security/Security.php";
 ?>
 
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -48,10 +49,11 @@ include "../App/Control/FunctionUserEdit.php";
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcUser?Act=Reset" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="IdUser" id="IdUser" value="<?php echo $EditIdUser; ?>">
+                        <?php echo CSRFProtection::getTokenField(); ?>
+                        <input type="hidden" name="IdUser" id="IdUser" value="<?php echo XSSProtection::escape($EditIdUser); ?>">
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Username</label>
                             <div class="col-lg-8">
-                                <input type="text" name="User" id="User" value="<?php echo $EditNameAkses; ?>" class="form-control" readonly>
+                                <input type="text" name="User" id="User" value="<?php echo XSSProtection::escape($EditNameAkses); ?>" class="form-control" readonly>
                             </div>
                         </div>
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Password</label>

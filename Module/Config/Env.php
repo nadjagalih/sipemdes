@@ -2,6 +2,11 @@
 date_default_timezone_set('Asia/Jakarta');
 require_once "SqlInjeksi.php";
 
+// Load security configuration (jika tidak sudah di-load sebelumnya)
+if (!class_exists('SecurityHeaders')) {
+    require_once __DIR__ . "/../Security/Security.php";
+}
+
 $host = "localhost";
 // $username = "sipemdes_pemde5ag4lek";
 // $password = "eH(s_gOj+vz&";
@@ -28,6 +33,6 @@ function sql_injeksi($data)
 function sql_url($url)
 {
   global $db;
-  $firewall_url = mysqli_real_escape_string($db, stripslashes(strip_tags(htmlspecialchars(preg_replace('/[^A-Za-z0-9]/', ' ', $url, ENT_QUOTES)))));
+  $firewall_url = mysqli_real_escape_string($db, stripslashes(strip_tags(htmlspecialchars(preg_replace('/[^A-Za-z0-9]/', ' ', $url), ENT_QUOTES))));
   return $firewall_url;
 }

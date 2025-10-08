@@ -2,14 +2,14 @@
 // Setting Profile Admin Desa - View dan Process
 ob_start(); // Start output buffering
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 // Include files
 include_once "../App/Control/FunctionSettingProfileAdminDesa.php";
 
 // Alert Handler seperti di PegawaiViewAll.php
 if (isset($_GET['alert'])) {
-    if ($_GET['alert'] == 'Edit') {
+    if (isset($_GET['alert']) && $_GET['alert'] == 'Edit') {
         echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -20,7 +20,7 @@ if (isset($_GET['alert'])) {
                 });
             },10);
         </script>";
-    } elseif ($_GET['alert'] == 'Gagal') {
+    } elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
         echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -31,7 +31,7 @@ if (isset($_GET['alert'])) {
                 });
             },10);
         </script>";
-    } elseif ($_GET['alert'] == 'ErrorTelepon') {
+    } elseif (isset($_GET['alert']) && $_GET['alert'] == 'ErrorTelepon') {
         echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -42,7 +42,7 @@ if (isset($_GET['alert'])) {
                 });
             },10);
         </script>";
-    } elseif ($_GET['alert'] == 'ErrorKoordinat') {
+    } elseif (isset($_GET['alert']) && $_GET['alert'] == 'ErrorKoordinat') {
         echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({

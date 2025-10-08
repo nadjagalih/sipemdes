@@ -1,9 +1,13 @@
 <?php
+require_once "../Module/Security/Security.php";
+
 if (isset($_GET['Kode'])) {
-    $IdTemp = sql_url($_GET['Kode']);
+    $IdTemp = XSSProtection::sanitizeInput($_GET['Kode']);
     
-    $QueryEditAward = mysqli_query($db, "SELECT * FROM master_award_desa WHERE IdAward = '$IdTemp'");
-    $DataEditAward = mysqli_fetch_assoc($QueryEditAward);
+    // Use prepared statement for SQL protection
+    $stmt = SQLProtection::prepare($db, "SELECT * FROM master_award_desa WHERE IdAward = ?", [$IdTemp]);
+    $result = SQLProtection::execute($stmt);
+    $DataEditAward = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
     
     $IdAward = $DataEditAward['IdAward'];
     $JenisPenghargaan = $DataEditAward['JenisPenghargaan'];
@@ -29,7 +33,8 @@ if (isset($_GET['Kode'])) {
     
     // Update status di database jika berbeda
     if ($StatusAktif !== $statusOtomatis) {
-        mysqli_query($db, "UPDATE master_award_desa SET StatusAktif = '$statusOtomatis' WHERE IdAward = '$IdAward'");
+        $updateStmt = SQLProtection::prepare($db, "UPDATE master_award_desa SET StatusAktif = ? WHERE IdAward = ?", [$statusOtomatis, $IdAward]);
+        SQLProtection::execute($updateStmt);
         $StatusAktif = $statusOtomatis; // Update variabel lokal
     }
     

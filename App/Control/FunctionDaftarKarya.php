@@ -5,7 +5,7 @@ $debugMode = isset($_GET['debug']) && $_GET['debug'] == '1';
 if ($debugMode) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
-    echo "<!-- Debug Mode: ON -->";
+    // Debug code removed for production
 }
 
 // Handle AJAX requests untuk get kategori
@@ -37,7 +37,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'getKategori') {
             ORDER BY NamaKategori ASC");
         
         if (!$QueryKategori) {
-            if ($debugMode) error_log("SQL Error: " . mysqli_error($db));
+            // Debug error log removed for production
             echo '<option value="">Database error</option>';
         } elseif (mysqli_num_rows($QueryKategori) > 0) {
             echo '<option value="">-- Pilih Kategori --</option>';
@@ -45,18 +45,17 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'getKategori') {
                 echo "<option value='{$DataKategori['IdKategoriAward']}'>{$DataKategori['NamaKategori']}{$deskripsi}</option>";
             }
         } else {
-            if ($debugMode) error_log("No categories found for IdAward: $IdAward");
+            // Debug error log removed for production
             echo '<option value="">Tidak ada kategori tersedia</option>';
         }
     } else {
-        if ($debugMode) error_log("AJAX Error: No IdAward provided");
+        // Debug error log removed for production
         echo '<option value="">Award tidak valid</option>';
     }
     exit; // Stop execution untuk AJAX request
 }
 
-if ($debugMode) echo "<!-- Debug: Controller loaded -->";
-
+if ($debugMode) // Debug code removed for production
 // Query untuk mendapatkan award yang sedang aktif dan berlangsung
 $QueryAwardAktif = mysqli_query($db, "SELECT 
     IdAward,
@@ -72,25 +71,24 @@ $QueryAwardAktif = mysqli_query($db, "SELECT
     ORDER BY TahunPenghargaan DESC, JenisPenghargaan ASC");
 
 if (!$QueryAwardAktif) {
-    if ($debugMode) echo "<!-- Debug: Query Error: " . mysqli_error($db) . " -->";
-    echo "Error: " . mysqli_error($db);
+    if ($debugMode) // Debug code removed for production
+echo "Error: " . mysqli_error($db);
     exit;
 }
 
-if ($debugMode) echo "<!-- Debug: Found " . mysqli_num_rows($QueryAwardAktif) . " awards -->";
-
+if ($debugMode) // Debug code removed for production
 // Get info desa dari session
 $IdDesa = $_SESSION['IdDesa'] ?? '';
 $NamaDesa = $_SESSION['NamaDesa'] ?? '';
 
 if (empty($IdDesa)) {
-    if ($debugMode) echo "<!-- Debug: No IdDesa in session -->";
-    echo "<script>
+    if ($debugMode) // Debug code removed for production
+echo "<script>
         alert('Session desa tidak ditemukan. Silakan login kembali.');
         window.location.href = '../../Auth/SignIn.php';
     </script>";
     exit;
 }
 
-if ($debugMode) echo "<!-- Debug: IdDesa = $IdDesa -->";
+if ($debugMode) // Debug code removed for production
 ?>

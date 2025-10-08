@@ -19,7 +19,7 @@ if (!isset($_GET['Act'])) {
     exit;
 }
 
-$Act = $_GET['Act'];
+$$Act = isset($_GET['Act']) ? sql_injeksi($_GET['Act']) : '';
 
 // Fungsi untuk generate ID Karya Desa
 function generateKaryaDesaId($db) {

@@ -1,9 +1,6 @@
 <?php
-ob_start(); // Start output buffering
 session_start();
-ini_set('display_errors', 0); // Disable error display to prevent output before redirect
-ini_set('display_startup_errors', 0);
-error_reporting(0); // Disable error reporting to prevent output before redirect
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 include "../../Module/Config/Env.php";
 include "../../Module/Variabel/FileUpload.php";
@@ -12,7 +9,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
 } else {
-    if ($_GET['Act'] == 'Save') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
 
             $ViewTanggal = date('YmdHis');
@@ -176,7 +173,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 }
             }
         }
-    } elseif ($_GET['Act'] == 'Edit') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
 
             $IdPegawaiFK = sql_injeksi($_POST['IdPegawaiFK']);
@@ -297,7 +294,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 }
             }
         }
-    } elseif ($_GET['Act'] == 'EditSK') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'EditSK') {
         if (isset($_POST['EditSK'])) {
             $IdMutasi = sql_injeksi($_POST['IdMutasi']);
 
@@ -344,7 +341,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=ViewMutasiAdminDesa&alert=FileMax");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdMutasi = sql_injeksi(($_GET['Kode']));
 
@@ -381,7 +378,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             }
         }
 
-    } elseif ($_GET['Act'] == 'SettingOn') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'SettingOn') {
         if (isset($_GET['Kode'])) {
             $IdTemp = sql_injeksi(($_GET['Kode']));
 

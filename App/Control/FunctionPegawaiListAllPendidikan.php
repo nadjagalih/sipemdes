@@ -1,5 +1,24 @@
 <?php
-$Nomor = 1;
+// Pagination setup
+$limit = 50; // Record per halaman
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Query untuk menghitung total data
+$queryCount = mysqli_query($db, "SELECT COUNT(*) as total
+FROM
+master_pegawai
+LEFT JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
+LEFT JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
+LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile
+INNER JOIN main_user ON master_pegawai.IdPegawaiFK = main_user.IdPegawai
+WHERE master_pegawai.Setting <> 0 and main_user.IdLevelUserFK <> 1 and main_user.IdLevelUserFK <> 2");
+
+$countResult = mysqli_fetch_assoc($queryCount);
+$totalRecords = $countResult['total'];
+$totalPages = ceil($totalRecords / $limit);
+
+$Nomor = $offset + 1;
 $QueryPegawai = mysqli_query($db, "SELECT
 master_pegawai.IdPegawaiFK,
 master_pegawai.Foto,
@@ -28,15 +47,27 @@ INNER JOIN main_user ON master_pegawai.IdPegawaiFK = main_user.IdPegawai
 WHERE master_pegawai.Setting <> 0 and main_user.IdLevelUserFK <> 1 and main_user.IdLevelUserFK <> 2
 ORDER BY
 master_kecamatan.IdKecamatan ASC,
-master_desa.NamaDesa ASC");
+master_desa.NamaDesa ASC
+LIMIT $limit OFFSET $offset");
 while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $IdPegawaiFK = $DataPegawai['IdPegawaiFK'];
     $Foto = $DataPegawai['Foto'];
     $NIK = $DataPegawai['NIK'];
     $Nama = $DataPegawai['Nama'];
     $TanggalLahir = $DataPegawai['TanggalLahir'];
-    $exp = explode('-', $TanggalLahir);
-    $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+    
+    // Cek dan format tanggal lahir
+    if (!empty($TanggalLahir) && $TanggalLahir != '0000-00-00') {
+        $exp = explode('-', $TanggalLahir);
+        if (count($exp) >= 3) {
+            $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+        } else {
+            $ViewTglLahir = $TanggalLahir; // Gunakan format asli jika tidak bisa di-parse
+        }
+    } else {
+        $ViewTglLahir = "Tidak Diset";
+    }
+    
     $JenKel = $DataPegawai['JenKel'];
     $NamaDesa = $DataPegawai['NamaDesa'];
     $Kecamatan = $DataPegawai['Kecamatan'];
@@ -68,7 +99,7 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
             <?php
             $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
             $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-            $JenisKelamin = $DataJenKel['Keterangan'];
+            $JenisKelamin = ($DataJenKel && isset($DataJenKel['Keterangan'])) ? $DataJenKel['Keterangan'] : 'Tidak Diset';
             echo $JenisKelamin;
             ?>
         </td>
@@ -125,3 +156,43 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
 <?php $Nomor++;
 }
 ?>
+
+<!-- Pagination -->
+<tr>
+    <td colspan="7">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="dataTables_info">
+                    Menampilkan <?php echo $offset + 1; ?> sampai <?php echo min($offset + $limit, $totalRecords); ?> dari <?php echo $totalRecords; ?> data
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="dataTables_paginate">
+                    <ul class="pagination justify-content-end">
+                        <?php if ($page > 1): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?pg=PegawaiViewPendidikan&page=<?php echo $page - 1; ?>">Previous</a>
+                            </li>
+                        <?php endif; ?>
+
+                        <?php
+                        $start = max(1, $page - 2);
+                        $end = min($totalPages, $page + 2);
+                        
+                        for ($i = $start; $i <= $end; $i++): ?>
+                            <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                                <a class="page-link" href="?pg=PegawaiViewPendidikan&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <?php if ($page < $totalPages): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?pg=PegawaiViewPendidikan&page=<?php echo $page + 1; ?>">Next</a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </td>
+</tr>

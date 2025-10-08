@@ -33,11 +33,15 @@ if (empty($_GET['alert'])) {
           </script>";
 }
 
-$IdKecamatan = $_SESSION['IdKecamatan'];
+$IdKecamatan = $_SESSION['IdKecamatan'] ?? '';
 
-$QHeader = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$IdKecamatan'");
-$DataHeader = mysqli_fetch_assoc($QHeader);
-$NamaKecamatanHeader = $DataHeader['Kecamatan'];
+if (!empty($IdKecamatan)) {
+    $QHeader = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$IdKecamatan'");
+    $DataHeader = mysqli_fetch_assoc($QHeader);
+    $NamaKecamatanHeader = ($DataHeader && isset($DataHeader['Kecamatan'])) ? $DataHeader['Kecamatan'] : 'Data Tidak Ditemukan';
+} else {
+    $NamaKecamatanHeader = 'Session Tidak Valid';
+}
 
 ?>
 
@@ -122,21 +126,23 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                         <tbody>
                             <?php
                             $downloadDir = '../';
-                            $IdKecamatan = $_SESSION['IdKecamatan'];
+                            $IdKecamatan = $_SESSION['IdKecamatan'] ?? '';
                             $Nomor = 1;
                             $q = mysqli_query($db, "SELECT f.*, k.KategoriFile 
                                     FROM file f
                                     JOIN master_file_kategori k ON f.IdFileKategoriFK = k.IdFileKategori
                                     WHERE f.IdLevelFileFK = '1'
                                     ORDER BY f.IdFile DESC");
-                            while ($row = mysqli_fetch_assoc($q)) {
-                                echo "<tr>
-                                        <td>{$Nomor}</td>
-                                        <td>{$row['Nama']}</td>
-                                        <td>{$row['KategoriFile']}</td>
-                                        <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
-                                    </tr>";
-                                $Nomor++;
+                            if ($q) {
+                                while ($row = mysqli_fetch_assoc($q)) {
+                                    echo "<tr>
+                                            <td>{$Nomor}</td>
+                                            <td>{$row['Nama']}</td>
+                                            <td>{$row['KategoriFile']}</td>
+                                            <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
+                                        </tr>";
+                                    $Nomor++;
+                                }
                             }
                             ?>
                         </tbody>
@@ -184,22 +190,24 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                         <tbody>
                             <?php
                             $downloadDir = '../';
-                            $IdKecamatan = $_SESSION['IdKecamatan'];
+                            $IdKecamatan = $_SESSION['IdKecamatan'] ?? '';
                             $Nomor = 1;
                             $q = mysqli_query($db, "SELECT f.*, k.KategoriFile, kc.Kecamatan
                                     FROM file f
                                     JOIN master_file_kategori k ON f.IdFileKategoriFK = k.IdFileKategori
                                     JOIN master_kecamatan kc ON f.IdKecamatanFK = kc.IdKecamatan
                                     ORDER BY f.IdFile DESC");
-                            while ($row = mysqli_fetch_assoc($q)) {
-                                echo "<tr>
-                                        <td>{$Nomor}</td>
-                                        <td>{$row['Nama']}</td>
-                                        <td>{$row['KategoriFile']}</td>
-                                        <td>{$row['Kecamatan']}</td>
-                                        <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
-                                    </tr>";
-                                $Nomor++;
+                            if ($q) {
+                                while ($row = mysqli_fetch_assoc($q)) {
+                                    echo "<tr>
+                                            <td>{$Nomor}</td>
+                                            <td>{$row['Nama']}</td>
+                                            <td>{$row['KategoriFile']}</td>
+                                            <td>{$row['Kecamatan']}</td>
+                                            <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
+                                        </tr>";
+                                    $Nomor++;
+                                }
                             }
                             ?>
                         </tbody>
@@ -248,7 +256,7 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                         <tbody>
                             <?php
                             $downloadDir = '../';
-                            $IdKecamatan = $_SESSION['IdKecamatan'];
+                            $IdKecamatan = $_SESSION['IdKecamatan'] ?? '';
                             $Nomor = 1;
                             $q = mysqli_query($db, "SELECT f.*, k.KategoriFile, d.NamaDesa, kc.Kecamatan
                                     FROM file f
@@ -256,7 +264,8 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                     JOIN master_desa d ON f.IdDesaFK = d.IdDesa
                                     JOIN master_kecamatan kc ON d.IdKecamatanFK = kc.IdKecamatan
                                     ORDER BY f.IdFile DESC");
-                            while ($row = mysqli_fetch_assoc($q)) {
+                            if ($q) {
+                                while ($row = mysqli_fetch_assoc($q)) {
                                 echo "<tr>
                                         <td>{$Nomor}</td>
                                         <td>{$row['Nama']}</td>
@@ -266,6 +275,7 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                         <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
                                     </tr>";
                                 $Nomor++;
+                            }
                             }
                             ?>
                         </tbody>

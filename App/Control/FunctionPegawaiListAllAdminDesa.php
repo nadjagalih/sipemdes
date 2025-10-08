@@ -61,12 +61,12 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $Lingkungan = $DataPegawai['Lingkungan'];
     $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
     $LingkunganPeg = mysqli_fetch_assoc($AmbilDesa);
-    $Komunitas = $LingkunganPeg['NamaDesa'];
+    $Komunitas = ($LingkunganPeg && isset($LingkunganPeg['NamaDesa'])) ? $LingkunganPeg['NamaDesa'] : 'Unknown';
 
     $KecamatanPeg = $DataPegawai['Kecamatan'];
     $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanPeg' ");
     $KecamatanPegData = mysqli_fetch_assoc($AmbilKecamatan);
-    $KomunitasKec = $KecamatanPegData['Kecamatan'];
+    $KomunitasKec = ($KecamatanPegData && isset($KecamatanPegData['Kecamatan'])) ? $KecamatanPegData['Kecamatan'] : 'Unknown';
 
     $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec
 ?>
@@ -99,7 +99,7 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
             <?php
             $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
             $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-            $JenisKelamin = $DataJenKel['Keterangan'];
+            $JenisKelamin = ($DataJenKel && isset($DataJenKel['Keterangan'])) ? $DataJenKel['Keterangan'] : 'Unknown';
             echo $JenisKelamin;
             ?>
         </td>

@@ -7,6 +7,75 @@
     </div>
 </div>
 
+<style>
+/* Perkecil kolom Pendidikan */
+.tabel-pegawai th:nth-child(7), 
+.tabel-pegawai td:nth-child(7) {
+    width: 80px !important;
+    max-width: 80px !important;
+    font-size: 12px;
+    text-align: center;
+    word-wrap: break-word;
+    vertical-align: middle;
+}
+
+/* Responsive font untuk tabel */
+.tabel-pegawai {
+    font-size: 12px;
+    min-width: 1200px; /* Minimum width untuk memaksa horizontal scroll */
+}
+
+.tabel-pegawai th, 
+.tabel-pegawai td {
+    padding: 6px 4px !important;
+    vertical-align: middle !important;
+    white-space: nowrap; /* Prevent text wrapping untuk scroll horizontal */
+}
+
+/* Enhanced table responsive */
+.table-responsive {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+/* Custom scrollbar styling */
+.table-responsive::-webkit-scrollbar {
+    height: 12px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Sticky first column for better navigation */
+.tabel-pegawai th:nth-child(1),
+.tabel-pegawai td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    background: #fff;
+    z-index: 10;
+    border-right: 2px solid #dee2e6;
+}
+
+.tabel-pegawai thead th:nth-child(1) {
+    background: #f8f9fa;
+    z-index: 11;
+}
+</style>
+
 <div class="wrapper wrapper-content animated fadeInRight">
 
     <div class="col-lg-12">
@@ -90,7 +159,7 @@
 
             <div class="ibox-content">
                 <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
+                    <table class="table table-striped table-bordered table-hover dataTables-kecamatan tabel-pegawai">
                         <thead>
                             <tr align="center">
                                 <th rowspan="2">No</th>
@@ -113,7 +182,32 @@
                         </thead>
                         <tbody>
                             <?php
-                            $Nomor = 1;
+                            // Pagination setup
+                            $limit = 50; // Record per halaman
+                            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                            $offset = ($page - 1) * $limit;
+
+                            // Query untuk menghitung total data
+                            $queryCount = mysqli_query($db, "SELECT COUNT(DISTINCT master_pegawai.IdPegawaiFK) as total
+                            FROM
+                            master_pegawai
+                            LEFT JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
+                            LEFT JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
+                            LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile
+                            INNER JOIN main_user ON master_pegawai.IdPegawaiFK = main_user.IdPegawai
+                            INNER JOIN history_mutasi ON master_pegawai.IdPegawaiFK = history_mutasi.IdPegawaiFK
+                            INNER JOIN master_jabatan ON history_mutasi.IdJabatanFK = master_jabatan.IdJabatan
+                            WHERE
+                            master_pegawai.Setting = 1 AND
+                            main_user.IdLevelUserFK <> 1 AND
+                            main_user.IdLevelUserFK <> 2 AND
+                            history_mutasi.Setting = 1");
+                            
+                            $countResult = mysqli_fetch_assoc($queryCount);
+                            $totalRecords = $countResult['total'];
+                            $totalPages = ceil($totalRecords / $limit);
+
+                            $Nomor = $offset + 1;
                             $QueryPegawai = mysqli_query($db, "SELECT
                             master_pegawai.IdPegawaiFK,
                             master_pegawai.Foto,
@@ -168,7 +262,8 @@
                             ORDER BY
                             master_kecamatan.IdKecamatan ASC,
                             master_desa.NamaDesa ASC,
-                            history_mutasi.IdJabatanFK ASC");
+                            history_mutasi.IdJabatanFK ASC
+                            LIMIT $limit OFFSET $offset");
                             while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
                                 $IdPegawaiFK = $DataPegawai['IdPegawaiFK'];
                                 $Foto = $DataPegawai['Foto'];
@@ -176,29 +271,54 @@
                                 $Nama = $DataPegawai['Nama'];
 
                                 $TanggalLahir = $DataPegawai['TanggalLahir'];
-                                $exp = explode('-', $TanggalLahir);
-                                $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+                                // Cek dan format tanggal lahir
+                                if (!empty($TanggalLahir) && $TanggalLahir != '0000-00-00') {
+                                    $exp = explode('-', $TanggalLahir);
+                                    if (count($exp) >= 3) {
+                                        $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+                                    } else {
+                                        $ViewTglLahir = $TanggalLahir;
+                                    }
+                                } else {
+                                    $ViewTglLahir = "Tidak Diset";
+                                }
 
-                                $TanggalPensiun = $DataPegawai['TanggalPensiun'];
-                                $exp1 = explode('-', $TanggalPensiun);
-                                $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+                                $TanggalPensiun = $DataPegawai['TanggalPensiun'] ?? null;
+                                // Cek dan format tanggal pensiun
+                                if (!empty($TanggalPensiun) && $TanggalPensiun != '0000-00-00') {
+                                    $exp1 = explode('-', $TanggalPensiun);
+                                    if (count($exp1) >= 3) {
+                                        $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+                                    } else {
+                                        $ViewTglPensiun = $TanggalPensiun;
+                                    }
+                                } else {
+                                    $ViewTglPensiun = "Tidak Diset";
+                                }
 
                                 //HITUNG DETAIL TANGGAL PENSIUN
-                                $TglPensiun = date_create($TanggalPensiun);
-                                $TglSekarang = date_create();
-                                $Temp = date_diff($TglSekarang, $TglPensiun);
+                                if (!empty($TanggalPensiun) && $TanggalPensiun != '0000-00-00') {
+                                    $TglPensiun = date_create($TanggalPensiun);
+                                    $TglSekarang = date_create();
+                                    $Temp = date_diff($TglSekarang, $TglPensiun);
 
-                                //CEK TANGGAL ASLI SAAT INI
-                                $TglSekarang1 = Date('Y-m-d');
+                                    //CEK TANGGAL ASLI SAAT INI
+                                    $TglSekarang1 = Date('Y-m-d');
 
-                                if ($TglSekarang1 >= $TanggalPensiun) {
-                                    $HasilTahun = 0 . ' Tahun ';
-                                    $HasilBulan = 0 . ' Bulan ';
-                                    $HasilHari = 0 . ' Hari ';
-                                } elseif ($TglSekarang1 < $TanggalPensiun) {
-                                    $HasilTahun = $Temp->y . ' Tahun ';
-                                    $HasilBulan = $Temp->m . ' Bulan ';
-                                    $HasilHari = $Temp->d + 1 . ' Hari ';
+                                    if ($TglSekarang1 >= $TanggalPensiun) {
+                                        $HasilTahun = 0 . ' Tahun ';
+                                        $HasilBulan = 0 . ' Bulan ';
+                                        $HasilHari = 0 . ' Hari ';
+                                    } elseif ($TglSekarang1 < $TanggalPensiun) {
+                                        $HasilTahun = $Temp->y . ' Tahun ';
+                                        $HasilBulan = $Temp->m . ' Bulan ';
+                                        $HasilHari = $Temp->d + 1 . ' Hari ';
+                                    }
+                                } else {
+                                    // Jika tanggal pensiun tidak valid
+                                    $HasilTahun = 'Tidak Diset';
+                                    $HasilBulan = '';
+                                    $HasilHari = '';
                                 }
                                 //SELESAI
 
@@ -207,34 +327,43 @@
                                 $NamaDesa = $DataPegawai['NamaDesa'];
                                 $Kecamatan = $DataPegawai['Kecamatan'];
                                 $Kabupaten = $DataPegawai['Kabupaten'];
-                                $Alamat = $DataPegawai['Alamat'];
-                                $RT = $DataPegawai['RT'];
-                                $RW = $DataPegawai['RW'];
+                                $Alamat = $DataPegawai['Alamat'] ?? '';
+                                $RT = $DataPegawai['RT'] ?? '';
+                                $RW = $DataPegawai['RW'] ?? '';
 
-                                $Lingkungan = $DataPegawai['Lingkungan'];
+                                $Lingkungan = $DataPegawai['Lingkungan'] ?? '';
                                 $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
                                 $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-                                $Komunitas = $LingkunganBPD['NamaDesa'];
+                                $Komunitas = ($LingkunganBPD && isset($LingkunganBPD['NamaDesa'])) ? $LingkunganBPD['NamaDesa'] : 'Data Tidak Ditemukan';
 
-                                $KecamatanBPD = $DataPegawai['Kec'];
+                                $KecamatanBPD = $DataPegawai['Kec'] ?? '';
                                 $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
-                                $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-                                $KomunitasKec = $KecamatanBPD['Kecamatan'];
+                                $KecamatanBPDData = mysqli_fetch_assoc($AmbilKecamatan);
+                                $KomunitasKec = ($KecamatanBPDData && isset($KecamatanBPDData['Kecamatan'])) ? $KecamatanBPDData['Kecamatan'] : 'Data Tidak Ditemukan';
 
                                 $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
-                                $Setting = $DataPegawai['Setting'];
-                                $JenisMutasi = $DataPegawai['JenisMutasi'];
+                                $Setting = $DataPegawai['Setting'] ?? 1;
+                                $JenisMutasi = $DataPegawai['JenisMutasi'] ?? '';
 
-                                $TglSKMutasi = $DataPegawai['TanggalMutasi'];
-                                $exp2 = explode('-', $TglSKMutasi);
-                                $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
+                                $TglSKMutasi = $DataPegawai['TanggalMutasi'] ?? null;
+                                // Cek dan format tanggal mutasi
+                                if (!empty($TglSKMutasi) && $TglSKMutasi != '0000-00-00') {
+                                    $exp2 = explode('-', $TglSKMutasi);
+                                    if (count($exp2) >= 3) {
+                                        $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
+                                    } else {
+                                        $TanggalMutasi = $TglSKMutasi;
+                                    }
+                                } else {
+                                    $TanggalMutasi = "Tidak Diset";
+                                }
 
-                                $NomorSK = $DataPegawai['NomorSK'];
-                                $SKMutasi = $DataPegawai['FileSKMutasi'];
-                                $Jabatan = $DataPegawai['Jabatan'];
-                                $KetJabatan = $DataPegawai['KeteranganJabatan'];
-                                $Siltap =  number_format($DataPegawai['Siltap'], 0, ",", ".");
-                                $Telp = $DataPegawai['NoTelp'];
+                                $NomorSK = $DataPegawai['NomorSK'] ?? '';
+                                $SKMutasi = $DataPegawai['FileSKMutasi'] ?? '';
+                                $Jabatan = $DataPegawai['Jabatan'] ?? '';
+                                $KetJabatan = $DataPegawai['KeteranganJabatan'] ?? '';
+                                $Siltap = isset($DataPegawai['Siltap']) ? number_format($DataPegawai['Siltap'], 0, ",", ".") : '0';
+                                $Telp = $DataPegawai['NoTelp'] ?? '';
 
                             ?>
 
@@ -310,6 +439,43 @@
                             ?>
                         </tbody>
                     </table>
+                    
+                    <!-- Pagination -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="dataTables_info">
+                                Menampilkan <?php echo $offset + 1; ?> sampai <?php echo min($offset + $limit, $totalRecords); ?> dari <?php echo $totalRecords; ?> data
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="dataTables_paginate">
+                                <ul class="pagination justify-content-end">
+                                    <?php if ($page > 1): ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?pg=ViewPegawaiReport&page=<?php echo $page - 1; ?>">Previous</a>
+                                        </li>
+                                    <?php endif; ?>
+
+                                    <?php
+                                    $start = max(1, $page - 2);
+                                    $end = min($totalPages, $page + 2);
+                                    
+                                    for ($i = $start; $i <= $end; $i++): ?>
+                                        <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                                            <a class="page-link" href="?pg=ViewPegawaiReport&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+
+                                    <?php if ($page < $totalPages): ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?pg=ViewPegawaiReport&page=<?php echo $page + 1; ?>">Next</a>
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>

@@ -1,7 +1,9 @@
 <?php
 // Setting Profile Admin Desa - View dan Process
 ob_start(); // Start output buffering
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 // Include files

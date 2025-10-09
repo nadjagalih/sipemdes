@@ -25,7 +25,7 @@ class CSPHandler {
         
         $csp = [
             "default-src 'self'",
-            "script-src 'self' 'nonce-$nonce' https://unpkg.com https://cdn.jsdelivr.net",
+            "script-src 'self' 'nonce-$nonce' 'sha256-J6XHI1Bzc5WXZ05UpDhWmUgJcbVKx4aeqaM41jTU6vA=' https://unpkg.com https://cdn.jsdelivr.net",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com https://unpkg.com",
             "font-src 'self' https://fonts.gstatic.com https://use.fontawesome.com",
             "img-src 'self' data: https:",

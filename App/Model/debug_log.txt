@@ -14,3 +14,411 @@ POST: Array
 )
 
 Data: NoTelepon=08123456789, AlamatKecamatan=tes, Lat=-8.050175, Lng=111.711042, IdKecamatan=202008011139591
+2025-10-09 10:44:47 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => +62321123456
+    [AlamatKantor] => Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur
+    [Latitude] => -8.050136
+    [Longitude] => 111.711525
+    [Save] => 
+)
+
+Data: NoTelepon=+62321123456, AlamatKecamatan=Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur, Lat=-8.050136, Lng=111.711525, IdKecamatan=202008011139591
+2025-10-09 10:44:51 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => +62321123456
+    [AlamatKantor] => Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur
+    [Latitude] => -8.048642
+    [Longitude] => 111.707748
+    [Save] => 
+)
+
+Data: NoTelepon=+62321123456, AlamatKecamatan=Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur, Lat=-8.048642, Lng=111.707748, IdKecamatan=202008011139591
+2025-10-09 10:45:04 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => +62321123456
+    [AlamatKantor] => Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur
+    [Latitude] => -8.050678
+    [Longitude] => 111.709122
+    [Save] => 
+)
+
+Data: NoTelepon=+62321123456, AlamatKecamatan=Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur, Lat=-8.050678, Lng=111.709122, IdKecamatan=202008011139591
+2025-10-09 10:46:33 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 0812345678
+    [AlamatKantor] => tes tugu
+    [Latitude] => -8.044439
+    [Longitude] => 111.649435
+    [Save] => 
+)
+
+Data: NoTelepon=0812345678, AlamatKecamatan=tes tugu, Lat=-8.044439, Lng=111.649435, IdKecamatan=202008191046266
+2025-10-09 10:46:59 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 0812345678
+    [AlamatKantor] => tes tugu
+    [Latitude] => -8.04443900
+    [Longitude] => 111.64943500
+    [Save] => 
+)
+
+Data: NoTelepon=0812345678, AlamatKecamatan=tes tugu, Lat=-8.04443900, Lng=111.64943500, IdKecamatan=202008191046266
+2025-10-09 11:01:09 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08223456789
+    [AlamatDesa] => test
+    [Latitude] => -8.170912
+    [Longitude] => 111.674173
+    [Save] => 
+)
+
+Data: NoTelepon=08223456789, AlamatDesa=test, Lat=-8.170912, Lng=111.674173, IdDesa=2020102619515953
+2025-10-09 11:09:09 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08223456789
+    [AlamatDesa] => test
+    [Latitude] => -8.17091200
+    [Longitude] => 111.67417300
+    [Save] => 
+)
+
+Data: NoTelepon=08223456789, AlamatDesa=test, Lat=-8.17091200, Lng=111.67417300, IdDesa=2020102619515953
+2025-10-09 11:09:54 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456789
+    [AlamatDesa] => jatiprahu
+    [Latitude] => -8.091287
+    [Longitude] => 111.692656
+    [Save] => 
+)
+
+Data: NoTelepon=08123456789, AlamatDesa=jatiprahu, Lat=-8.091287, Lng=111.692656, IdDesa=2020102620040057
+2025-10-09 11:16:17 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456789
+    [AlamatDesa] => jatiprahu
+    [Latitude] => -8.09128700
+    [Longitude] => 111.69265600
+    [Save] => 
+)
+
+Data: NoTelepon=08123456789, AlamatDesa=jatiprahu, Lat=-8.09128700, Lng=111.69265600, IdDesa=2020102620040057
+2025-10-09 11:16:20 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456789
+    [AlamatDesa] => jatiprahu
+    [Latitude] => -8.09128700
+    [Longitude] => 111.69265600
+    [Save] => 
+)
+
+Data: NoTelepon=08123456789, AlamatDesa=jatiprahu, Lat=-8.09128700, Lng=111.69265600, IdDesa=2020102620040057
+2025-10-09 11:16:26 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456789
+    [AlamatDesa] => jatiprahu
+    [Latitude] => -8.09128700
+    [Longitude] => 111.69265600
+    [Save] => 
+)
+
+Data: NoTelepon=08123456789, AlamatDesa=jatiprahu, Lat=-8.09128700, Lng=111.69265600, IdDesa=2020102620040057
+2025-10-09 11:23:12 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456789
+    [AlamatDesa] => jatiprahu
+    [Latitude] => -8.09128700
+    [Longitude] => 111.69265600
+    [Save] => 
+)
+
+Data: NoTelepon=08123456789, AlamatDesa=jatiprahu, Lat=-8.09128700, Lng=111.69265600, IdDesa=2020102620040057
+Existing data: Array
+(
+    [NoTelepon] => 08123456789
+    [alamatDesa] => jatiprahu
+    [Latitude] => -8.09128700
+    [Longitude] => 111.69265600
+)
+
+isExisting: true
+Sending alert: Edit
+2025-10-09 11:23:15 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456789
+    [AlamatDesa] => jatiprahu
+    [Latitude] => -8.09128700
+    [Longitude] => 111.69265600
+    [Save] => 
+)
+
+Data: NoTelepon=08123456789, AlamatDesa=jatiprahu, Lat=-8.09128700, Lng=111.69265600, IdDesa=2020102620040057
+Existing data: Array
+(
+    [NoTelepon] => 08123456789
+    [alamatDesa] => jatiprahu
+    [Latitude] => -8.09128700
+    [Longitude] => 111.69265600
+)
+
+isExisting: true
+Sending alert: Edit
+2025-10-09 11:23:22 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456789
+    [AlamatDesa] => jatiprahu
+    [Latitude] => -8.09128700
+    [Longitude] => 111.69265600
+    [Save] => 
+)
+
+Data: NoTelepon=08123456789, AlamatDesa=jatiprahu, Lat=-8.09128700, Lng=111.69265600, IdDesa=2020102620040057
+Existing data: Array
+(
+    [NoTelepon] => 08123456789
+    [alamatDesa] => jatiprahu
+    [Latitude] => -8.09128700
+    [Longitude] => 111.69265600
+)
+
+isExisting: true
+Sending alert: Edit
+2025-10-09 11:24:33 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456899
+    [AlamatDesa] => parakan
+    [Latitude] => -8.039274
+    [Longitude] => 111.735380
+    [Save] => 
+)
+
+Data: NoTelepon=08123456899, AlamatDesa=parakan, Lat=-8.039274, Lng=111.735380, IdDesa=20201110200935154
+Existing data: Array
+(
+    [NoTelepon] => 0
+    [alamatDesa] => 
+    [Latitude] => 
+    [Longitude] => 
+)
+
+isExisting: false
+Sending alert: Save
+2025-10-09 11:26:50 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456899
+    [AlamatDesa] => parakan
+    [Latitude] => -8.03927400
+    [Longitude] => 111.73538000
+    [Save] => 
+)
+
+Data: NoTelepon=08123456899, AlamatDesa=parakan, Lat=-8.03927400, Lng=111.73538000, IdDesa=20201110200935154
+2025-10-09 11:26:53 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456899
+    [AlamatDesa] => parakan
+    [Latitude] => -8.03927400
+    [Longitude] => 111.73538000
+    [Save] => 
+)
+
+Data: NoTelepon=08123456899, AlamatDesa=parakan, Lat=-8.03927400, Lng=111.73538000, IdDesa=20201110200935154
+2025-10-09 11:28:12 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08208320732
+    [AlamatKantor] => kampak
+    [Latitude] => -8.175111
+    [Longitude] => 111.660324
+    [Save] => 
+)
+
+Data: NoTelepon=08208320732, AlamatKecamatan=kampak, Lat=-8.175111, Lng=111.660324, IdKecamatan=2020081910473010
+2025-10-09 11:29:37 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 001280130183
+    [AlamatDesa] => sambirjo
+    [Latitude] => -8.073305
+    [Longitude] => 111.702530
+    [Save] => 
+)
+
+Data: NoTelepon=001280130183, AlamatDesa=sambirjo, Lat=-8.073305, Lng=111.702530, IdDesa=20201110200821150
+2025-10-09 11:29:49 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 001280130183
+    [AlamatDesa] => sambirjo
+    [Latitude] => -8.07330500
+    [Longitude] => 111.70253000
+    [Save] => 
+)
+
+Data: NoTelepon=001280130183, AlamatDesa=sambirjo, Lat=-8.07330500, Lng=111.70253000, IdDesa=20201110200821150
+2025-10-09 11:29:53 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 001280130183
+    [AlamatDesa] => sambirjo
+    [Latitude] => -8.07330500
+    [Longitude] => 111.70253000
+    [Save] => 
+)
+
+Data: NoTelepon=001280130183, AlamatDesa=sambirjo, Lat=-8.07330500, Lng=111.70253000, IdDesa=20201110200821150
+2025-10-09 11:29:57 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 001280130183
+    [AlamatDesa] => sambirjo
+    [Latitude] => -8.07330500
+    [Longitude] => 111.70253000
+    [Save] => 
+)
+
+Data: NoTelepon=001280130183, AlamatDesa=sambirjo, Lat=-8.07330500, Lng=111.70253000, IdDesa=20201110200821150
+2025-10-09 11:30:05 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 001280130183
+    [AlamatDesa] => sambirjo
+    [Latitude] => -8.07330500
+    [Longitude] => 111.70253000
+    [Save] => 
+)
+
+Data: NoTelepon=001280130183, AlamatDesa=sambirjo, Lat=-8.07330500, Lng=111.70253000, IdDesa=20201110200821150

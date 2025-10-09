@@ -8,11 +8,12 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 // Include files
 include_once "../App/Control/FunctionSettingProfileAdminDesa.php";
+require_once "../Module/Security/CSPHandler.php";
 
 // Alert Handler seperti di PegawaiViewAll.php
 if (isset($_GET['alert'])) {
     if (isset($_GET['alert']) && $_GET['alert'] == 'Edit') {
-        echo "<script type='text/javascript'>
+        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Berhasil!',
@@ -23,7 +24,7 @@ if (isset($_GET['alert'])) {
             },10);
         </script>";
     } elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
-        echo "<script type='text/javascript'>
+        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Gagal!',
@@ -34,7 +35,7 @@ if (isset($_GET['alert'])) {
             },10);
         </script>";
     } elseif (isset($_GET['alert']) && $_GET['alert'] == 'ErrorTelepon') {
-        echo "<script type='text/javascript'>
+        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Peringatan!',
@@ -45,7 +46,7 @@ if (isset($_GET['alert'])) {
             },10);
         </script>";
     } elseif (isset($_GET['alert']) && $_GET['alert'] == 'ErrorKoordinat') {
-        echo "<script type='text/javascript'>
+        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Peringatan!',
@@ -574,7 +575,7 @@ if (isset($_GET['alert'])) {
 </div>
 
 <!-- Map Script -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         // Koordinat default (Indonesia/Jawa)
         var defaultLat = <?php echo !empty($currentLatitude) ? $currentLatitude : '-8.055'; ?>;
@@ -870,7 +871,7 @@ if (isset($_GET['alert'])) {
 </script>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Force pace loading to complete after page is fully loaded
     window.addEventListener('load', function() {
         // Wait a bit for all scripts to finish

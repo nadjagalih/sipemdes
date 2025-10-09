@@ -39,7 +39,10 @@ $isLaporanPensiunActive = in_array($pg, [
     'ViewPensiunKec'
 ]);
 
-echo '<style>
+// Start output buffering to prevent headers already sent
+ob_start();
+?>
+<style>
     /* Override semua warna hijau dengan prioritas tinggi */
     .nav > li.active,
     .nav > li.active > a,
@@ -394,7 +397,11 @@ echo '<style>
         box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
         border: none !important;
     }
-</style>';
+</style>
+<?php
+// Flush any buffered output and clean
+$styles = ob_get_clean();
+echo $styles;
 ?>
 <div class="sidebar-collapse">
     <ul class="nav metismenu" id="side-menu">

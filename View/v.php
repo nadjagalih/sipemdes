@@ -3,6 +3,7 @@ session_start();
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 require_once "../Module/Config/Env.php";
+require_once "../Module/Security/CSPHandler.php";
 
 if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     echo "<meta http-equiv='refresh' content='0; url=../index'>";
@@ -17,13 +18,15 @@ if (isset($_SESSION['start_time'])) {
     $elapsed_time = time() - $_SESSION['start_time'];
     if ($elapsed_time >= $timeout) {
         session_destroy();
-        echo "<script>
+        echo "<script " . CSPHandler::scriptNonce() . ">
             window.location = '$logout_redirect_url'
         </script>";
     }
 }
 $_SESSION['start_time'] = time();
 
+// Set CSP headers
+CSPHandler::setCSPHeaders();
 ?>
 
 <!DOCTYPE html>
@@ -149,7 +152,7 @@ $_SESSION['start_time'] = time();
     <script src="../Vendor/Assets/js/plugins/datapicker/bootstrap-datepicker.js"></script>
     <script src="../Vendor/Assets/sweetalert/sweetalert.min.js"></script>
 
-    <script>
+    <script <?php echo CSPHandler::scriptNonce(); ?>>
         $(document).ready(function() {
             $('.dataTables-kecamatan').DataTable({
                 pageLength: 25,
@@ -197,7 +200,7 @@ $_SESSION['start_time'] = time();
         });
     </script>
 
-    <script>
+    <script <?php echo CSPHandler::scriptNonce(); ?>>
         $(".select2_kabupaten").select2();
         $(".select2_kecamatan").select2();
         $(".select2_akses").select2();
@@ -213,7 +216,7 @@ $_SESSION['start_time'] = time();
         $(".select2_pendidikan").select2();
     </script>
 
-    <script>
+    <script <?php echo CSPHandler::scriptNonce(); ?>>
         $(document).ready(function() {
             var mem = $('#TanggalLahir .input-group.date').datepicker({
                 todayBtn: "linked",
@@ -225,7 +228,7 @@ $_SESSION['start_time'] = time();
             });
         });
     </script>
-    <script>
+    <script <?php echo CSPHandler::scriptNonce(); ?>>
         $(document).ready(function() {
             var mem = $('#TanggalNikah .input-group.date').datepicker({
                 todayBtn: "linked",

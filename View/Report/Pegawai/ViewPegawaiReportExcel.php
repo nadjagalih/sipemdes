@@ -273,7 +273,7 @@
                             $searchCondition");
                             
                             $countResult = mysqli_fetch_assoc($queryCount);
-                            $totalRecords = $countResult['total'];
+                            $totalRecords = ($countResult !== null) ? $countResult['total'] : 0;
                             $totalPages = ceil($totalRecords / $limit);
 
                             $Nomor = $offset + 1;
@@ -465,7 +465,7 @@
                                         <?php
                                         $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
                                         $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-                                        $JenisKelamin = $DataJenKel['Keterangan'];
+                                        $JenisKelamin = ($DataJenKel !== null) ? $DataJenKel['Keterangan'] : '-';
                                         echo $JenisKelamin;
                                         ?>
                                     </td>
@@ -483,7 +483,7 @@
                                                 INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
                                         WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
                                         $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-                                        $Pendidikan = $DataPendidikan['JenisPendidikan'];
+                                        $Pendidikan = ($DataPendidikan !== null) ? $DataPendidikan['JenisPendidikan'] : '-';
                                         echo $Pendidikan;
                                         ?>
                                     </td>

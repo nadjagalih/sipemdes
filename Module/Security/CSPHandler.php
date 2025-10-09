@@ -37,7 +37,11 @@ class CSPHandler {
         ];
         
         $cspHeader = implode('; ', $csp);
-        header("Content-Security-Policy: " . $cspHeader);
+        
+        // Only set header if headers haven't been sent yet
+        if (!headers_sent()) {
+            header("Content-Security-Policy: " . $cspHeader);
+        }
         
         // Debug: log the CSP header and nonce
         error_log("CSP Header: " . $cspHeader);

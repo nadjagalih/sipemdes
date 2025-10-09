@@ -1,0 +1,16 @@
+2025-10-09 10:42:16 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08123456789
+    [AlamatKantor] => tes
+    [Latitude] => -8.050175
+    [Longitude] => 111.711042
+    [Save] => 
+)
+
+Data: NoTelepon=08123456789, AlamatKecamatan=tes, Lat=-8.050175, Lng=111.711042, IdKecamatan=202008011139591

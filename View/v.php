@@ -2,11 +2,13 @@
 session_start();
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
-// Include security configurations
+// Include security configurations FIRST
 require_once "../Module/Security/Security.php";
-
 require_once "../Module/Config/Env.php";
 require_once "../Module/Security/CSPHandler.php";
+
+// Set CSP headers IMMEDIATELY before any output
+CSPHandler::setCSPHeaders();
 
 if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     echo "<meta http-equiv='refresh' content='0; url=../index'>";
@@ -27,9 +29,6 @@ if (isset($_SESSION['start_time'])) {
     }
 }
 $_SESSION['start_time'] = time();
-
-// Set CSP headers
-CSPHandler::setCSPHeaders();
 ?>
 
 <!DOCTYPE html>

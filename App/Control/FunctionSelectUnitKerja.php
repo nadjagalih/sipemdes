@@ -1,5 +1,21 @@
 <?php
-if ($UnitKerja == '') {
+// Definisi dan validasi variabel
+$UnitKerja = isset($_GET['UnitKerja']) ? mysqli_real_escape_string($db, $_GET['UnitKerja']) : '';
+$EditNamaUnitKerja = '';
+
+// Mode edit: ambil data unit kerja yang dipilih
+if (!empty($UnitKerja)) {
+    $queryEdit = mysqli_query($db, "SELECT master_desa.*, master_kecamatan.Kecamatan 
+                                   FROM master_desa 
+                                   INNER JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan 
+                                   WHERE master_desa.IdDesa = '$UnitKerja'");
+    if ($queryEdit && mysqli_num_rows($queryEdit) > 0) {
+        $dataEdit = mysqli_fetch_assoc($queryEdit);
+        $EditNamaUnitKerja = $dataEdit['NamaDesa'] . ' - ' . $dataEdit['Kecamatan'];
+    }
+}
+
+if (empty($UnitKerja)) {
 ?>
     <select name="UnitKerja" id="UnitKerja" style="width: 100%;" class="select2_desa form-control">
         <option value="">Pilih Unit Kerja</option>
@@ -15,18 +31,21 @@ if ($UnitKerja == '') {
     ORDER BY
     master_kecamatan.Kecamatan ASC,
     master_desa.NamaDesa ASC");
-        while ($DataDesa = mysqli_fetch_assoc($QueryDesa)) {
-            $IdDesa = $DataDesa['IdDesa'];
-            $NamaDesa = $DataDesa['NamaDesa'];
-            $NamaKecamatan = $DataDesa['Kecamatan'];
+        if ($QueryDesa && mysqli_num_rows($QueryDesa) > 0) {
+            while ($DataDesa = mysqli_fetch_assoc($QueryDesa)) {
+                $IdDesaOption = $DataDesa['IdDesa'];
+                $NamaDesaOption = $DataDesa['NamaDesa'];
+                $NamaKecamatanOption = $DataDesa['Kecamatan'];
         ?>
-            <option value="<?php echo $IdDesa; ?>"><?php echo $NamaDesa; ?> - Kecamatan <?php echo $NamaKecamatan; ?></option>
-        <?php }
+            <option value="<?php echo $IdDesaOption; ?>"><?php echo $NamaDesaOption; ?> - Kecamatan <?php echo $NamaKecamatanOption; ?></option>
+        <?php 
+            }
+        }
         ?>
     </select>
-<?php } elseif ($UnitKerja <> '') { ?>
+<?php } else { ?>
     <select name="UnitKerja" id="UnitKerja" style="width: 100%;" class="select2_desa form-control">
-        <option value="<?php echo $EditIdUnitKerja; ?>"><?php echo $EditNamaUnitKerja; ?> - Kecamatan <?php echo $EditNamaKecamatanUnitKerja; ?></option>
+        <option value="<?php echo $UnitKerja; ?>"><?php echo $EditNamaUnitKerja; ?></option>
         <?php
         $QueryDesa = mysqli_query($db, "SELECT
     master_desa.IdDesa,
@@ -40,13 +59,16 @@ if ($UnitKerja == '') {
     ORDER BY
     master_kecamatan.Kecamatan ASC,
     master_desa.NamaDesa ASC");
-        while ($DataDesa = mysqli_fetch_assoc($QueryDesa)) {
-            $IdDesa = $DataDesa['IdDesa'];
-            $NamaDesa = $DataDesa['NamaDesa'];
-            $NamaKecamatan = $DataDesa['Kecamatan'];
+        if ($QueryDesa && mysqli_num_rows($QueryDesa) > 0) {
+            while ($DataDesa = mysqli_fetch_assoc($QueryDesa)) {
+                $IdDesaOption = $DataDesa['IdDesa'];
+                $NamaDesaOption = $DataDesa['NamaDesa'];
+                $NamaKecamatanOption = $DataDesa['Kecamatan'];
         ?>
-            <option value="<?php echo $IdDesa; ?>"><?php echo $NamaDesa; ?> - Kecamatan <?php echo $NamaKecamatan; ?></option>
-        <?php }
+            <option value="<?php echo $IdDesaOption; ?>"><?php echo $NamaDesaOption; ?> - Kecamatan <?php echo $NamaKecamatanOption; ?></option>
+        <?php 
+            }
+        }
         ?>
     </select>
 <?php } ?>

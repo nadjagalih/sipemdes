@@ -29,8 +29,8 @@ SecureErrorHandler::initialize(__DIR__ . '/../../Logs/error.log');
 // Apply security headers
 SecurityHeaders::setSecurityHeaders();
 
-// Set CSP headers
-CSPHandler::setCSPHeaders();
+// Set CSP headers with nonce support - TEMPORARILY DISABLED FOR DEBUGGING
+// CSPHandler::setCSPHeaders();
 
 // Start secure session
 SecurityHeaders::setSecureSession();

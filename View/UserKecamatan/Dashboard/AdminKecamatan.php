@@ -1295,7 +1295,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
             }
         },
         title: {
-            text: '<strong>Grafik Data Kades & Perangkat Desa Kecamatan <?php echo $NamaKecamatan; ?></strong>',
+            text: '<strong>Grafik Data Kades & Perangkat Desa Kecamatan <?php echo addslashes(htmlspecialchars($NamaKecamatan, ENT_QUOTES, 'UTF-8')); ?></strong>',
             style: {
                 color: '#111827',
                 fontSize: '16px'
@@ -1395,7 +1395,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
                 $NamaDesa = $DataPerangkat['NamaDesa'];
                 $Jumlah = $DataPerangkat['JmlPerangkat'];
             ?> {
-                    name: '<?php echo $NamaDesa; ?>',
+                    name: '<?php echo addslashes(htmlspecialchars($NamaDesa, ENT_QUOTES, 'UTF-8')); ?>',
                     data: [<?php echo $Jumlah; ?>]
                 },
             <?php } ?>
@@ -1541,7 +1541,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
                     $Pendidikan = $DataPendidikan['JenisPendidikan'];
                     $JumlahPendidikan = $DataPendidikan['JmlPendidikan'];
                 ?> {
-                        name: '<?php echo $Pendidikan; ?>',
+                        name: '<?php echo addslashes(htmlspecialchars($Pendidikan, ENT_QUOTES, 'UTF-8')); ?>',
                         y: <?php echo $JumlahPendidikan; ?>,
                         sliced: false,
                         selected: false
@@ -1705,7 +1705,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
                 $Jabatan = $DataJabatan['Jabatan'];
                 $JmlJabatan = $DataJabatan['JmlJabatan'];
             ?> {
-                    name: '<?php echo $Jabatan; ?>',
+                    name: '<?php echo addslashes(htmlspecialchars($Jabatan, ENT_QUOTES, 'UTF-8')); ?>',
                     data: [<?php echo $JmlJabatan; ?>]
                 },
             <?php } ?>
@@ -1861,7 +1861,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
                 $NamaDesaBPD = $DataBPDDesa['NamaDesa'];
                 $JumlahBPD = $DataBPDDesa['JmlBPD'];
             ?> {
-                    name: '<?php echo $NamaDesaBPD; ?>',
+                    name: '<?php echo addslashes(htmlspecialchars($NamaDesaBPD, ENT_QUOTES, 'UTF-8')); ?>',
                     data: [<?php echo $JumlahBPD; ?>]
                 },
             <?php } ?>
@@ -1901,16 +1901,16 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
         var popupContent = `
             <div style="text-align: center; min-width: 220px; font-family: 'Ubuntu', sans-serif;">
                 <div style="background: linear-gradient(135deg, #6f42c1, #5a34a3); color: white; margin: 8px 10px 15px 8px; padding: 15px; border-radius: 8px 8px 0 0;">
-                    <h5 style="margin: 0; font-weight: 600;"><i class="fas fa-home"></i> <?php echo htmlspecialchars($NamaDesaHeader); ?></h5>
+                    <h5 style="margin: 0; font-weight: 600;"><i class="fas fa-home"></i> <?php echo htmlspecialchars($NamaKecamatanHeader); ?></h5>
                 </div>
                 
                 <div style="padding: 0 5px;">
                     <p style="margin: 5px 0; font-size: 13px; color: #666;"><i class="fas fa-map"></i> Kec. <?php echo htmlspecialchars($NamaKecamatanHeader); ?></p>
                     <p style="margin: 5px 0; font-size: 13px; color: #666;"><i class="fas fa-building"></i> Kab. <?php echo htmlspecialchars($Kabupaten); ?></p>
                     
-                    <?php if (!empty($alamatDesa)): ?>
+                    <?php if (!empty($AlamatKecamatan)): ?>
                     <p style="margin: 8px 0; font-size: 12px; color: #555; font-style: italic; line-height: 1.4;">
-                        <i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($alamatDesa); ?>
+                        <i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($AlamatKecamatan); ?>
                     </p>
                     <?php endif; ?>
                     

@@ -2,6 +2,9 @@
 session_start();
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
+// Include security configurations
+require_once "../Module/Security/Security.php";
+
 require_once "../Module/Config/Env.php";
 require_once "../Module/Security/CSPHandler.php";
 

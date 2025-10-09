@@ -1,11 +1,14 @@
 <?php
+// Include CSP Handler for nonce
+require_once "../Module/Security/CSPHandler.php";
+
 // ===============================================
 // ALERT NOTIFICATIONS
 // ===============================================
 if (empty($_GET['alert'])) {
     echo "";
 } elseif (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
-    echo "<script type='text/javascript'>
+    echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Sukses Ajukan SK Pensiun',
@@ -15,7 +18,7 @@ if (empty($_GET['alert'])) {
             }, 100);
           </script>";
 } elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
-    echo "<script type='text/javascript'>
+    echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Gagal Ajukan SK Pensiun',
@@ -182,7 +185,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 
 <!-- Leaflet CSS for Map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script <?php echo CSPHandler::scriptNonce(); ?> src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
     :root {
@@ -677,7 +680,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
     }
 </style>
 
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         // Add mini-navbar class by default
         document.body.classList.add('mini-navbar');
@@ -1265,7 +1268,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 <!-- =============================================== -->
 
 <!-- Chart 1: Grafik Perangkat Desa per Kecamatan -->
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('GrafikDesaV', {
         chart: {
             type: 'column',
@@ -1404,7 +1407,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Chart 2: Statistik Pendidikan (Pie Chart) -->
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     // Purple theme color palette
     const purpleColors = ['#6f42c1', '#1bcfb4', '#fd397a', '#ffb822', '#0084ff', '#17a2b8', '#28a745'];
 
@@ -1553,7 +1556,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Chart 3: Statistik Jabatan (Column Chart) -->
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('StatistikJabatan', {
         chart: {
             type: 'column',
@@ -1714,7 +1717,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Chart 4: Statistik BPD per Desa (Column Chart) -->
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('GrafikDesaVBPD', {
         chart: {
             type: 'column',
@@ -1870,7 +1873,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Leaflet Map Script -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Initialize the map after the page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Koordinat dari database atau default jika belum diset
@@ -1970,7 +1973,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Force pace loading to complete after page is fully loaded
     window.addEventListener('load', function() {
         // Wait a bit for all scripts to finish

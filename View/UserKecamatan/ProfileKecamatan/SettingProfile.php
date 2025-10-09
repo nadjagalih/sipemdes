@@ -2,10 +2,14 @@
 // Setting Profile Admin Kecamatan - View dan Process
 // Include safe helpers for production-ready error handling
 require_once __DIR__ . '/../../../helpers/safe_helpers.php';
+require_once __DIR__ . '/../../../Module/Security/CSPHandler.php';
 
 ob_start(); // Start output buffering
 safeSessionStart();
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
+// Set CSP headers
+CSPHandler::setCSPHeaders();
 
 // Include files
 include_once "../App/Control/FunctionSettingProfileAdminKecamatan.php";
@@ -14,7 +18,7 @@ include_once "../App/Control/FunctionSettingProfileAdminKecamatan.php";
 $alert = safeGetParam('alert');
 if (!safeEmpty($alert)) {
     if ($alert == 'Edit') {
-        echo "<script type='text/javascript'>
+        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Berhasil!',
@@ -25,7 +29,7 @@ if (!safeEmpty($alert)) {
             },10);
         </script>";
     } elseif ($alert == 'Gagal') {
-        echo "<script type='text/javascript'>
+        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Gagal!',
@@ -36,7 +40,7 @@ if (!safeEmpty($alert)) {
             },10);
         </script>";
     } elseif ($alert == 'ErrorTelepon') {
-        echo "<script type='text/javascript'>
+        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Peringatan!',
@@ -47,7 +51,7 @@ if (!safeEmpty($alert)) {
             },10);
         </script>";
     } elseif ($alert == 'ErrorKoordinat') {
-        echo "<script type='text/javascript'>
+        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Peringatan!',
@@ -78,10 +82,10 @@ if (!safeEmpty($alert)) {
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script <?php echo CSPHandler::scriptNonce(); ?> src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <!-- SweetAlert -->
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script <?php echo CSPHandler::scriptNonce(); ?> src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <style>
     /* Menggunakan struktur CSS yang sama dengan UserAdd.php */
@@ -575,7 +579,7 @@ if (!safeEmpty($alert)) {
 </div>
 
 <!-- Map Script -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         // Koordinat default (Indonesia/Jawa)
         var defaultLat = <?php echo !empty($currentLatitude) && is_numeric($currentLatitude) ? $currentLatitude : '-8.055'; ?>;

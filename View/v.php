@@ -57,14 +57,14 @@ CSPHandler::setCSPHeaders();
     <link href="../Vendor/Assets/sweetalert/sweetalert.css" rel="stylesheet">
 
     <!-- View Foto -->
-    <script src="../Vendor/Assets/foto-view/jquery-2.2.4.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/foto-view/jquery-2.2.4.js"></script>
 
     <!-- Charts -->
-    <script src="../Vendor/Charts/code/highcharts.js"></script>
-    <script src="../Vendor/Charts/code/highcharts-3d.js"></script>
-    <script src="../Vendor/Charts/code/modules/exporting.js"></script>
-    <script src="../Vendor/Charts/code/modules/export-data.js"></script>
-    <script src="../Vendor/Charts/code/modules/accessibility.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Charts/code/highcharts.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Charts/code/highcharts-3d.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Charts/code/modules/exporting.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Charts/code/modules/export-data.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Charts/code/modules/accessibility.js"></script>
 
 </head>
 
@@ -110,50 +110,50 @@ CSPHandler::setCSPHeaders();
     </div>
 
     <!-- Mainly scripts -->
-    <script src="../Vendor/Assets/js/jquery-3.1.1.min.js"></script>
-    <script src="../Vendor/Assets/js/popper.min.js"></script>
-    <script src="../Vendor/Assets/js/bootstrap.js"></script>
-    <script src="../Vendor/Assets/js/plugins/metisMenu/jquery.metisMenu.js"></script>
-    <script src="../Vendor/Assets/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/jquery-3.1.1.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/popper.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/bootstrap.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
 
     <!-- Flot -->
-    <script src="../Vendor/Assets/js/plugins/flot/jquery.flot.js"></script>
-    <script src="../Vendor/Assets/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
-    <script src="../Vendor/Assets/js/plugins/flot/jquery.flot.spline.js"></script>
-    <script src="../Vendor/Assets/js/plugins/flot/jquery.flot.resize.js"></script>
-    <script src="../Vendor/Assets/js/plugins/flot/jquery.flot.pie.js"></script>
-    <script src="../Vendor/Assets/js/plugins/flot/jquery.flot.symbol.js"></script>
-    <script src="../Vendor/Assets/js/plugins/flot/curvedLines.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/flot/jquery.flot.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/flot/jquery.flot.spline.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/flot/jquery.flot.resize.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/flot/jquery.flot.pie.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/flot/jquery.flot.symbol.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/flot/curvedLines.js"></script>
 
     <!-- Peity -->
-    <script src="../Vendor/Assets/js/plugins/peity/jquery.peity.min.js"></script>
-    <script src="../Vendor/Assets/js/demo/peity-demo.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/peity/jquery.peity.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/demo/peity-demo.js"></script>
 
     <!-- Custom and plugin javascript -->
-    <script src="../Vendor/Assets/js/inspinia.js"></script>
-    <script src="../Vendor/Assets/js/plugins/pace/pace.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/inspinia.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/pace/pace.min.js"></script>
 
     <!-- jQuery UI -->
-    <script src="../Vendor/Assets/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/jquery-ui/jquery-ui.min.js"></script>
 
     <!-- Jvectormap -->
-    <script src="../Vendor/Assets/js/plugins/jvectormap/jquery-jvectormap-2.0.2.min.js"></script>
-    <script src="../Vendor/Assets/js/plugins/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/jvectormap/jquery-jvectormap-2.0.2.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
 
     <!-- Sparkline -->
-    <script src="../Vendor/Assets/js/plugins/sparkline/jquery.sparkline.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/sparkline/jquery.sparkline.min.js"></script>
 
     <!-- Sparkline demo data  -->
-    <script src="../Vendor/Assets/js/demo/sparkline-demo.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/demo/sparkline-demo.js"></script>
 
     <!-- ChartJS-->
-    <script src="../Vendor/Assets/js/plugins/chartJs/Chart.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/chartJs/Chart.min.js"></script>
 
-    <script src="../Vendor/Assets/js/plugins/dataTables/datatables.min.js"></script>
-    <script src="../Vendor/Assets/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
-    <script src="../Vendor/Assets/js/plugins/select2/select2.full.min.js"></script>
-    <script src="../Vendor/Assets/js/plugins/datapicker/bootstrap-datepicker.js"></script>
-    <script src="../Vendor/Assets/sweetalert/sweetalert.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/dataTables/datatables.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/select2/select2.full.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/sweetalert/sweetalert.min.js"></script>
 
     <script <?php echo CSPHandler::scriptNonce(); ?>>
         $(document).ready(function() {

@@ -1245,7 +1245,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
 </div>
 
 
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     // Purple theme color palette
     const purpleColors = ['#6f42c1', '#1bcfb4', '#fd397a', '#ffb822', '#0084ff', '#17a2b8', '#28a745'];
     
@@ -1391,7 +1391,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
     });
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('StatistikJabatan', {
         chart: {
             type: 'column',
@@ -1545,7 +1545,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
     });
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('StatistikBPD', {
         chart: {
             type: 'column',

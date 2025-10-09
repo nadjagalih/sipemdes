@@ -1,6 +1,7 @@
 <?php
 include '../../../Module/Config/Env.php';
-$$IdTemp = isset($_POST['Kecamatan']) ? sql_injeksi($_POST['Kecamatan']) : '';
+require_once '../../../Module/Security/CSPHandler.php';
+$IdTemp = isset($_POST['Kecamatan']) ? sql_injeksi($_POST['Kecamatan']) : '';
 $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan ='$IdTemp' ");
 $DataKecamatan = mysqli_fetch_assoc($QueryKecamatan);
 $IdKecamatan = $DataKecamatan['IdKecamatan'];
@@ -92,7 +93,7 @@ $NamaKecamatan = $DataKecamatan['Kecamatan'];
     </div>
 </div>
 
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('GrafikDesa', {
         chart: {
             type: 'column'

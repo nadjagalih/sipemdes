@@ -1,4 +1,7 @@
-<script type="text/javascript">
+<?php
+require_once "../../../Module/Security/CSPHandler.php";
+?>
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     $(document).ready(function() {
         $.ajax({
             type: 'POST',

@@ -1,8 +1,11 @@
 <?php
-$IdKec = $_SESSION['IdKecamatan'];
+// Include safe helpers for production-ready error handling
+require_once __DIR__ . '/../../../helpers/safe_helpers.php';
+
+$IdKec = safeSession('IdKecamatan');
 $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$IdKec' ");
 $DataQuery = mysqli_fetch_assoc($QueryKecamatan);
-$Kecamatan = $DataQuery['Kecamatan'];
+$Kecamatan = safeGet($DataQuery, 'Kecamatan', 'Unknown');
 ?>
 
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -120,6 +123,7 @@ $Kecamatan = $DataQuery['Kecamatan'];
                             master_pegawai.NIK,
                             master_pegawai.Nama,
                             master_pegawai.TanggalLahir,
+                            master_pegawai.TanggalPensiun,
                             master_pegawai.JenKel,
                             master_pegawai.IdDesaFK,
                             master_pegawai.Alamat,
@@ -147,6 +151,8 @@ $Kecamatan = $DataQuery['Kecamatan'];
                             history_mutasi.TanggalMutasi,
                             history_mutasi.IdJabatanFK,
                             history_mutasi.KeteranganJabatan,
+                            history_mutasi.JenisMutasi,
+                            history_mutasi.FileSKMutasi,
                             history_mutasi.Setting,
                             master_jabatan.IdJabatan,
                             master_jabatan.Jabatan
@@ -171,71 +177,104 @@ $Kecamatan = $DataQuery['Kecamatan'];
                             master_desa.NamaDesa ASC,
                             history_mutasi.IdJabatanFK ASC");
                             while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
-                                $IdPegawaiFK = $DataPegawai['IdPegawaiFK'];
-                                $Foto = $DataPegawai['Foto'];
-                                $NIK = $DataPegawai['NIK'];
-                                $Nama = $DataPegawai['Nama'];
+                                // Use safe data access with schema for employee data
+                                $safeEmployeeSchema = [
+                                    'IdPegawaiFK' => '',
+                                    'Foto' => '',
+                                    'NIK' => '',
+                                    'Nama' => '',
+                                    'TanggalLahir' => '',
+                                    'TanggalPensiun' => '',
+                                    'JenKel' => '',
+                                    'NamaDesa' => '',
+                                    'Kecamatan' => '',
+                                    'Kabupaten' => '',
+                                    'Alamat' => '',
+                                    'RT' => '',
+                                    'RW' => '',
+                                    'Lingkungan' => '',
+                                    'Kec' => '',
+                                    'Setting' => '',
+                                    'JenisMutasi' => '',
+                                    'TanggalMutasi' => '',
+                                    'NomorSK' => '',
+                                    'FileSKMutasi' => '',
+                                    'Jabatan' => '',
+                                    'KeteranganJabatan' => '',
+                                    'Siltap' => '0',
+                                    'NoTelp' => ''
+                                ];
+                                $safeData = safeDataRow($DataPegawai, $safeEmployeeSchema);
+                                
+                                $IdPegawaiFK = $safeData['IdPegawaiFK'];
+                                $Foto = $safeData['Foto'];
+                                $NIK = $safeData['NIK'];
+                                $Nama = $safeData['Nama'];
 
-                                $TanggalLahir = $DataPegawai['TanggalLahir'];
-                                $exp = explode('-', $TanggalLahir);
-                                $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+                                // Safe date formatting
+                                $TanggalLahir = $safeData['TanggalLahir'];
+                                $ViewTglLahir = safeDateFormat($TanggalLahir);
 
-                                $TanggalPensiun = $DataPegawai['TanggalPensiun'];
-                                $exp1 = explode('-', $TanggalPensiun);
-                                $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+                                $TanggalPensiun = $safeData['TanggalPensiun'];
+                                $ViewTglPensiun = safeDateFormat($TanggalPensiun);
 
-                                //HITUNG DETAIL TANGGAL PENSIUN
-                                $TglPensiun = date_create($TanggalPensiun);
-                                $TglSekarang = date_create();
-                                $Temp = date_diff($TglSekarang, $TglPensiun);
+                                //HITUNG DETAIL TANGGAL PENSIUN - SAFE VERSION
+                                if (!safeEmpty($TanggalPensiun) && $TanggalPensiun !== '0000-00-00') {
+                                    $TglPensiun = date_create($TanggalPensiun);
+                                    $TglSekarang = date_create();
+                                    $Temp = date_diff($TglSekarang, $TglPensiun);
 
-                                //CEK TANGGAL ASLI SAAT INI
-                                $TglSekarang1 = Date('Y-m-d');
+                                    //CEK TANGGAL ASLI SAAT INI
+                                    $TglSekarang1 = Date('Y-m-d');
 
-                                if ($TglSekarang1 >= $TanggalPensiun) {
-                                    $HasilTahun = 0 . ' Tahun ';
-                                    $HasilBulan = 0 . ' Bulan ';
-                                    $HasilHari = 0 . ' Hari ';
-                                } elseif ($TglSekarang1 < $TanggalPensiun) {
-                                    $HasilTahun = $Temp->y . ' Tahun ';
-                                    $HasilBulan = $Temp->m . ' Bulan ';
-                                    $HasilHari = $Temp->d + 1 . ' Hari ';
+                                    if ($TglSekarang1 >= $TanggalPensiun) {
+                                        $HasilTahun = '0 Tahun ';
+                                        $HasilBulan = '0 Bulan ';
+                                        $HasilHari = '0 Hari ';
+                                    } else {
+                                        $HasilTahun = $Temp->y . ' Tahun ';
+                                        $HasilBulan = $Temp->m . ' Bulan ';
+                                        $HasilHari = ($Temp->d + 1) . ' Hari ';
+                                    }
+                                } else {
+                                    $HasilTahun = 'N/A';
+                                    $HasilBulan = '';
+                                    $HasilHari = '';
                                 }
                                 //SELESAI
 
-                                $JenKel = $DataPegawai['JenKel'];
-                                $KodeDesa = $DataPegawai['KodeDesa'];
-                                $NamaDesa = $DataPegawai['NamaDesa'];
-                                $Kecamatan = $DataPegawai['Kecamatan'];
-                                $Kabupaten = $DataPegawai['Kabupaten'];
-                                $Alamat = $DataPegawai['Alamat'];
-                                $RT = $DataPegawai['RT'];
-                                $RW = $DataPegawai['RW'];
+                                $JenKel = $safeData['JenKel'];
+                                $KodeDesa = safeGet($DataPegawai, 'KodeDesa', '');
+                                $NamaDesa = $safeData['NamaDesa'];
+                                $Kecamatan = $safeData['Kecamatan'];
+                                $Kabupaten = $safeData['Kabupaten'];
+                                $Alamat = $safeData['Alamat'];
+                                $RT = $safeData['RT'];
+                                $RW = $safeData['RW'];
 
-                                $Lingkungan = $DataPegawai['Lingkungan'];
+                                $Lingkungan = $safeData['Lingkungan'];
                                 $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
                                 $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-                                $Komunitas = $LingkunganBPD['NamaDesa'];
+                                $Komunitas = safeGet($LingkunganBPD, 'NamaDesa', '');
 
-                                $KecamatanBPD = $DataPegawai['Kec'];
+                                $KecamatanBPD = $safeData['Kec'];
                                 $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
-                                $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-                                $KomunitasKec = $KecamatanBPD['Kecamatan'];
+                                $KecamatanBPDData = mysqli_fetch_assoc($AmbilKecamatan);
+                                $KomunitasKec = safeGet($KecamatanBPDData, 'Kecamatan', '');
 
                                 $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
-                                $Setting = $DataPegawai['Setting'];
-                                $JenisMutasi = $DataPegawai['JenisMutasi'];
+                                $Setting = $safeData['Setting'];
+                                $JenisMutasi = $safeData['JenisMutasi'];
 
-                                $TglSKMutasi = $DataPegawai['TanggalMutasi'];
-                                $exp2 = explode('-', $TglSKMutasi);
-                                $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
+                                $TglSKMutasi = $safeData['TanggalMutasi'];
+                                $TanggalMutasi = safeDateFormat($TglSKMutasi);
 
-                                $NomorSK = $DataPegawai['NomorSK'];
-                                $SKMutasi = $DataPegawai['FileSKMutasi'];
-                                $Jabatan = $DataPegawai['Jabatan'];
-                                $KetJabatan = $DataPegawai['KeteranganJabatan'];
-                                $Siltap =  number_format($DataPegawai['Siltap'], 0, ",", ".");
-                                $Telp = $DataPegawai['NoTelp'];
+                                $NomorSK = $safeData['NomorSK'];
+                                $SKMutasi = $safeData['FileSKMutasi'];
+                                $Jabatan = $safeData['Jabatan'];
+                                $KetJabatan = $safeData['KeteranganJabatan'];
+                                $Siltap = number_format(safeFloat($safeData['Siltap'], 0), 0, ",", ".");
+                                $Telp = $safeData['NoTelp'];
 
                             ?>
 
@@ -250,28 +289,28 @@ $Kecamatan = $DataQuery['Kecamatan'];
                                     </td>
 
                                     <?php
-                                    if (empty($Foto)) {
+                                    if (safeEmpty($Foto)) {
                                     ?>
                                         <td>
                                             <img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/no-image.jpg">
                                         </td>
                                     <?php } else { ?>
                                         <td>
-                                            <img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo $Foto; ?>">
+                                            <img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo safeHtml($Foto); ?>">
                                         </td>
                                     <?php } ?>
 
                                     <td style="width:350px;">
-                                        <strong><?php echo $Nama; ?></strong><br><br>
-                                        <?php echo $Address; ?>
+                                        <strong><?php echo safeHtml($Nama); ?></strong><br><br>
+                                        <?php echo safeHtml($Address); ?>
                                     </td>
                                     <td style="width:70px;">
                                         <?php echo $ViewTglLahir; ?><br>
                                         <?php
                                         $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
                                         $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-                                        $JenisKelamin = $DataJenKel['Keterangan'];
-                                        echo $JenisKelamin;
+                                        $JenisKelamin = safeGet($DataJenKel, 'Keterangan', 'N/A');
+                                        echo safeHtml($JenisKelamin);
                                         ?>
                                     </td>
                                     <td>

@@ -19,7 +19,7 @@
                     <form action="../App/Model/ExcPegawaiBPDAdminDesa?Act=Edit" method="POST" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-lg-6">
-                                <input type="hidden" name="IdPegawaiFK" id="IdPegawaiFK" value="<?php echo $IdPegawaiFK; ?>" class="form-control" readonly>
+                                <input type="hidden" name="IdPegawaiFK" id="IdPegawaiFK" value="<?php echo htmlspecialchars($IdPegawaiFK); ?>" class="form-control" readonly>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">NIK<span style="font-style: italic; color:red">*</span></label>
                                     <script>
                                         function hanyaAngka(evt) {
@@ -30,15 +30,15 @@
                                             return true;
                                         }
                                     </script>
-                                    <div class="col-lg-8"><input type="text" name="NIK" id="NIK" value="<?php echo $NIK; ?>" placeholder="Masukkan NIK" class="form-control" autocomplete="off" required onkeypress="return hanyaAngka(event)">
+                                    <div class="col-lg-8"><input type="text" name="NIK" id="NIK" value="<?php echo htmlspecialchars($NIK); ?>" placeholder="Masukkan NIK" class="form-control" autocomplete="off" required onkeypress="return hanyaAngka(event)">
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Nama<span style="font-style: italic; color:red">*</span></label>
-                                    <div class="col-lg-8"><input type="text" name="Nama" id="Nama" value="<?php echo $Nama; ?>" placeholder="Masukkan Nama" class="form-control" autocomplete="off" required maxlength="100">
+                                    <div class="col-lg-8"><input type="text" name="Nama" id="Nama" value="<?php echo htmlspecialchars($Nama); ?>" placeholder="Masukkan Nama" class="form-control" autocomplete="off" required maxlength="100">
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Tempat Lahir<span style="font-style: italic; color:red">*</span></label>
-                                    <div class="col-lg-8"><input type="text" name="TempatLahir" id="TempatLahir" value="<?php echo $TempatLahir; ?>" placeholder="Masukkan Tempat Lahir" class="form-control" autocomplete="off" required>
+                                    <div class="col-lg-8"><input type="text" name="TempatLahir" id="TempatLahir" value="<?php echo htmlspecialchars($TempatLahir); ?>" placeholder="Masukkan Tempat Lahir" class="form-control" autocomplete="off" required>
                                     </div>
                                 </div>
                                 <div class="form-group row" id="TanggalLahir">
@@ -46,7 +46,7 @@
                                     <div class="col-lg-4">
                                         <div class="input-group date">
                                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                            <input type="text" name="TanggalLahir" id="TanggalLahir" class="form-control" value="<?php echo $TanggalLahir; ?>">
+                                            <input type="text" name="TanggalLahir" id="TanggalLahir" class="form-control" value="<?php echo htmlspecialchars($TanggalLahir); ?>">
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
@@ -54,17 +54,17 @@
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Alamat</label>
-                                    <div class="col-lg-8"><input type="text" name="Alamat" id="Alamat" value="<?php echo $Alamat; ?>" placeholder=" Masukkan Alamat" class="form-control" autocomplete="off" required>
+                                    <div class="col-lg-8"><input type="text" name="Alamat" id="Alamat" value="<?php echo htmlspecialchars($Alamat); ?>" placeholder=" Masukkan Alamat" class="form-control" autocomplete="off" required>
                                     </div><span style="font-style: italic; color:red">*</span>
                                 </div>
                                 <div class="form-group row"><label class="col-sm-3 col-form-label">RT / RW<span style="font-style: italic; color:red">*</span></label>
                                     <div class="col-sm-9">
                                         <div class="row">
                                             <div class="col-md-3">
-                                                <input type="text" name="RT" id="RT" value="<?php echo $RT; ?>" placeholder="RT" class="form-control" autocomplete="off" required>
+                                                <input type="text" name="RT" id="RT" value="<?php echo htmlspecialchars($RT); ?>" placeholder="RT" class="form-control" autocomplete="off" required>
                                             </div><span style="font-style: italic;">/</span>
                                             <div class="col-md-3">
-                                                <input type="text" name="RW" id="RW" value="<?php echo $RW; ?>" placeholder="RW" class="form-control" autocomplete="off" required>
+                                                <input type="text" name="RW" id="RW" value="<?php echo htmlspecialchars($RW); ?>" placeholder="RW" class="form-control" autocomplete="off" required>
                                             </div>
                                         </div>
                                     </div>
@@ -118,11 +118,11 @@
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Telp</label>
-                                    <div class="col-lg-8"><input type="text" name="Telp" id="Telp" value="<?php echo $Telp; ?>" placeholder="Masukkan No Telp" class="form-control" autocomplete="off">
+                                    <div class="col-lg-8"><input type="text" name="Telp" id="Telp" value="<?php echo htmlspecialchars($Telp); ?>" placeholder="Masukkan No Telp" class="form-control" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Email</label>
-                                    <div class="col-lg-8"><input type="email" name="Email" id="Email" value="<?php echo $Email; ?>" placeholder="contoh@gmail.com" class="form-control" autocomplete="off">
+                                    <div class="col-lg-8"><input type="email" name="Email" id="Email" value="<?php echo htmlspecialchars($Email); ?>" placeholder="contoh@gmail.com" class="form-control" autocomplete="off">
                                     </div>
                                 </div>
 
@@ -131,7 +131,7 @@
                                         <?php if (empty($Foto)) { ?>
                                             <img style="width:190px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/no-image.jpg">
                                         <?php } else { ?>
-                                            <img style="width:190px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo $Foto; ?>">
+                                            <img style="width:190px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo htmlspecialchars($Foto); ?>">
                                         <?php } ?>
                                     </div>
                                 </div>

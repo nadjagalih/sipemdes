@@ -71,7 +71,7 @@
             <div class="col-lg-12">
                 <div class="ibox ">
                     <div class="ibox-title">
-                        <h5>Hasil Data Filter BPD Desa Kecamatan <?php echo $NamaKecamatan; ?></h5>
+                        <h5>Hasil Data Filter BPD Desa Kecamatan <?php echo htmlspecialchars(NamaKecamatan); ?></h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -168,41 +168,41 @@
 
                                         <tr class="gradeX">
                                             <td>
-                                                <?php echo $Nomor; ?>
+                                                <?php echo htmlspecialchars(Nomor); ?>
                                             </td>
 
                                             <?php
                                             if (empty($Foto)) {
                                             ?>
                                                 <td>
-                                                    <a href="?pg=BPDViewFoto&Kode=<?php echo $IdPegawaiFK; ?>" title="Edit Foto"><img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/no-image.jpg"></a>
+                                                    <a href="?pg=BPDViewFoto&Kode=<?php echo htmlspecialchars(IdPegawaiFK); ?>" title="Edit Foto"><img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/no-image.jpg"></a>
                                                 </td>
                                             <?php } else { ?>
                                                 <td>
-                                                    <a href="?pg=BPDViewFoto&Kode=<?php echo $IdPegawaiFK; ?>" title="Edit Foto"><img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo $Foto; ?>"></a>
+                                                    <a href="?pg=BPDViewFoto&Kode=<?php echo htmlspecialchars(IdPegawaiFK); ?>" title="Edit Foto"><img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo htmlspecialchars(Foto); ?>"></a>
                                                 </td>
                                             <?php } ?>
 
                                             <td>
-                                                <?php echo $NIK; ?>
+                                                <?php echo htmlspecialchars(NIK); ?>
                                             </td>
                                             <td>
-                                                <strong><?php echo $Nama; ?></strong><br><br>
-                                                <?php echo $Address; ?>
+                                                <strong><?php echo htmlspecialchars(Nama); ?></strong><br><br>
+                                                <?php echo htmlspecialchars(Address); ?>
                                             </td>
                                             <td>
-                                                <?php echo $ViewTglLahir; ?><br>
+                                                <?php echo htmlspecialchars(ViewTglLahir); ?><br>
                                                 <?php
                                                 $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
                                                 $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
                                                 $JenisKelamin = $DataJenKel['Keterangan'];
-                                                echo $JenisKelamin;
+                                                echo htmlspecialchars(JenisKelamin);
                                                 ?>
                                             </td>
                                             <td>
-                                                <?php echo $NamaDesa; ?><br>
-                                                <?php echo $Kecamatan; ?><br>
-                                                <?php echo $Kabupaten; ?>
+                                                <?php echo htmlspecialchars(NamaDesa); ?><br>
+                                                <?php echo htmlspecialchars(Kecamatan); ?><br>
+                                                <?php echo htmlspecialchars(Kabupaten); ?>
                                             </td>
                                         </tr>
                                     <?php $Nomor++;

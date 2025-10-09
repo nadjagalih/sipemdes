@@ -10,7 +10,7 @@ $Kecamatan = $DataQuery['Kecamatan'];
         <div class="col-lg-12">
             <div class="ibox ">
                 <div class="ibox-title">
-                    <h5>Filter Data BPD Desa PerDesa Kecamatan <?php echo htmlspecialchars(Kecamatan); ?></h5>
+                    <h5>Filter Data BPD Desa PerDesa Kecamatan <?php echo htmlspecialchars($Kecamatan); ?></h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>

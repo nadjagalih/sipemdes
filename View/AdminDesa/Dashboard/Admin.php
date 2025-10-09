@@ -842,7 +842,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
     }
 </style>
 
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         // Add mini-navbar class by default
         document.body.classList.add('mini-navbar');
@@ -1249,7 +1249,13 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
     // Purple theme color palette
     const purpleColors = ['#6f42c1', '#1bcfb4', '#fd397a', '#ffb822', '#0084ff', '#17a2b8', '#28a745'];
     
-    Highcharts.chart('StatistikPendidikan', {
+    function createStatistikPendidikan() {
+        if (typeof Highcharts === 'undefined') {
+            console.error('Highcharts not loaded for StatistikPendidikan');
+            return;
+        }
+        
+        Highcharts.chart('StatistikPendidikan', {
         chart: {
             type: 'pie',
             backgroundColor: 'transparent',
@@ -1389,10 +1395,22 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             <?php } ?>
         ]}]
     });
+    }
+    
+    // Initialize chart when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(createStatistikPendidikan, 500);
+    });
 </script>
 
 <script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
-    Highcharts.chart('StatistikJabatan', {
+    function createStatistikJabatan() {
+        if (typeof Highcharts === 'undefined') {
+            console.error('Highcharts not loaded for StatistikJabatan');
+            return;
+        }
+        
+        Highcharts.chart('StatistikJabatan', {
         chart: {
             type: 'column',
             style: {
@@ -1543,10 +1561,22 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             <?php } ?>
         ]
     });
+    }
+    
+    // Initialize chart when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(createStatistikJabatan, 1000);
+    });
 </script>
 
 <script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
-    Highcharts.chart('StatistikBPD', {
+    function createStatistikBPD() {
+        if (typeof Highcharts === 'undefined') {
+            console.error('Highcharts not loaded for StatistikBPD');
+            return;
+        }
+        
+        Highcharts.chart('StatistikBPD', {
         chart: {
             type: 'column',
             style: {
@@ -1704,10 +1734,16 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             <?php } ?>
         ]
     });
+    }
+    
+    // Initialize chart when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(createStatistikBPD, 1500);
+    });
 </script>
 
 <!-- Leaflet Map Script -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Initialize the map after the page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Koordinat dari database atau default jika belum diset
@@ -1807,7 +1843,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
 </script>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Force pace loading to complete after page is fully loaded
     window.addEventListener('load', function() {
         // Wait a bit for all scripts to finish

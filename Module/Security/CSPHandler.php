@@ -36,7 +36,12 @@ class CSPHandler {
             "form-action 'self'"
         ];
         
-        header("Content-Security-Policy: " . implode('; ', $csp));
+        $cspHeader = implode('; ', $csp);
+        header("Content-Security-Policy: " . $cspHeader);
+        
+        // Debug: log the CSP header and nonce
+        error_log("CSP Header: " . $cspHeader);
+        error_log("CSP Nonce: " . $nonce);
     }
     
     /**

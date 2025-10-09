@@ -1,8 +1,14 @@
 <?php
-if (empty($_GET['alert'])) {
-    echo "";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
-    echo "<script type='text/javascript'>
+// Include security handler for CSP nonce
+require_once "../Module/Security/CSPHandler.php";
+
+// Use CSPHandler nonce for script tags
+$nonce = CSPHandler::getNonce();
+
+$alertScript = '';
+if (!empty($_GET['alert'])) {
+    if ($_GET['alert'] == 'Sukses') {
+        $alertScript = "
             setTimeout(function () {
                 swal({
                     title: 'Sukses Ajukan SK Pensiun',
@@ -10,9 +16,9 @@ if (empty($_GET['alert'])) {
                     type: 'success'
                 });
             }, 100);
-          </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
-    echo "<script type='text/javascript'>
+        ";
+    } elseif ($_GET['alert'] == 'Gagal') {
+        $alertScript = "
             setTimeout(function () {
                 swal({
                     title: 'Gagal Ajukan SK Pensiun',
@@ -20,7 +26,8 @@ if (empty($_GET['alert'])) {
                     type: 'warning'
                 });
             }, 100);
-          </script>";
+        ";
+    }
 }
 
 include "../App/Control/FunctionProfileDinasView.php";
@@ -246,7 +253,6 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
     echo "<!-- Using final fallback default -->";
 }
 ?>
-
 
 <!-- Purple Theme Assets -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
@@ -824,6 +830,11 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
         animation: pulse 2s infinite;
     }
     
+    /* Close notification button hover effect */
+    .close-notification-btn:hover {
+        background: rgba(255,255,255,0.2) !important;
+    }
+    
     @keyframes pulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.05); }
@@ -953,7 +964,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                     </div>
                 </div>
                 <div class="notification-actions" style="display: flex; align-items: center; gap: 10px;">
-                    <button onclick="closeNotificationBar()" style="
+                    <button class="close-notification-btn" style="
                         background: none;
                         border: none;
                         color: white;
@@ -967,8 +978,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                         align-items: center;
                         justify-content: center;
                         transition: all 0.3s ease;
-                    " onmouseover="this.style.background='rgba(255,255,255,0.2)'" 
-                       onmouseout="this.style.background='none'">
+                    ">>
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -1866,6 +1876,12 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
     
     // Check apakah notification bar dengan konten yang sama sudah di-close dan belum expired
     document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener for close notification button
+        const closeBtn = document.querySelector('.close-notification-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeNotificationBar);
+        }
+        
         const notifBar = document.querySelector('.notification-bar');
         if (notifBar) {
             const isPersistent = notifBar.getAttribute('data-persistent') === 'true';
@@ -1946,4 +1962,9 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             sessionStorage.removeItem('awardBarTempClosed');
         }
     });
+    
+    // Execute alert script if available
+    <?php if (!empty($alertScript)): ?>
+    <?php echo $alertScript; ?>
+    <?php endif; ?>
 </script>

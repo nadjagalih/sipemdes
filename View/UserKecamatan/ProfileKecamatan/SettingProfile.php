@@ -509,13 +509,13 @@ if (!safeEmpty($alert)) {
                                     Koordinat Saat Ini
                                 </h6>
                                 <div class="coordinate-display">
-                                    <div>Latitude: <span id="currentLat"><?php echo $currentLatitude ?: 'Belum diset'; ?></span></div>
-                                    <div>Longitude: <span id="currentLng"><?php echo $currentLongitude ?: 'Belum diset'; ?></span></div>
+                                    <div>Latitude: <span id="currentLat"><?php echo htmlspecialchars($currentLatitude ?: 'Belum diset', ENT_QUOTES, 'UTF-8'); ?></span></div>
+                                    <div>Longitude: <span id="currentLng"><?php echo htmlspecialchars($currentLongitude ?: 'Belum diset', ENT_QUOTES, 'UTF-8'); ?></span></div>
                                 </div>
                             </div>
 
-                            <input type="hidden" name="Latitude" id="Latitude" value="<?php echo $currentLatitude; ?>">
-                            <input type="hidden" name="Longitude" id="Longitude" value="<?php echo $currentLongitude; ?>">
+                            <input type="hidden" name="Latitude" id="Latitude" value="<?php echo htmlspecialchars($currentLatitude, ENT_QUOTES, 'UTF-8'); ?>">
+                            <input type="hidden" name="Longitude" id="Longitude" value="<?php echo htmlspecialchars($currentLongitude, ENT_QUOTES, 'UTF-8'); ?>">
 
                             <!-- Tombol -->
                             <div style="margin-top: 1.5rem;">
@@ -578,8 +578,8 @@ if (!safeEmpty($alert)) {
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Koordinat default (Indonesia/Jawa)
-        var defaultLat = <?php echo !empty($currentLatitude) ? $currentLatitude : '-8.055'; ?>;
-        var defaultLng = <?php echo !empty($currentLongitude) ? $currentLongitude : '111.715'; ?>;
+        var defaultLat = <?php echo !empty($currentLatitude) && is_numeric($currentLatitude) ? $currentLatitude : '-8.055'; ?>;
+        var defaultLng = <?php echo !empty($currentLongitude) && is_numeric($currentLongitude) ? $currentLongitude : '111.715'; ?>;
 
         // Initialize map
         var map = L.map('koordinatMap').setView([defaultLat, defaultLng], 13);
@@ -756,7 +756,7 @@ if (!safeEmpty($alert)) {
                 draggable: true
             }).addTo(map);
 
-            marker.bindPopup('<b><?php echo $namaDesa; ?></b><br>Lokasi saat ini').openPopup();
+            marker.bindPopup('<b><?php echo addslashes(htmlspecialchars($namaKecamatan, ENT_QUOTES, 'UTF-8')); ?></b><br>Lokasi saat ini').openPopup();
 
             // Event ketika marker di-drag
             marker.on('dragend', function(e) {
@@ -780,7 +780,7 @@ if (!safeEmpty($alert)) {
                 draggable: true
             }).addTo(map);
 
-            marker.bindPopup('<b><?php echo $namaDesa; ?></b><br>Lokasi baru').openPopup();
+            marker.bindPopup('<b><?php echo addslashes(htmlspecialchars($namaKecamatan, ENT_QUOTES, 'UTF-8')); ?></b><br>Lokasi baru').openPopup();
 
             // Update koordinat
             updateCoordinates(lat, lng);

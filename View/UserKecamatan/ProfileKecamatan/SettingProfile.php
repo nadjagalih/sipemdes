@@ -1,15 +1,19 @@
 <?php
-// Setting Profile Admin Desa - View dan Process
+// Setting Profile Admin Kecamatan - View dan Process
+// Include safe helpers for production-ready error handling
+require_once __DIR__ . '/../../../helpers/safe_helpers.php';
+
 ob_start(); // Start output buffering
-session_start();
+safeSessionStart();
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 // Include files
 include_once "../App/Control/FunctionSettingProfileAdminKecamatan.php";
 
-// Alert Handler seperti di PegawaiViewAll.php
-if (isset($_GET['alert'])) {
-    if (isset($_GET['alert']) && $_GET['alert'] == 'Edit') {
+// Alert Handler dengan safe GET access
+$alert = safeGetParam('alert');
+if (!safeEmpty($alert)) {
+    if ($alert == 'Edit') {
         echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -20,7 +24,7 @@ if (isset($_GET['alert'])) {
                 });
             },10);
         </script>";
-    } elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
+    } elseif ($alert == 'Gagal') {
         echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -31,7 +35,7 @@ if (isset($_GET['alert'])) {
                 });
             },10);
         </script>";
-    } elseif (isset($_GET['alert']) && $_GET['alert'] == 'ErrorTelepon') {
+    } elseif ($alert == 'ErrorTelepon') {
         echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -42,7 +46,7 @@ if (isset($_GET['alert'])) {
                 });
             },10);
         </script>";
-    } elseif (isset($_GET['alert']) && $_GET['alert'] == 'ErrorKoordinat') {
+    } elseif ($alert == 'ErrorKoordinat') {
         echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({

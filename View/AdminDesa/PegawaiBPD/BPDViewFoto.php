@@ -90,8 +90,8 @@
                         <div class="col-sm-6 b-r">
                             <h3 class="m-t-none m-b">Masukkan Foto</h3>
                             <form action="../App/Model/ExcPegawaiBPDAdminDesa?Act=Foto" method="POST" enctype="multipart/form-data">
-                                <p><input type="hidden" name="IdPegawaiFK" id="IdPegawaiFK" value="<?php echo $IdPegawaiFK; ?>" class="form-control" readonly></p>
-                                <input type="hidden" name="NamaLama" id="NamaLama" value="<?php echo $Foto; ?>" readonly>
+                                <p><input type="hidden" name="IdPegawaiFK" id="IdPegawaiFK" value="<?php echo htmlspecialchars($IdPegawaiFK); ?>" class="form-control" readonly></p>
+                                <input type="hidden" name="NamaLama" id="NamaLama" value="<?php echo htmlspecialchars($Foto); ?>" readonly>
 
                                 <!-- PREVIEW UPLOAD FOTO -->
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Foto</label>
@@ -120,7 +120,7 @@
                                     <?php if (empty($Foto)) { ?>
                                         <img style="width:190px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/no-image.jpg">
                                     <?php } else { ?>
-                                        <img style="width:190px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo $Foto; ?>">
+                                        <img style="width:190px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo htmlspecialchars($Foto); ?>">
                                     <?php } ?>
                                 </div>
                             </div>

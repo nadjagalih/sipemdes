@@ -10,7 +10,7 @@ $Kecamatan = $DataQuery['Kecamatan'];
         <div class="col-lg-12">
             <div class="ibox ">
                 <div class="ibox-title">
-                    <h5>Filter Data BPD Desa PerDesa Kecamatan <?php echo $Kecamatan; ?></h5>
+                    <h5>Filter Data BPD Desa PerDesa Kecamatan <?php echo htmlspecialchars(Kecamatan); ?></h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -41,7 +41,7 @@ $Kecamatan = $DataQuery['Kecamatan'];
                                         $QueryDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdKecamatanFK = '$IdKec' ORDER BY NamaDesa ASC");
                                         while ($RowDesa = mysqli_fetch_assoc($QueryDesa)) {
                                         ?>
-                                            <option value="<?php echo $RowDesa['IdDesa']; ?>"> <?php echo  $RowDesa['NamaDesa']; ?></option>;
+                                            <option value="<?php echo htmlspecialchars(safeGet($RowDesa, 'IdDesa')); ?>"> <?php echo htmlspecialchars(safeGet($RowDesa, 'NamaDesa')); ?></option>;
                                         <?php
                                         }
                                         ?>

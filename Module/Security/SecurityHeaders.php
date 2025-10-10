@@ -54,8 +54,10 @@ class SecurityHeaders {
         // Prevent MIME type sniffing
         header('X-Content-Type-Options: nosniff');
         
-        // HSTS - Force HTTPS for 1 year
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+        // HSTS - Force HTTPS for 1 year (always set in production)
+        if (!self::isDevelopmentMode()) {
+            header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
+        } else if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
         }
         
@@ -70,13 +72,29 @@ class SecurityHeaders {
      * Set secure session configuration
      */
     public static function setSecureSession() {
+        // Force HTTPS for production security
+        if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+            // Allow localhost and development environments
+            $isLocalhost = (
+                $_SERVER['HTTP_HOST'] === 'localhost' || 
+                strpos($_SERVER['HTTP_HOST'], '127.0.0.1') === 0 ||
+                strpos($_SERVER['HTTP_HOST'], '::1') === 0
+            );
+            
+            if (!$isLocalhost && !self::isDevelopmentMode()) {
+                $redirectURL = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+                header("Location: $redirectURL", true, 301);
+                exit();
+            }
+        }
+        
         // Set secure session parameters
         if (session_status() === PHP_SESSION_NONE) {
             session_set_cookie_params([
                 'lifetime' => 3600, // 1 hour
                 'path' => '/',
                 'domain' => '',
-                'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+                'secure' => true, // Always secure in production
                 'httponly' => true,
                 'samesite' => 'Strict'
             ]);
@@ -90,5 +108,26 @@ class SecurityHeaders {
                 $_SESSION['created'] = time();
             }
         }
+    }
+    
+    /**
+     * Check if application is in development mode
+     */
+    private static function isDevelopmentMode() {
+        // Check common development indicators
+        if (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] === 'localhost') {
+            return true;
+        }
+        if (isset($_SERVER['HTTP_HOST']) && (
+            strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
+            strpos($_SERVER['HTTP_HOST'], '.local') !== false
+        )) {
+            return true;
+        }
+        if (isset($_SERVER['DOCUMENT_ROOT']) && strpos($_SERVER['DOCUMENT_ROOT'], 'xampp') !== false) {
+            return true;
+        }
+        
+        return false;
     }
 }

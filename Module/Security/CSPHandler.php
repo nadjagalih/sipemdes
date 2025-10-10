@@ -54,4 +54,35 @@ class CSPHandler {
     public static function scriptNonce() {
         return 'nonce="' . self::getNonce() . '"';
     }
+    
+    /**
+     * Get SRI (Subresource Integrity) attributes for external resources
+     */
+    public static function getSRI() {
+        return [
+            // jQuery 3.7.1
+            'jquery-3.7.1' => 'sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs',
+            
+            // Leaflet 1.9.4
+            'leaflet-1.9.4-css' => 'sha384-xzAm8b7LBz5Zzxh6UzJvJK0xj35GGl3VgcCl7CGkL3D5lCNaGIB3QVhqYB6Q+f6z',
+            'leaflet-1.9.4-js' => 'sha384-Q0ZbcA6LjD8xT6TL9V6hH2pKlhm0WGmyFXjGRZnKHjt2z9aT5F9S8b7jt6l6v5',
+            
+            // FontAwesome 5.15.4
+            'fontawesome-5.15.4' => 'sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm',
+            
+            // SweetAlert
+            'sweetalert' => 'sha384-VUqOCbXMiN6UrLaA0CtM5z7b5Nd1xKoRb2YHhvfgq1Q6Fl5+tKmlvU1C6oX7J+XN'
+        ];
+    }
+    
+    /**
+     * Get SRI attribute string for a resource
+     */
+    public static function sriAttribute($resourceKey) {
+        $sriHashes = self::getSRI();
+        if (isset($sriHashes[$resourceKey])) {
+            return 'integrity="' . $sriHashes[$resourceKey] . '" crossorigin="anonymous"';
+        }
+        return '';
+    }
 }

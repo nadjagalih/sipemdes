@@ -118,7 +118,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Email</label>
-                                    <div class="col-lg-8"><input type="email" name="Email" id="Email" placeholder="contoh@gmail.com" class="form-control" autocomplete="off">
+                                    <div class="col-lg-8"><input type="email" name="Email" id="Email" placeholder="user@example.com" class="form-control" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Foto Saat Ini</label>

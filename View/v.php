@@ -56,7 +56,7 @@ $_SESSION['start_time'] = time();
     <link href="../Vendor/Assets/sweetalert/sweetalert.css" rel="stylesheet">
 
     <!-- View Foto -->
-    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/foto-view/jquery-2.2.4.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/foto-view/jquery-3.7.1.min.js"></script>
 
     <!-- Charts -->
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Charts/code/highcharts.js"></script>
@@ -109,7 +109,7 @@ $_SESSION['start_time'] = time();
     </div>
 
     <!-- Mainly scripts -->
-    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/jquery-3.1.1.min.js"></script>
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/jquery-3.7.1.min.js"></script>
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/popper.min.js"></script>
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/bootstrap.js"></script>
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/metisMenu/jquery.metisMenu.js"></script>

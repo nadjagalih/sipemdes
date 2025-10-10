@@ -81,8 +81,8 @@ if (!safeEmpty($alert)) {
 <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
 
 <!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script <?php echo CSPHandler::scriptNonce(); ?> src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="../../../Vendor/External/leaflet/leaflet.css" />
+<script <?php echo CSPHandler::scriptNonce(); ?> src="../../../Vendor/External/leaflet/leaflet.js"></script>
 
 <!-- SweetAlert -->
 <script <?php echo CSPHandler::scriptNonce(); ?> src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -467,6 +467,7 @@ if (!safeEmpty($alert)) {
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="container-fluid">
         <form action="../App/Model/ExcSettingProfileAdminKecamatan.php?Act=Save" method="POST" id="koordinatForm">
+            <?php echo CSRFProtection::getTokenField(); ?>
             <div class="row">
                 <div class="col-lg-4">
                     <div class="ibox ">

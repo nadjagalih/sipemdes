@@ -11,11 +11,11 @@ include "../App/Control/FunctionDesaEdit.php";
 
 <!-- Bootstrap CSS -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="../Assets/css/local-fonts.css" rel="stylesheet">
 <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
 
 <!-- jQuery -->
-<script <?php echo CSPHandler::scriptNonce(); ?> src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script <?php echo CSPHandler::scriptNonce(); ?> src="../../Vendor/Assets/js/jquery-3.7.1.min.js"></script>
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
@@ -29,8 +29,9 @@ include "../App/Control/FunctionDesaEdit.php";
         onload="console.log('Leaflet JS loaded successfully')"
         onerror="console.error('Failed to load Leaflet JS')"></script>
 
-<!-- SweetAlert -->
-<script <?php echo CSPHandler::scriptNonce(); ?> src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<!-- SweetAlert2 -->
+<link href="../Assets/sweetalert/sweetalert2.min.css" rel="stylesheet">
+<script <?php echo CSPHandler::scriptNonce(); ?> src="../Assets/sweetalert/sweetalert2.min.js"></script>
 
 <style>
     /* Map Container Styles */

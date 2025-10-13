@@ -152,7 +152,8 @@ $_SESSION['start_time'] = time();
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/dataTables/dataTables.bootstrap4.min.js"></script>
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/select2/select2.full.min.js"></script>
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/datapicker/bootstrap-datepicker.js"></script>
-    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/sweetalert/sweetalert.min.js"></script>
+    <link href="../Vendor/Assets/sweetalert/sweetalert2.min.css" rel="stylesheet">
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/sweetalert/sweetalert2.min.js"></script>
 
     <script <?php echo CSPHandler::scriptNonce(); ?>>
         $(document).ready(function() {

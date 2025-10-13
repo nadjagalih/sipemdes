@@ -409,7 +409,7 @@ $totalPages = ceil($totalUsers / $limit);
         </div>
     </div>
 
-    <script src="Vendor/Assets/js/jquery-3.1.1.min.js"></script>
+    <script src="Vendor/Assets/js/jquery-3.7.1.min.js"></script>
     <script src="Vendor/Assets/js/popper.min.js"></script>
     <script src="Vendor/Assets/js/bootstrap.js"></script>
 

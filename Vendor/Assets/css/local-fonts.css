@@ -1,0 +1,38 @@
+/* 
+ * Local Font Fallback - Mengganti Google Fonts untuk Keamanan
+ * Font Ubuntu diganti dengan font system yang aman
+ */
+
+body, html {
+    font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+                 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol' !important;
+}
+
+/* Font weight variants */
+.font-weight-300 {
+    font-weight: 300;
+}
+
+.font-weight-400 {
+    font-weight: 400;
+}
+
+.font-weight-500 {
+    font-weight: 500;
+}
+
+.font-weight-700 {
+    font-weight: 700;
+}
+
+/* Fallback untuk font Ubuntu yang digunakan */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+                 'Helvetica Neue', Arial, sans-serif !important;
+}
+
+/* Untuk teks body */
+p, span, div, a, button, input, textarea {
+    font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+                 'Helvetica Neue', Arial, sans-serif !important;
+}

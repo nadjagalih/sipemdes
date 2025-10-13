@@ -977,8 +977,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        transition: all 0.3s ease;
-                    ">>
+                        transition: all 0.3s ease;">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>

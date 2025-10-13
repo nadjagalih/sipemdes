@@ -38,7 +38,7 @@ return [
         'session' => [
             'timeout' => 3600, // 1 hour
             'regenerate_interval' => 1800, // 30 minutes
-            'cookie_secure' => false, // Set to true for HTTPS
+            'cookie_secure' => true, // Always secure for production - SECURITY FIX
             'cookie_httponly' => true,
             'cookie_samesite' => 'Strict'
         ],

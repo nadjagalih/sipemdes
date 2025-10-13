@@ -82,7 +82,7 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                 <th>No</th>
                                 <th>Nama File</th>
                                 <th>Kategori</th>
-                                <th>File</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -101,7 +101,11 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                         <td>{$Nomor}</td>
                                         <td>{$row['Nama']}</td>
                                         <td>{$row['KategoriFile']}</td>
-                                        <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
+                                        <td>
+                                            <a href='{$downloadDir}Module/File/View.php?id={$row['IdFile']}' target='_blank' class='btn btn-info btn-sm'>
+                                                <i class='fa fa-eye'></i> Lihat File
+                                            </a>
+                                        </td>
                                     </tr>";
                                 $Nomor++;
                             }
@@ -127,7 +131,7 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                 <th>Nama File</th>
                                 <th>Kategori</th>
                                 <th>Desa</th>
-                                <th>File</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -148,7 +152,11 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                         <td>{$row['Nama']}</td>
                                         <td>{$row['KategoriFile']}</td>
                                         <td>{$row['NamaDesa']}</td>
-                                        <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
+                                        <td>
+                                            <a href='{$downloadDir}Module/File/View.php?id={$row['IdFile']}' target='_blank' class='btn btn-info btn-sm'>
+                                                <i class='fa fa-eye'></i> Lihat File
+                                            </a>
+                                        </td>
                                     </tr>";
                                 $Nomor++;
                             }

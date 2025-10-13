@@ -1,7 +1,15 @@
 <?php
+// Mulai output buffering untuk mencegah header error
+ob_start();
+
+// Generate CSRF token jika belum ada
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// Basic alert handling tanpa header redirect untuk menghindari error
 if (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
-    echo
-        "<script type='text/javascript'>
+    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
                     setTimeout(function () {
                     swal({
                       title: 'SUKSES',
@@ -17,13 +25,48 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
         </script>";
 } else
 if (isset($_GET['alert']) && $_GET['alert'] == 'Panjang') {
-    echo
-        "<script type='text/javascript'>
+    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
                     setTimeout(function () {
                     swal({
                       title: 'INFORMATION',
-                      text:  'Panjang Minimal Password 5 Karakter',
+                      text:  'Panjang Minimal Password 8 Karakter',
                       type: 'warning',
+                      showConfirmButton: true
+                     });
+                    },10);
+        </script>";
+} else
+if (isset($_GET['alert']) && $_GET['alert'] == 'CSRFError') {
+    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
+                    setTimeout(function () {
+                    swal({
+                      title: 'ERROR',
+                      text:  'Token keamanan tidak valid. Silakan coba lagi.',
+                      type: 'error',
+                      showConfirmButton: true
+                     });
+                    },10);
+        </script>";
+} else
+if (isset($_GET['alert']) && $_GET['alert'] == 'PasswordSalah') {
+    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
+                    setTimeout(function () {
+                    swal({
+                      title: 'ERROR',
+                      text:  'Password lama yang Anda masukkan salah',
+                      type: 'error',
+                      showConfirmButton: true
+                     });
+                    },10);
+        </script>";
+} else
+if (isset($_GET['alert']) && $_GET['alert'] == 'DatabaseError') {
+    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
+                    setTimeout(function () {
+                    swal({
+                      title: 'ERROR',
+                      text:  'Gagal menyimpan password ke database. Silakan coba lagi.',
+                      type: 'error',
                       showConfirmButton: true
                      });
                     },10);
@@ -59,12 +102,19 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Panjang') {
                     <h5>Form Ganti Password</h5>
                 </div>
                 <div class="ibox-content">
-                    <form action="../App/Model/ExcPassword?Act=Pass" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" class="form-control" name="IdUser" id="IdUser" value="<?php echo $_SESSION['IdUser']; ?>">
-                        <div class="form-group row"><label class="col-lg-4 col-form-label">Password Baru</label>
+                    <form action="../App/Model/ExcPassword?Act=Pass" method="POST" enctype="multipart/form-data" id="passwordForm">
+                        <!-- CSRF Protection (hidden untuk compatibility) -->
+                        <input type="hidden" name="csrf_token" value="<?php echo isset($_SESSION['csrf_token']) ? $_SESSION['csrf_token'] : ''; ?>">
+                        
+                        <!-- Hidden User ID -->
+                        <input type="hidden" class="form-control" name="IdUser" id="IdUser" value="<?php echo isset($_SESSION['IdUser']) ? htmlspecialchars($_SESSION['IdUser']) : ''; ?>">
+                        
+                        <!-- Password Baru (desain lama) -->
+                        <div class="form-group row">
+                            <label class="col-lg-4 col-form-label">Password Baru</label>
                             <div class="col-lg-8">
-                                <input type="password" class="form-control" name="PasswordBaru" id="PasswordBaru" placeholder="Password Baru" autocomplete="off" required>
-                                <span class="form-text m-b-none" style="font-style: italic;">*) Minimal Panjang Password 5 Karakter</span>
+                                <input type="password" class="form-control" name="PasswordBaru" id="PasswordBaru" placeholder="Password Baru" autocomplete="off" required minlength="8">
+                                <span class="form-text m-b-none" style="font-style: italic;">*) Minimal Panjang Password 8 Karakter</span>
                             </div>
                         </div>
 
@@ -80,3 +130,30 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Panjang') {
         </div>
     </div>
 </div>
+
+<!-- Simple validation script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('passwordForm');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const password = document.getElementById('PasswordBaru').value;
+            
+            // Simple length validation
+            if (password.length < 8) {
+                e.preventDefault();
+                alert('Password minimal 8 karakter');
+                return false;
+            }
+            
+            return true;
+        });
+    }
+});
+</script>
+
+<?php
+// Flush output buffer
+ob_end_flush();
+?>

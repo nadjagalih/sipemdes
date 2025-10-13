@@ -137,9 +137,6 @@ if ($_GET['pg'] == 'PegawaiDetailPendidikan') {
 if ($_GET['pg'] == 'PegawaiEditPendidikan') {
     include "Pendidikan/PegawaiEditPendidikan.php";
 }
-if ($_GET['pg'] == 'PegawaiEditPendidikan') {
-    include "Pendidikan/PegawaiEditPendidikan.php";
-}
 
 //MUTASI
 if ($_GET['pg'] == 'ViewMutasi') {

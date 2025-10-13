@@ -1,5 +1,5 @@
 <?php
-require_once '../../../Module/Security/CSPHandler.php';
+require_once '../Module/Security/CSPHandler.php';
 $QProfile = mysqli_query($db, "SELECT * FROM master_Setting_profile_dinas");
 $DataProfile = mysqli_fetch_assoc($QProfile);
 $Kabupaten = $DataProfile['Kabupaten'];

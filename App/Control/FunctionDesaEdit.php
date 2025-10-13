@@ -1,4 +1,8 @@
 <?php
+// Include safe helpers and database connection
+require_once __DIR__ . '/../../helpers/safe_helpers.php';
+require_once __DIR__ . '/../../Module/Config/Env.php';
+
 if (isset($_GET['Kode'])) {
     $IdTemp = sql_url($_GET['Kode']);
 
@@ -13,6 +17,7 @@ if (isset($_GET['Kode'])) {
     master_desa.Latitude,
     master_desa.Longitude,
     master_kecamatan.IdKecamatan,
+    master_kecamatan.KodeKecamatan,
     master_kecamatan.Kecamatan,
     master_setting_profile_dinas.IdKabupatenProfile,
     master_setting_profile_dinas.Kabupaten
@@ -23,16 +28,32 @@ if (isset($_GET['Kode'])) {
     WHERE master_desa.IdDesa = '$IdTemp' ");
     $EditDesa = mysqli_fetch_assoc($QueryEditDesa);
 
-    $EditIdKabupaten = $EditDesa['IdKabupatenFK'];
-    $EditKabupaten = $EditDesa['Kabupaten'];
-    $EditIdKecamatan = $EditDesa['IdKecamatan'];
-    $EditKodeKecamatan = $EditDesa['KodeKecamatan'];
-    $EditNamaKecamatan = $EditDesa['Kecamatan'];
-    $EditIdDesa = $EditDesa['IdDesa'];
-    $EditKodeDesa = $EditDesa['KodeDesa'];
-    $EditNamaDesa = $EditDesa['NamaDesa'];
-    $EditAlamatDesa = $EditDesa['AlamatDesa'];
-    $EditNoTelepon = $EditDesa['NoTelepon'];
-    $EditLatitude = $EditDesa['Latitude'];
-    $EditLongitude = $EditDesa['Longitude'];
+    // Safe array access with fallback values
+    $EditIdKabupaten = safeGet($EditDesa, 'IdKabupatenFK', '');
+    $EditKabupaten = safeGet($EditDesa, 'Kabupaten', '');
+    $EditIdKecamatan = safeGet($EditDesa, 'IdKecamatan', '');
+    $EditKodeKecamatan = safeGet($EditDesa, 'KodeKecamatan', '');
+    $EditNamaKecamatan = safeGet($EditDesa, 'Kecamatan', '');
+    $EditIdDesa = safeGet($EditDesa, 'IdDesa', '');
+    $EditKodeDesa = safeGet($EditDesa, 'KodeDesa', '');
+    $EditNamaDesa = safeGet($EditDesa, 'NamaDesa', '');
+    $EditAlamatDesa = safeGet($EditDesa, 'AlamatDesa', '');
+    $EditNoTelepon = safeGet($EditDesa, 'NoTelepon', '');
+    $EditLatitude = safeGet($EditDesa, 'Latitude', '');
+    $EditLongitude = safeGet($EditDesa, 'Longitude', '');
+} else {
+    // Initialize empty values if no Kode parameter
+    $EditIdKabupaten = '';
+    $EditKabupaten = '';
+    $EditIdKecamatan = '';
+    $EditKodeKecamatan = '';
+    $EditNamaKecamatan = '';
+    $EditIdDesa = '';
+    $EditKodeDesa = '';
+    $EditNamaDesa = '';
+    $EditAlamatDesa = '';
+    $EditNoTelepon = '';
+    $EditLatitude = '';
+    $EditLongitude = '';
 }
+?>

@@ -1,4 +1,7 @@
 <?php
+// Include safe helpers
+require_once __DIR__ . '/../../helpers/safe_helpers.php';
+
 if (isset($_GET['Kode'])) {
     $IdTemp = sql_url($_GET['Kode']);
 
@@ -20,15 +23,30 @@ WHERE
 	main_user_kecamatan.IdUser = '$IdTemp'");
     $EditUser = mysqli_fetch_assoc($QueryEditUser);
 
-    $EditIdUser = $EditUser['IdUser'];
-    $EditNameAkses = $EditUser['NameAkses'];
-    $EditNamePassword = $EditUser['NamePassword'];
-    $EditIdLevelUserFK = $EditUser['IdLevelUserFK'];
-    $EditUserLevel = $EditUser['UserLevel'];
-    $EditStatus = $EditUser['Status'];
-    $EditStatusLogin = $EditUser['StatusLogin'];
-    $EditSetting = $EditUser['Setting'];
-    $EditIdKecamatanFK = $EditUser['IdKecamatanFK'];
-    $EditNamaKecamatan = $EditUser['Kecamatan'];
-    $EditNama = $EditUser['Nama'];
+    // Safe array access with fallback values
+    $EditIdUser = safeGet($EditUser, 'IdUser', '');
+    $EditNameAkses = safeGet($EditUser, 'NameAkses', '');
+    $EditNamePassword = safeGet($EditUser, 'NamePassword', '');
+    $EditIdLevelUserFK = safeGet($EditUser, 'IdLevelUserFK', '');
+    $EditUserLevel = safeGet($EditUser, 'UserLevel', '');
+    $EditStatus = safeGet($EditUser, 'Status', '');
+    $EditStatusLogin = safeGet($EditUser, 'StatusLogin', '');
+    $EditSetting = safeGet($EditUser, 'Setting', '');
+    $EditIdKecamatanFK = safeGet($EditUser, 'IdKecamatanFK', '');
+    $EditNamaKecamatan = safeGet($EditUser, 'Kecamatan', '');
+    $EditNama = safeGet($EditUser, 'Nama', '');
+} else {
+    // Initialize empty values if no Kode parameter
+    $EditIdUser = '';
+    $EditNameAkses = '';
+    $EditNamePassword = '';
+    $EditIdLevelUserFK = '';
+    $EditUserLevel = '';
+    $EditStatus = '';
+    $EditStatusLogin = '';
+    $EditSetting = '';
+    $EditIdKecamatanFK = '';
+    $EditNamaKecamatan = '';
+    $EditNama = '';
 }
+?>

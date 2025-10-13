@@ -11,6 +11,9 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 // Set CSP headers
 CSPHandler::setCSPHeaders();
 
+// Include database connection
+require_once __DIR__ . '/../../../Module/Config/Env.php';
+
 // Include files
 include_once "../App/Control/FunctionSettingProfileAdminKecamatan.php";
 
@@ -65,7 +68,16 @@ if (!safeEmpty($alert)) {
 }
 
 // Debug: uncomment untuk cek session (hapus setelah testing)
-// echo "<pre>"; print_r($_SESSION); echo "</pre>"; exit;
+// echo "<pre>"; print_r($_SESSION); echo "</pre>";
+// echo "<pre>Current Data: "; print_r($currentData ?? 'No data'); echo "</pre>"; 
+// echo "<pre>Variables: Lat=" . ($currentLatitude ?? 'null') . ", Lng=" . ($currentLongitude ?? 'null') . ", Nama=" . ($namaKecamatan ?? 'null') . "</pre>";
+
+// Pastikan variabel terdefinisi dengan nilai default
+$currentLatitude = $currentLatitude ?? '';
+$currentLongitude = $currentLongitude ?? '';
+$namaKecamatan = $namaKecamatan ?? 'Kecamatan';
+$currentNoTelepon = $currentNoTelepon ?? '';
+$AlamatKecamatan = $AlamatKecamatan ?? '';
 ?>
 
 <!DOCTYPE html>
@@ -81,8 +93,13 @@ if (!safeEmpty($alert)) {
 <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
 
 <!-- Leaflet CSS -->
-<link rel="stylesheet" href="../../../Vendor/External/leaflet/leaflet.css" />
-<script <?php echo CSPHandler::scriptNonce(); ?> src="../../../Vendor/External/leaflet/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin=""/>
+<script <?php echo CSPHandler::scriptNonce(); ?> 
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
 
 <!-- SweetAlert -->
 <script <?php echo CSPHandler::scriptNonce(); ?> src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -568,7 +585,7 @@ if (!safeEmpty($alert)) {
                         
                         <div class="ibox-content" style="padding: 0;">
                             <div class="map-container">
-                                <div id="koordinatMap"></div>
+                                <div id="koordinatMap" style="height: 400px; width: 100%; min-height: 400px;"></div>
                             </div>
                         </div>
                     </div>
@@ -582,18 +599,51 @@ if (!safeEmpty($alert)) {
 <!-- Map Script -->
 <script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing map...');
+        
+        // Add a small delay to ensure CSS is loaded
+        setTimeout(function() {
+            initializeMap();
+        }, 100);
+    });
+
+    function initializeMap() {
+        // Check if Leaflet is loaded
+        if (typeof L === 'undefined') {
+            console.error('Leaflet library not loaded');
+            document.getElementById('koordinatMap').innerHTML = 
+                '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d; text-align: center; flex-direction: column;">' +
+                '<i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px; color: #ffc107;"></i>' +
+                '<h5>Leaflet Library Error</h5>' +
+                '<p>Library peta tidak dapat dimuat. Silakan refresh halaman.</p>' +
+                '</div>';
+            return;
+        }
+
         // Koordinat default (Indonesia/Jawa)
         var defaultLat = <?php echo !empty($currentLatitude) && is_numeric($currentLatitude) ? $currentLatitude : '-8.055'; ?>;
         var defaultLng = <?php echo !empty($currentLongitude) && is_numeric($currentLongitude) ? $currentLongitude : '111.715'; ?>;
 
-        // Initialize map
-        var map = L.map('koordinatMap').setView([defaultLat, defaultLng], 13);
+        console.log('Default coordinates:', defaultLat, defaultLng);
 
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        try {
+            // Check if map container exists
+            var mapContainer = document.getElementById('koordinatMap');
+            if (!mapContainer) {
+                console.error('Map container not found');
+                return;
+            }
+
+            // Initialize map
+            var map = L.map('koordinatMap').setView([defaultLat, defaultLng], 13);
+            console.log('Map initialized successfully');
+
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            console.log('Tile layer added successfully');
 
         // Marker untuk menunjukkan lokasi yang dipilih
         var marker = null;
@@ -756,12 +806,12 @@ if (!safeEmpty($alert)) {
         toggleClearButton();
 
         // Jika sudah ada koordinat, tampilkan marker
-        <?php if (!empty($currentLatitude) && !empty($currentLongitude)): ?>
+        <?php if (!empty($currentLatitude) && !empty($currentLongitude) && is_numeric($currentLatitude) && is_numeric($currentLongitude)): ?>
             marker = L.marker([defaultLat, defaultLng], {
                 draggable: true
             }).addTo(map);
 
-            marker.bindPopup('<b><?php echo addslashes(htmlspecialchars($namaKecamatan, ENT_QUOTES, 'UTF-8')); ?></b><br>Lokasi saat ini').openPopup();
+            marker.bindPopup('<b><?php echo addslashes(htmlspecialchars($namaKecamatan ?? 'Kecamatan', ENT_QUOTES, 'UTF-8')); ?></b><br>Lokasi saat ini').openPopup();
 
             // Event ketika marker di-drag
             marker.on('dragend', function(e) {
@@ -785,7 +835,7 @@ if (!safeEmpty($alert)) {
                 draggable: true
             }).addTo(map);
 
-            marker.bindPopup('<b><?php echo addslashes(htmlspecialchars($namaKecamatan, ENT_QUOTES, 'UTF-8')); ?></b><br>Lokasi baru').openPopup();
+            marker.bindPopup('<b><?php echo addslashes(htmlspecialchars($namaKecamatan ?? 'Kecamatan', ENT_QUOTES, 'UTF-8')); ?></b><br>Lokasi baru').openPopup();
 
             // Update koordinat
             updateCoordinates(lat, lng);
@@ -872,5 +922,16 @@ if (!safeEmpty($alert)) {
             });
             */
         });
-    });
+        
+        } catch (error) {
+            console.error('Error initializing map:', error);
+            // Show user-friendly error message
+            document.getElementById('koordinatMap').innerHTML = 
+                '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d; text-align: center; flex-direction: column;">' +
+                '<i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px; color: #ffc107;"></i>' +
+                '<h5>Peta tidak dapat dimuat</h5>' +
+                '<p>Silakan refresh halaman atau coba lagi nanti.</p>' +
+                '</div>';
+        }
+    } // End of initializeMap function
 </script>

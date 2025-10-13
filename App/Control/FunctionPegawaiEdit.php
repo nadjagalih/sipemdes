@@ -1,29 +1,49 @@
 <?php
+// Include safe helpers
+require_once __DIR__ . '/../../helpers/safe_helpers.php';
+
 if (isset($_GET['Kode'])) {
     $IdTemp = sql_url($_GET['Kode']);
 
     $QueryPegawaiEdit = mysqli_query($db, "SELECT * FROM master_pegawai WHERE IdPegawaiFK = '$IdTemp' ");
     $DataPegawaiEdit = mysqli_fetch_assoc($QueryPegawaiEdit);
-    $IdPegawaiFK =  $DataPegawaiEdit['IdPegawaiFK'];
-    $NIK =  $DataPegawaiEdit['NIK'];
-    $Nama =  $DataPegawaiEdit['Nama'];
-    $TempatLahir =  $DataPegawaiEdit['Tempat'];
-    $TanggalLahirAmbil =  $DataPegawaiEdit['TanggalLahir'];
-    $exp = explode('-', $TanggalLahirAmbil);
-    $TanggalLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
-    $Alamat =  $DataPegawaiEdit['Alamat'];
-    $RT =  $DataPegawaiEdit['RT'];
-    $RW =  $DataPegawaiEdit['RW'];
-    // $Siltap =  number_format($DataPegawaiEdit['Siltap'], 0, ",", ".");
-    $AmbilSiltap =  number_format($DataPegawaiEdit['Siltap'], 0, ",", ".");
+    
+    // Safe array access with fallback values
+    $IdPegawaiFK = safeGet($DataPegawaiEdit, 'IdPegawaiFK', '');
+    $NIK = safeGet($DataPegawaiEdit, 'NIK', '');
+    $Nama = safeGet($DataPegawaiEdit, 'Nama', '');
+    $TempatLahir = safeGet($DataPegawaiEdit, 'Tempat', '');
+    
+    // Safe date parsing
+    $TanggalLahirAmbil = safeGet($DataPegawaiEdit, 'TanggalLahir', '');
+    if (!empty($TanggalLahirAmbil)) {
+        $exp = explode('-', $TanggalLahirAmbil);
+        if (count($exp) >= 3) {
+            $TanggalLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+        } else {
+            $TanggalLahir = $TanggalLahirAmbil;
+        }
+    } else {
+        $TanggalLahir = '';
+    }
+    
+    $Alamat = safeGet($DataPegawaiEdit, 'Alamat', '');
+    $RT = safeGet($DataPegawaiEdit, 'RT', '');
+    $RW = safeGet($DataPegawaiEdit, 'RW', '');
+    
+    // Safe number formatting
+    $AmbilSiltap = safeGet($DataPegawaiEdit, 'Siltap', 0);
+    $AmbilSiltap = number_format($AmbilSiltap, 0, ",", ".");
     if ($AmbilSiltap == 0) {
         $Siltap = "";
     } else {
         $Siltap = $AmbilSiltap;
     }
-    $Foto =  $DataPegawaiEdit['Foto'];
+    $Foto = safeGet($DataPegawaiEdit, 'Foto', '');
 
-    $Lingkungan =  $DataPegawaiEdit['Lingkungan'];
+    $Lingkungan = safeGet($DataPegawaiEdit, 'Lingkungan', '');
+    
+    // Safe query for Desa
     $QueryDesaEdit = mysqli_query($db, "SELECT
     master_kecamatan.IdKecamatan,
     master_desa.IdKecamatanFK,
@@ -34,46 +54,46 @@ if (isset($_GET['Kode'])) {
     INNER JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
     WHERE master_desa.IdDesa = '$Lingkungan' ");
     $DataDesaEdit = mysqli_fetch_assoc($QueryDesaEdit);
-    $EditIdDesa =  $DataDesaEdit['IdDesa'];
-    $EditNamaDesa =  $DataDesaEdit['NamaDesa'];
-    $EditNamaKecamatan =  $DataDesaEdit['Kecamatan'];
+    $EditIdDesa = safeGet($DataDesaEdit, 'IdDesa', '');
+    $EditNamaDesa = safeGet($DataDesaEdit, 'NamaDesa', '');
+    $EditNamaKecamatan = safeGet($DataDesaEdit, 'Kecamatan', '');
 
-    $EditIdKecamatan =  $DataPegawaiEdit['Kecamatan'];
+    $EditIdKecamatan = safeGet($DataPegawaiEdit, 'Kecamatan', '');
     $QueryKecamatanEdit = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$EditIdKecamatan' ");
     $DataKecamatanEdit = mysqli_fetch_assoc($QueryKecamatanEdit);
-    // $EditKecamatan =  $DataKecamatanEdit['Kecamatan'];
+    // $EditKecamatan = safeGet($DataKecamatanEdit, 'Kecamatan', '');
 
-    $EditIdKabupaten =  $DataPegawaiEdit['Kabupaten'];
+    $EditIdKabupaten = safeGet($DataPegawaiEdit, 'Kabupaten', '');
     $QueryKabupatenEdit = mysqli_query($db, "SELECT * FROM master_setting_profile_dinas WHERE IdKAbupatenProfile = '$EditIdKabupaten' ");
     $DataKabupatenEdit = mysqli_fetch_assoc($QueryKabupatenEdit);
-    $EditKabupaten =  $DataKabupatenEdit['Kabupaten'];
+    $EditKabupaten = safeGet($DataKabupatenEdit, 'Kabupaten', '');
 
-    $JenKel =  $DataPegawaiEdit['JenKel'];
+    $JenKel = safeGet($DataPegawaiEdit, 'JenKel', '');
     $QueryJenKelEdit = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
     $DataJenKelEdit = mysqli_fetch_assoc($QueryJenKelEdit);
-    $EditNamaJenKel =  $DataJenKelEdit['Keterangan'];
+    $EditNamaJenKel = safeGet($DataJenKelEdit, 'Keterangan', '');
 
-    $Agama =  $DataPegawaiEdit['Agama'];
+    $Agama = safeGet($DataPegawaiEdit, 'Agama', '');
     $QueryAgamaEdit = mysqli_query($db, "SELECT * FROM master_agama WHERE IdAgama = '$Agama' ");
     $DataAgamaEdit = mysqli_fetch_assoc($QueryAgamaEdit);
-    $EditNamaAgama =  $DataAgamaEdit['Agama'];
+    $EditNamaAgama = safeGet($DataAgamaEdit, 'Agama', '');
 
-    $GolDarah =  $DataPegawaiEdit['GolDarah'];
+    $GolDarah = safeGet($DataPegawaiEdit, 'GolDarah', '');
     $QueryGolDarahEdit = mysqli_query($db, "SELECT * FROM master_golongan_darah WHERE IdGolDarah = '$GolDarah' ");
     $DataGolDarahEdit = mysqli_fetch_assoc($QueryGolDarahEdit);
-    $EditNamaGolDarah =  $DataGolDarahEdit['Golongan'];
+    $EditNamaGolDarah = safeGet($DataGolDarahEdit, 'Golongan', '');
 
-    $Pernikahan =  $DataPegawaiEdit['StatusPernikahan'];
+    $Pernikahan = safeGet($DataPegawaiEdit, 'StatusPernikahan', '');
     $QuerySTNikahEdit = mysqli_query($db, "SELECT * FROM master_status_pernikahan WHERE IdPernikahan = '$Pernikahan' ");
     $DataSTNikahEdit = mysqli_fetch_assoc($QuerySTNikahEdit);
-    $EditNamaSTNikah =  $DataSTNikahEdit['Status'];
+    $EditNamaSTNikah = safeGet($DataSTNikahEdit, 'Status', '');
 
-    $StatusPegawai =  $DataPegawaiEdit['StatusKepegawaian'];
+    $StatusPegawai = safeGet($DataPegawaiEdit, 'StatusKepegawaian', '');
     $QuerySTPegawaiEdit = mysqli_query($db, "SELECT * FROM master_status_kepegawaian WHERE IdStatusPegawai = '$StatusPegawai' ");
     $DataSTPegawaiEdit = mysqli_fetch_assoc($QuerySTPegawaiEdit);
-    $EditNamaSTPegawai =  $DataSTPegawaiEdit['StatusPegawai'];
+    $EditNamaSTPegawai = safeGet($DataSTPegawaiEdit, 'StatusPegawai', '');
 
-    $UnitKerja =  $DataPegawaiEdit['IdDesaFK'];
+    $UnitKerja = safeGet($DataPegawaiEdit, 'IdDesaFK', '');
     $QueryUnitKerja = mysqli_query($db, "SELECT
     master_kecamatan.IdKecamatan,
     master_desa.IdKecamatanFK,
@@ -84,11 +104,42 @@ if (isset($_GET['Kode'])) {
     INNER JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
     WHERE master_desa.IdDesa = '$UnitKerja' ");
     $DataUnitKerja = mysqli_fetch_assoc($QueryUnitKerja);
-    $EditIdUnitKerja =  $DataUnitKerja['IdDesa'];
-    $EditNamaUnitKerja =  $DataUnitKerja['NamaDesa'];
-    $EditNamaKecamatanUnitKerja =  $DataUnitKerja['Kecamatan'];
+    $EditIdUnitKerja = safeGet($DataUnitKerja, 'IdDesa', '');
+    $EditNamaUnitKerja = safeGet($DataUnitKerja, 'NamaDesa', '');
+    $EditNamaKecamatanUnitKerja = safeGet($DataUnitKerja, 'Kecamatan', '');
 
-    $Telp =  $DataPegawaiEdit['NoTelp'];
-    $Email =  $DataPegawaiEdit['Email'];
-    $FotoUpload =  $DataPegawaiEdit['Foto'];
+    $Telp = safeGet($DataPegawaiEdit, 'NoTelp', '');
+    $Email = safeGet($DataPegawaiEdit, 'Email', '');
+    $FotoUpload = safeGet($DataPegawaiEdit, 'Foto', '');
+} else {
+    // Initialize empty values if no Kode parameter
+    $IdPegawaiFK = '';
+    $NIK = '';
+    $Nama = '';
+    $TempatLahir = '';
+    $TanggalLahir = '';
+    $Alamat = '';
+    $RT = '';
+    $RW = '';
+    $Siltap = '';
+    $Foto = '';
+    $Lingkungan = '';
+    $EditIdDesa = '';
+    $EditNamaDesa = '';
+    $EditNamaKecamatan = '';
+    $EditIdKecamatan = '';
+    $EditIdKabupaten = '';
+    $EditKabupaten = '';
+    $EditNamaJenKel = '';
+    $EditNamaAgama = '';
+    $EditNamaGolDarah = '';
+    $EditNamaSTNikah = '';
+    $EditNamaSTPegawai = '';
+    $EditIdUnitKerja = '';
+    $EditNamaUnitKerja = '';
+    $EditNamaKecamatanUnitKerja = '';
+    $Telp = '';
+    $Email = '';
+    $FotoUpload = '';
 }
+?>

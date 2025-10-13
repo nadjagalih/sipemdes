@@ -1,6 +1,6 @@
 <?php
 include '../../../Module/Config/Env.php';
-require_once '../../../Module/Security/CSPHandler.php';
+require_once '../Module/Security/CSPHandler.php';
 
 if (isset($_GET['id'])) {
     $IdKecamatan = sql_injeksi($_GET['id']);

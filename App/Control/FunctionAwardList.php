@@ -33,7 +33,7 @@ $QueryAward = mysqli_query($db, "SELECT
     ORDER BY ma.TahunPenghargaan DESC, ma.TanggalInput DESC");
 
 $no = 1;
-if (mysqli_num_rows($QueryAward) > 0) {
+if ($QueryAward && mysqli_num_rows($QueryAward) > 0) {
     while ($DataAward = mysqli_fetch_assoc($QueryAward)) {
         $IdAward = $DataAward['IdAward'];
         $JenisPenghargaan = $DataAward['JenisPenghargaan'];
@@ -140,6 +140,14 @@ if (mysqli_num_rows($QueryAward) > 0) {
 <?php 
         $no++;
     }
+} elseif ($QueryAward === false) {
+?>
+    <div class="text-center" style="padding: 60px 0;">
+        <i class="fa fa-exclamation-triangle" style="font-size: 48px; color: #f8ac59;"></i>
+        <h3 style="color: #676a6c; margin-top: 20px;">Error Database</h3>
+        <p style="color: #999;">Terjadi kesalahan saat mengambil data: <?php echo mysqli_error($db); ?></p>
+    </div>
+<?php 
 } else {
 ?>
     <div class="text-center" style="padding: 60px 0;">

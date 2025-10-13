@@ -35,10 +35,13 @@ $TipeMutasi = isset($_GET['TipeMutasi']) ? $_GET['TipeMutasi'] : '';
                 </div>
 
                 <?php
+                $JenMutasi = 0; // Inisialisasi variabel
                 $CekMutasi = mysqli_query($db, "SELECT * FROM history_mutasi WHERE IdPegawaiFK = '$IdTemp' ");
-                while ($Result = mysqli_fetch_assoc($CekMutasi)) {
-                    $IdPeg = $Result['IdPegawaiFK'];
-                    $JenMutasi = $Result['JenisMutasi'];
+                if ($CekMutasi && mysqli_num_rows($CekMutasi) > 0) {
+                    while ($Result = mysqli_fetch_assoc($CekMutasi)) {
+                        $IdPeg = isset($Result['IdPegawaiFK']) ? $Result['IdPegawaiFK'] : '';
+                        $JenMutasi = isset($Result['JenisMutasi']) ? $Result['JenisMutasi'] : 0;
+                    }
                 }
 
                 if ($JenMutasi == 3 or $JenMutasi == 4 or $JenMutasi == 5) { ?>

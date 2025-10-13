@@ -48,9 +48,17 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
             color: white !important;
         }
-    </style>
-
-    <div class="col-lg-12">
+        
+        /* Perkecil kolom jabatan */
+        .dataTables-kecamatan th:nth-child(9),
+        .dataTables-kecamatan td:nth-child(9) {
+            width: 120px !important;
+            max-width: 120px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        </style>    <div class="col-lg-12">
         <div class="ibox ">
             <div class="ibox-title">
                 <h5>Filter Pemerintah Desa</h5>

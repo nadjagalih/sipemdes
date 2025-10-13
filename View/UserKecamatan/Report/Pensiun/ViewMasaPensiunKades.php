@@ -71,6 +71,8 @@ $Kecamatan = $DataQuery['Kecamatan'];
             
             <form action="UserKecamatan/Report/Pensiun/PdfMasaPensiunKecamatanKades" method="GET"
                 enctype="multipart/form-data" target="_BLANK">
+                <!-- SECURITY FIX: Added CSRF protection for report generation -->
+                <?php echo CSRFProtection::getTokenField(); ?>
                 <button type="submit" name="Proses" value="Proses" class="btn btn-outline btn-primary">Cetak
                     PDF</button>
                 <?php

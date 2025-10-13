@@ -54,10 +54,12 @@ class SecurityHeaders {
         // Prevent MIME type sniffing
         header('X-Content-Type-Options: nosniff');
         
-        // HSTS - Force HTTPS for 1 year (always set in production)
+        // HSTS - Force HTTPS for 1 year (SECURITY FIX: Always enforce in production)
         if (!self::isDevelopmentMode()) {
+            // Production: Always enforce HSTS
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
         } else if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+            // Development: Only if already on HTTPS
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
         }
         

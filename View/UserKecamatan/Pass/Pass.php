@@ -77,6 +77,8 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Panjang') {
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcPasswordKec?Act=Pass" method="POST" enctype="multipart/form-data">
+                        <!-- SECURITY FIX: Added CSRF protection for password change -->
+                        <?php echo CSRFProtection::getTokenField(); ?>
                         <input type="hidden" class="form-control" name="IdUser" id="IdUser" value="<?php echo $_SESSION['IdUser']; ?>">
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Password Baru</label>
                             <div class="col-lg-8">

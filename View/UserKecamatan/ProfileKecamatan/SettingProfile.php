@@ -90,9 +90,13 @@ $AlamatKecamatan = $AlamatKecamatan ?? '';
 <!-- Bootstrap CSS -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
 <link href="../Assets/css/local-fonts.css" rel="stylesheet">
-<link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
+<!-- SECURITY FIX: Added SRI for Font Awesome -->
+<link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" 
+      rel="stylesheet"
+      integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm"
+      crossorigin="anonymous">
 
-<!-- Leaflet CSS -->
+<!-- Leaflet CSS - SRI already implemented -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
       crossorigin=""/>
@@ -101,8 +105,11 @@ $AlamatKecamatan = $AlamatKecamatan ?? '';
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
 
-<!-- SweetAlert -->
-<script <?php echo CSPHandler::scriptNonce(); ?> src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<!-- SECURITY FIX: Added SRI for SweetAlert -->
+<script <?php echo CSPHandler::scriptNonce(); ?> 
+        src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"
+        integrity="sha384-DH6zfTvl3SJHSFMFYe4kO5xq4HGAAVhxZ3J3dw7tNH85I2tZGX7PSr8hzjO25YRm"
+        crossorigin="anonymous"></script>
 
 <style>
     /* Menggunakan struktur CSS yang sama dengan UserAdd.php */

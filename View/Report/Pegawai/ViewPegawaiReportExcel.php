@@ -197,17 +197,6 @@
                         <?php endif; ?>
                     </form>
                 </div>
-
-                <!-- Info Pagination -->
-                <div class="row mb-3">
-                    <div class="col-md-12">
-                        <div class="alert alert-success" style="margin-bottom: 15px; padding: 12px 15px;">
-                            <i class="fa fa-info-circle"></i> 
-                            <strong>Halaman <?php echo isset($page) ? $page : 1; ?></strong> dari <strong><?php echo isset($totalPages) ? $totalPages : 1; ?></strong> 
-                            | Total <strong><?php echo isset($totalRecords) ? number_format($totalRecords) : 0; ?></strong> pegawai
-                        </div>
-                    </div>
-                </div>
                 
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-hover dataTables-kecamatan">

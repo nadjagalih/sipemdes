@@ -1,3 +1,96 @@
+<?php
+// Alert handling untuk berbagai error conditions
+if (isset($_GET['alert'])) {
+    $alert = $_GET['alert'];
+    switch ($alert) {
+        case 'EmptyField':
+            echo "<script>
+                setTimeout(function() {
+                    swal({
+                        title: 'ERROR',
+                        text: 'Semua field harus diisi',
+                        type: 'error',
+                        showConfirmButton: true
+                    });
+                }, 10);
+            </script>";
+            break;
+        case 'FileError':
+            echo "<script>
+                setTimeout(function() {
+                    swal({
+                        title: 'ERROR',
+                        text: 'Error saat upload file. Pastikan file sudah dipilih.',
+                        type: 'error',
+                        showConfirmButton: true
+                    });
+                }, 10);
+            </script>";
+            break;
+        case 'FileExt':
+            echo "<script>
+                setTimeout(function() {
+                    swal({
+                        title: 'ERROR',
+                        text: 'Hanya file PDF yang diizinkan',
+                        type: 'error',
+                        showConfirmButton: true
+                    });
+                }, 10);
+            </script>";
+            break;
+        case 'FileMax':
+            echo "<script>
+                setTimeout(function() {
+                    swal({
+                        title: 'ERROR',
+                        text: 'Ukuran file maksimal 5MB',
+                        type: 'error',
+                        showConfirmButton: true
+                    });
+                }, 10);
+            </script>";
+            break;
+        case 'DatabaseError':
+            echo "<script>
+                setTimeout(function() {
+                    swal({
+                        title: 'ERROR',
+                        text: 'Gagal menyimpan file ke database',
+                        type: 'error',
+                        showConfirmButton: true
+                    });
+                }, 10);
+            </script>";
+            break;
+        case 'DesaNotFound':
+            echo "<script>
+                setTimeout(function() {
+                    swal({
+                        title: 'ERROR',
+                        text: 'Data desa tidak ditemukan',
+                        type: 'error',
+                        showConfirmButton: true
+                    });
+                }, 10);
+            </script>";
+            break;
+        case 'FileReadError':
+            echo "<script>
+                setTimeout(function() {
+                    swal({
+                        title: 'ERROR',
+                        text: 'Gagal membaca file yang diupload',
+                        type: 'error',
+                        showConfirmButton: true
+                    });
+                }, 10);
+            </script>";
+            break;
+    }
+}
+?>
+
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
         <h2>Upload File Desa</h2>

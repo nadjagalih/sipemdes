@@ -1,4 +1,7 @@
 <?php
+// Start output buffering to prevent headers already sent errors
+ob_start();
+
 include "../App/Control/FunctionSession.php";
 include "../App/Control/FunctionProfilePegawaiUserKecamatan.php";
 
@@ -39,8 +42,7 @@ $isLaporanPensiunActive = in_array($pg, [
     'ViewPensiunKec'
 ]);
 
-// Start output buffering to prevent headers already sent
-ob_start();
+// Style untuk menu (output buffering sudah dimulai di atas)
 ?>
 <style>
     /* Override semua warna hijau dengan prioritas tinggi */
@@ -486,7 +488,7 @@ echo $styles;
             </a>
         </li>
         <li class="special_link">
-            <a href="../Auth/SignOut"><i class="fa fa-power-off"></i> <span class="nav-label">Keluar</span></a>
+            <a href="../Auth/SignOut.php" onclick="return confirmLogout();"><i class="fa fa-power-off"></i> <span class="nav-label">Keluar</span></a>
         </li>
     </ul>
 
@@ -524,5 +526,31 @@ $(document).ready(function() {
         $mainParent.addClass('active');
         $subParent.addClass('active');
     });
+});
+
+// Logout confirmation function
+function confirmLogout() {
+    var result = confirm('Apakah Anda yakin ingin keluar dari sistem?');
+    if (result) {
+        // Mark that logout is being performed
+        if (typeof(Storage) !== "undefined") {
+            sessionStorage.setItem('logout_performed', 'true');
+        }
+    }
+    return result;
+}
+
+// Additional security: Clear storage on logout click
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutLink = document.querySelector('.special_link a');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', function() {
+            if (typeof(Storage) !== "undefined") {
+                sessionStorage.setItem('logout_performed', 'true');
+                sessionStorage.clear();
+                localStorage.clear();
+            }
+        });
+    }
 });
 </script>

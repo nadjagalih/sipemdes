@@ -326,8 +326,8 @@ $Kecamatan = safeGet($DataQuery, 'Kecamatan', 'Unknown');
                                                 INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
                                         WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
                                         $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-                                        $Pendidikan = $DataPendidikan['JenisPendidikan'];
-                                        echo $Pendidikan;
+                                        $Pendidikan = safeGet($DataPendidikan, 'JenisPendidikan', 'N/A');
+                                        echo safeHtml($Pendidikan);
                                         ?>
                                     </td>
                                     <td style="width:60px;">

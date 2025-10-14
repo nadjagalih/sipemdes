@@ -60,8 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST) && $showForm) {
                     $message = 'User sudah tidak aktif!';
                     $messageType = 'error';
                 } else {
-                    if ($data['IdLevelUserFK'] == 4) { // Level 3 untuk Kecamatan
-                        // Set session
+                    if ($data['IdLevelUserFK'] == 4) { // Level 4 untuk Kecamatan
+                        // Set session untuk Kecamatan user
                         session_start();
                         $_SESSION['IdUser'] = $data['IdUser'];
                         $_SESSION['NameUser'] = $data['NameAkses'];
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST) && $showForm) {
                         $_SESSION['Setting'] = $data['Status'];
                         $_SESSION['IdLevelUserFK'] = $data['IdLevelUserFK'];
                         $_SESSION['Status'] = $data['StatusLogin'];
-                        $_SESSION['IdPegawai'] = $data['IdPegawai'];
+                        $_SESSION['IdKecamatan'] = $data['IdUser']; // Identifier untuk Kecamatan user
                         $_SESSION['IdDesa'] = $data['IdDesaFK'];
 
                         // Fungsi Logout Automatis

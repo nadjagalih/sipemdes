@@ -1,10 +1,13 @@
 <?php
+// Start output buffering untuk mencegah header already sent
+ob_start();
+
 include "../App/Control/FunctionSession.php";
 include "../App/Control/FunctionProfilePegawaiUser.php";
 
 $pg = isset($_GET['pg']) ? $_GET['pg'] : '';
-
-echo '<style>
+?>
+<style>
     .sidebar-collapse {
         position: fixed;
         top: 0;
@@ -276,8 +279,8 @@ echo '<style>
     .special_link a i {
         color: #fff !important;
     }
-</style>';
-?>
+</style>
+
 <div class="sidebar-collapse">
     <ul class="nav metismenu" id="side-menu">
         <li class="nav-header">
@@ -306,8 +309,42 @@ echo '<style>
             <a href="?pg=Pass"><i class="fa fa-terminal"></i> <span class="nav-label">Ganti Password</span></a>
         </li>
         <li class="special_link">
-            <a href="../Auth/SignOut"><i class="fa fa-power-off"></i> <span class="nav-label">Keluar</span></a>
+            <a href="../Auth/SignOut.php" onclick="return confirmLogout();"><i class="fa fa-power-off"></i> <span class="nav-label">Keluar</span></a>
         </li>
     </ul>
 
 </div>
+
+<script>
+// Logout confirmation function
+function confirmLogout() {
+    var result = confirm('Apakah Anda yakin ingin keluar dari sistem?');
+    if (result) {
+        // Mark that logout is being performed
+        if (typeof(Storage) !== "undefined") {
+            sessionStorage.setItem('logout_performed', 'true');
+        }
+    }
+    return result;
+}
+
+// Additional security: Clear storage on logout click
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutLink = document.querySelector('.special_link a');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', function() {
+            if (typeof(Storage) !== "undefined") {
+                sessionStorage.setItem('logout_performed', 'true');
+                sessionStorage.clear();
+                localStorage.clear();
+            }
+        });
+    }
+});
+</script>
+<?php
+// Flush output buffer
+if (ob_get_level()) {
+    ob_end_flush();
+}
+?>

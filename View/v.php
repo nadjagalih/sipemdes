@@ -38,6 +38,11 @@ $_SESSION['start_time'] = time();
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Prevent caching and back button access -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <title>SIPEMDES | Kab. Trenggalek</title>
     <link href="../Vendor/Media/Logo/pemkab.png" type="image/x-icon" rel="icon">
@@ -64,6 +69,81 @@ $_SESSION['start_time'] = time();
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Charts/code/modules/exporting.js"></script>
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Charts/code/modules/export-data.js"></script>
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Charts/code/modules/accessibility.js"></script>
+
+    <!-- Immediate session and back button protection -->
+    <script <?php echo CSPHandler::scriptNonce(); ?>>
+        // Immediate session check and back button prevention
+        (function() {
+            // Prevent back button immediately
+            if (typeof(Storage) !== "undefined") {
+                // Check if we came from logout
+                if (sessionStorage.getItem('logout_performed') === 'true') {
+                    // Clear storage and redirect
+                    sessionStorage.clear();
+                    localStorage.clear();
+                    window.location.replace('../Auth/SignIn.php');
+                    return;
+                }
+            }
+            
+            // Override browser navigation
+            history.pushState(null, null, location.href);
+            
+            // Prevent popstate (back button) - simplified version
+            window.addEventListener('popstate', function(event) {
+                // Force forward navigation without aggressive session checking
+                history.pushState(null, null, location.href);
+                
+                // Only check session if we're definitely in admin area and user has been logged in for a while
+                if (window.location.href.indexOf('/v?') !== -1) {
+                    // Small delay to allow for proper page transitions
+                    setTimeout(function() {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('GET', '../Auth/CheckSession.php?t=' + Date.now(), true); // Asynchronous
+                        xhr.onreadystatechange = function() {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                try {
+                                    var response = JSON.parse(xhr.responseText);
+                                    if (!response.valid) {
+                                        // Session invalid, redirect
+                                        if (typeof(Storage) !== "undefined") {
+                                            sessionStorage.clear();
+                                            localStorage.clear();
+                                        }
+                                        window.location.replace('../Auth/SignIn.php');
+                                    }
+                                } catch(e) {
+                                    // If JSON parse fails, assume session is ok for now
+                                }
+                            }
+                        };
+                        xhr.send();
+                    }, 500); // 500ms delay
+                }
+                
+                // Prevent the back action
+                history.go(1);
+                return false;
+            });
+            
+            // Disable browser cache
+            window.addEventListener('beforeunload', function() {
+                // Clear any cached data
+                if (typeof(Storage) !== "undefined") {
+                    sessionStorage.removeItem('isLoggedIn');
+                }
+            });
+            
+            // Check for browser refresh/reload
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page loaded from cache, force reload
+                    window.location.reload(true);
+                }
+            });
+            
+        })();
+    </script>
 
 </head>
 
@@ -245,6 +325,84 @@ $_SESSION['start_time'] = time();
                 format: "dd-mm-yyyy"
             });
         });
+    </script>
+
+    <!-- Security Script: Prevent Back Button After Logout -->
+    <script <?php echo CSPHandler::scriptNonce(); ?>>
+        // Prevent back button functionality for logged-in users
+        (function() {
+            // Check if user is logged in
+            if (typeof sessionStorage !== 'undefined') {
+                sessionStorage.setItem('isLoggedIn', 'true');
+            }
+            
+            // Session checking every 2 minutes (less aggressive)
+            setInterval(function() {
+                // Make an AJAX call to verify session is still valid
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '../Auth/CheckSession.php?t=' + Date.now(), true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            try {
+                                var response = JSON.parse(xhr.responseText);
+                                if (!response.valid) {
+                                    // Session invalid, redirect only if we're in admin area
+                                    if (window.location.href.indexOf('/v?') !== -1) {
+                                        if (typeof(Storage) !== "undefined") {
+                                            sessionStorage.clear();
+                                            localStorage.clear();
+                                        }
+                                        window.location.replace('../Auth/SignIn.php');
+                                    }
+                                }
+                            } catch(e) {
+                                // JSON parse error, redirect only if we're in admin area
+                                if (window.location.href.indexOf('/v?') !== -1) {
+                                    window.location.replace('../Auth/SignIn.php');
+                                }
+                            }
+                        } else {
+                            // Server error, redirect only if we're in admin area
+                            if (window.location.href.indexOf('/v?') !== -1) {
+                                window.location.replace('../Auth/SignIn.php');
+                            }
+                        }
+                    }
+                };
+                xhr.send();
+            }, 120000); // Check every 2 minutes instead of 30 seconds
+            
+            // Delayed session check on page load (only after user has been inactive)
+            setTimeout(function() {
+                // Only check session if page has been loaded for a while
+                // This prevents interference with login process
+                if (document.readyState === 'complete') {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', '../Auth/CheckSession.php?t=' + Date.now(), true);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            try {
+                                var response = JSON.parse(xhr.responseText);
+                                if (!response.valid) {
+                                    // Only redirect if we're not in a login process
+                                    if (window.location.href.indexOf('/v?') !== -1) {
+                                        window.location.replace('../Auth/SignIn.php');
+                                    }
+                                }
+                            } catch(e) {
+                                // Only redirect if we're not in a login process
+                                if (window.location.href.indexOf('/v?') !== -1) {
+                                    window.location.replace('../Auth/SignIn.php');
+                                }
+                            }
+                        }
+                    };
+                    xhr.send();
+                }
+            }, 5000); // Check after 5 seconds instead of 1 second
+            
+        })();
     </script>
 
 </body>

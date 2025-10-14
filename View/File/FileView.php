@@ -31,6 +31,36 @@ if (empty($_GET['alert'])) {
                 });
             }, 100);
           </script>";
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'DeleteSuccess') {
+    echo "<script type='text/javascript'>
+            setTimeout(function () {
+                swal({
+                    title: 'Hapus Berhasil',
+                    text: 'File telah berhasil dihapus.',
+                    type: 'success'
+                });
+            }, 100);
+          </script>";
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'DeleteError') {
+    echo "<script type='text/javascript'>
+            setTimeout(function () {
+                swal({
+                    title: 'Hapus Gagal',
+                    text: 'Terjadi kesalahan saat menghapus file.',
+                    type: 'error'
+                });
+            }, 100);
+          </script>";
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'InvalidID') {
+    echo "<script type='text/javascript'>
+            setTimeout(function () {
+                swal({
+                    title: 'ID Tidak Valid',
+                    text: 'ID file yang dipilih tidak valid.',
+                    type: 'warning'
+                });
+            }, 100);
+          </script>";
 }
 
 $IdKecamatan = $_SESSION['IdKecamatan'] ?? '';
@@ -120,7 +150,7 @@ if (!empty($IdKecamatan)) {
                                 <th>No</th>
                                 <th>Nama File</th>
                                 <th>Kategori</th>
-                                <th>File</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -139,7 +169,14 @@ if (!empty($IdKecamatan)) {
                                             <td>{$Nomor}</td>
                                             <td>{$row['Nama']}</td>
                                             <td>{$row['KategoriFile']}</td>
-                                            <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
+                                            <td>
+                                                <a href='{$downloadDir}Module/File/View.php?id={$row['IdFile']}' target='_blank' class='btn btn-info btn-sm'>
+                                                    <i class='fa fa-eye'></i> Lihat File
+                                                </a>
+                                                <a href='File/DeleteFile.php?id={$row['IdFile']}' class='btn btn-danger btn-sm delete-file-btn' data-filename='{$row['Nama']}'>
+                                                    <i class='fa fa-trash'></i> Hapus
+                                                </a>
+                                            </td>
                                         </tr>";
                                     $Nomor++;
                                 }
@@ -184,7 +221,7 @@ if (!empty($IdKecamatan)) {
                                 <th>Nama File</th>
                                 <th>Kategori</th>
                                 <th>Kecamatan</th>
-                                <th>File</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -204,7 +241,14 @@ if (!empty($IdKecamatan)) {
                                             <td>{$row['Nama']}</td>
                                             <td>{$row['KategoriFile']}</td>
                                             <td>{$row['Kecamatan']}</td>
-                                            <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
+                                            <td>
+                                                <a href='{$downloadDir}Module/File/View.php?id={$row['IdFile']}' target='_blank' class='btn btn-info btn-sm'>
+                                                    <i class='fa fa-eye'></i> Lihat File
+                                                </a>
+                                                <a href='File/DeleteFile.php?id={$row['IdFile']}' class='btn btn-danger btn-sm delete-file-btn' data-filename='{$row['Nama']}'>
+                                                    <i class='fa fa-trash'></i> Hapus
+                                                </a>
+                                            </td>
                                         </tr>";
                                     $Nomor++;
                                 }
@@ -250,7 +294,7 @@ if (!empty($IdKecamatan)) {
                                 <th>Kategori</th>
                                 <th>Kecamatan</th>
                                 <th>Desa</th>
-                                <th>File</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -272,7 +316,14 @@ if (!empty($IdKecamatan)) {
                                         <td>{$row['KategoriFile']}</td>
                                         <td>{$row['Kecamatan']}</td>
                                         <td>{$row['NamaDesa']}</td>
-                                        <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
+                                        <td>
+                                            <a href='{$downloadDir}Module/File/View.php?id={$row['IdFile']}' target='_blank' class='btn btn-info btn-sm'>
+                                                <i class='fa fa-eye'></i> Lihat File
+                                            </a>
+                                            <a href='File/DeleteFile.php?id={$row['IdFile']}' class='btn btn-danger btn-sm delete-file-btn' data-filename='{$row['Nama']}'>
+                                                <i class='fa fa-trash'></i> Hapus
+                                            </a>
+                                        </td>
                                     </tr>";
                                 $Nomor++;
                             }
@@ -286,3 +337,31 @@ if (!empty($IdKecamatan)) {
     </div>
 
 </div>
+
+<script>
+$(document).ready(function() {
+    // Handle delete file button clicks
+    $('.delete-file-btn').on('click', function(e) {
+        e.preventDefault();
+        
+        const deleteUrl = $(this).attr('href');
+        const filename = $(this).data('filename');
+        
+        swal({
+            title: 'Konfirmasi Hapus',
+            text: `Apakah Anda yakin ingin menghapus file "${filename}"?`,
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.value) {
+                // If confirmed, redirect to delete URL
+                window.location.href = deleteUrl;
+            }
+        });
+    });
+});
+</script>

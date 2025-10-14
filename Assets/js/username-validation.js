@@ -43,6 +43,7 @@
     function validateUsername(inputElement) {
         const endpoint = inputElement.dataset.validationEndpoint;
         const targetId = inputElement.dataset.validationTarget;
+        const paramName = inputElement.dataset.validationParam || 'UserName';
         const targetElement = document.getElementById(targetId);
         
         if (!endpoint || !targetElement) {
@@ -67,8 +68,8 @@
         // Show loading state
         targetElement.innerHTML = '<span style="color: blue; font-weight: bold;">🔄 Memeriksa ketersediaan...</span>';
         
-        // Make secure request
-        const requestData = 'UserNama=' + encodeURIComponent(username);
+        // Make secure request with configurable parameter name
+        const requestData = paramName + '=' + encodeURIComponent(username);
         
         makeSecureRequest(
             endpoint,
@@ -103,9 +104,11 @@
      * Initialize validation system
      */
     function initValidationSystem() {
-        // Use event delegation for security
+        // Use event delegation for security - supports multiple validation types
         document.addEventListener('input', function(event) {
-            if (event.target && event.target.dataset.validation === 'username') {
+            if (event.target && 
+                (event.target.dataset.validation === 'username' || 
+                 event.target.dataset.validation === 'username-kecamatan')) {
                 const debouncedValidation = debounce(function() {
                     validateUsername(event.target);
                 }, 300); // 300ms debounce
@@ -115,7 +118,9 @@
         });
         
         document.addEventListener('keyup', function(event) {
-            if (event.target && event.target.dataset.validation === 'username') {
+            if (event.target && 
+                (event.target.dataset.validation === 'username' || 
+                 event.target.dataset.validation === 'username-kecamatan')) {
                 const debouncedValidation = debounce(function() {
                     validateUsername(event.target);
                 }, 300);

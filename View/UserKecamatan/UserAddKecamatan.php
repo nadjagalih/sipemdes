@@ -1,18 +1,4 @@
-<script>
-    function checkAvailability() {
-        // $( "#loaderIcon" ).show();
-        jQuery.ajax({
-            url: "UserKecamatan/CheckAvailability.php",
-            data: 'UserNama=' + $("#UserNama").val(),
-            type: "POST",
-            success: function(data) {
-                $("#UserAvailabilityStatus").html(data);
-                $("#loaderIcon").hide();
-            },
-            error: function() {}
-        });
-    }
-</script>
+
 <style>
     .status-sukses {
         background: white;
@@ -73,7 +59,15 @@
                     <form action="../App/Model/ExcUserKecamatan?Act=Save" method="POST" enctype="multipart/form-data">
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Username</label>
                             <div class="col-lg-8">
-                                <input type="text" name="UserNama" id="UserNama" onkeyup="checkAvailability()" placeholder="Masukkan Username" class="form-control" required autocomplete="off">
+                                <input type="text" 
+                                       name="UserNama" 
+                                       id="UserNama" 
+                                       data-validation="username-kecamatan"
+                                       data-validation-endpoint="UserKecamatan/CheckAvailability.php"
+                                       data-validation-target="UserAvailabilityStatus"
+                                       data-validation-param="UserNama"
+                                       placeholder="Masukkan Username" 
+                                       class="form-control" required autocomplete="off">
 
                             </div>
                         </div>

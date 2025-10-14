@@ -422,3 +422,85 @@ POST: Array
 )
 
 Data: NoTelepon=001280130183, AlamatDesa=sambirjo, Lat=-8.07330500, Lng=111.70253000, IdDesa=20201110200821150
+2025-10-13 14:24:53 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 081234567890
+    [AlamatDesa] => Test alamat desa dawuhan trenggalek
+    [Latitude] => -8.00412800
+    [Longitude] => 111.74142500
+    [Save] => 
+)
+
+Data: NoTelepon=081234567890, AlamatDesa=Test alamat desa dawuhan trenggalek, Lat=-8.00412800, Lng=111.74142500, IdDesa=20201110200952155
+2025-10-13 14:24:57 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 081234567890
+    [AlamatDesa] => Test alamat desa dawuhan trenggalek
+    [Latitude] => -8.004955
+    [Longitude] => 111.740542
+    [Save] => 
+)
+
+Data: NoTelepon=081234567890, AlamatDesa=Test alamat desa dawuhan trenggalek, Lat=-8.004955, Lng=111.740542, IdDesa=20201110200952155
+2025-10-13 14:25:04 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 081234567890
+    [AlamatDesa] => Test alamat desa dawuhan trenggalek
+    [Latitude] => -8.005804
+    [Longitude] => 111.743277
+    [Save] => 
+)
+
+Data: NoTelepon=081234567890, AlamatDesa=Test alamat desa dawuhan trenggalek, Lat=-8.005804, Lng=111.743277, IdDesa=20201110200952155
+2025-10-13 14:28:57 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [csrf_token] => 530c894fd7f956815f7f5f30ff678ea3a1daa4bd999d5b15f78ebc7254cb0e6c
+    [NoTelepon] => +62321123456
+    [AlamatKantor] => Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur
+    [Latitude] => -8.051938
+    [Longitude] => 111.704862
+    [Save] => 
+)
+
+Data: NoTelepon=+62321123456, AlamatKecamatan=Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur, Lat=-8.051938, Lng=111.704862, IdKecamatan=202008011139591
+2025-10-13 15:20:26 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [csrf_token] => f708bc21f24bd36a8eddf040b612785210e4e0b74c1db74e6d65824e6a430a17
+    [NoTelepon] => +62321123456
+    [AlamatKantor] => Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur
+    [Latitude] => -8.050204
+    [Longitude] => 111.710008
+    [Save] => 
+)
+
+Data: NoTelepon=+62321123456, AlamatKecamatan=Jl. Raya Trenggalek No. 1, Trenggalek, Jawa Timur, Lat=-8.050204, Lng=111.710008, IdKecamatan=202008011139591

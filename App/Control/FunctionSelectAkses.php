@@ -1,4 +1,9 @@
 <?php
+// Initialize variable if not set
+if (!isset($EditIdUser)) {
+    $EditIdUser = '';
+}
+
 if ($EditIdUser == '') {
 ?>
     <select name="Akses" id="Akses" style="width: 100%;" class="select2_akses form-control" required>

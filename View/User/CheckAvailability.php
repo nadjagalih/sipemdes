@@ -1,11 +1,28 @@
 <?php
-session_start();
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+// Secure session management (enhancement from referensi)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+error_reporting(E_ALL ^ E_NOTICE);
 
-require_once "../../Module/Config/Env.php";
+// Add CORS headers for AJAX requests
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    exit(0);
+}
+
+// Use absolute path to avoid path issues
+$env_path = $_SERVER['DOCUMENT_ROOT'] . '/sipemdes1/Module/Config/Env.php';
+require_once $env_path;
 
 if (!empty($_POST["UserNama"])) {
-    $Result = mysqli_query($db, "SELECT * FROM main_user WHERE NameAkses LIKE '" . $_POST["UserNama"] . "'");
+    // Sanitize input to prevent SQL injection (enhancement from referensi)  
+    $username = mysqli_real_escape_string($db, $_POST["UserNama"]);
+    $Result = mysqli_query($db, "SELECT * FROM main_user WHERE NameAkses LIKE '" . $username . "'");
     $row = mysqli_fetch_row($Result);
     if ($row > 0) {
         echo "<span class='status-no-sukses'> <b>Username Sudah Terpakai, Silahkan Cari Yang Lain !!!!</b></span>";

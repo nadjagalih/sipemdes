@@ -3,6 +3,10 @@ vendor/Media
 vendor/Charts
 Vendor/Assets/html5pdf
 
+# Large files (prevent files > 100MB)
+*.zip
+Vendor/Charts/api.zip
+
 # Database files
 *.sql
 *.db

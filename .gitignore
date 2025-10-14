@@ -1,7 +1,6 @@
 # Vendor folders
 vendor/Media
-Vendor/Charts/graphics
-Vendor/Assets/js
+vendor/Charts/api.zip
 Vendor/Assets/html5pdf
 
 # Database files

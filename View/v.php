@@ -114,6 +114,9 @@ $_SESSION['start_time'] = time();
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/bootstrap.js"></script>
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/metisMenu/jquery.metisMenu.js"></script>
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    
+    <!-- Secure Username Validation System -->
+    <script <?php echo CSPHandler::scriptNonce(); ?> src="../Assets/js/username-validation.js"></script>
 
     <!-- Flot -->
     <script <?php echo CSPHandler::scriptNonce(); ?> src="../Vendor/Assets/js/plugins/flot/jquery.flot.js"></script>

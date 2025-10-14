@@ -567,9 +567,6 @@ $showNotif = ($notifPensiun > 0 && empty($_SESSION['visited_pensiun_sadmin']));
         <li class="<?= isActive('Pass') ?>">
             <a href="?pg=Pass"><i class="fa fa-terminal"></i> <span class="nav-label">Ganti Password</span></a>
         </li>
-        <li class="special_link">
-            <a href="../Auth/SignOut"><i class="fa fa-power-off"></i> <span class="nav-label">Keluar</span></a>
-        </li>
 
         <li class="<?= isActive('ViewPegawaiReportExcel') ?>">
             <a href="?pg=ViewPegawaiReportExcel"><i class="fa fa-print"></i> <span class="nav-label">Laporan
@@ -577,6 +574,10 @@ $showNotif = ($notifPensiun > 0 && empty($_SESSION['visited_pensiun_sadmin']));
             <!-- <ul class="nav nav-second-level collapse">
                 <li><a href="">Semua Data</a></li>
             </ul> -->
+        </li>
+
+        <li class="special_link">
+            <a href="../Auth/SignOut"><i class="fa fa-power-off"></i> <span class="nav-label">Keluar</span></a>
         </li>
 
     </ul>

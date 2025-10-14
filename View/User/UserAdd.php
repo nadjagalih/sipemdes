@@ -1,20 +1,4 @@
 <?php require_once "../Module/Security/Security.php"; ?>
-
-<script>
-    function checkAvailability() {
-        // $( "#loaderIcon" ).show();
-        jQuery.ajax({
-            url: "User/CheckAvailability.php",
-            data: 'UserNama=' + $("#UserNama").val(),
-            type: "POST",
-            success: function(data) {
-                $("#UserAvailabilityStatus").html(data);
-                $("#loaderIcon").hide();
-            },
-            error: function() {}
-        });
-    }
-</script>
 <style>
     .status-sukses {
         background: white;
@@ -76,7 +60,15 @@
                         <?php echo CSRFProtection::getTokenField(); ?>
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Username</label>
                             <div class="col-lg-8">
-                                <input type="text" name="UserNama" id="UserNama" onkeyup="checkAvailability()" placeholder="Masukkan Username" class="form-control" required autocomplete="off">
+                                <input type="text" 
+                                       name="UserNama" 
+                                       id="UserNama" 
+                                       data-validation="username"
+                                       data-validation-endpoint="User/CheckAvailability.php"
+                                       data-validation-target="UserAvailabilityStatus"
+                                       data-validation-param="UserNama"
+                                       placeholder="Masukkan Username" 
+                                       class="form-control" required autocomplete="off">
 
                             </div>
                         </div>
@@ -88,3 +80,5 @@
         </div>
     </div>
 </div>
+
+<script src="../Assets/js/username-validation.js"></script>

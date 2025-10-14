@@ -11,13 +11,12 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
 // Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);
 }
 
-// Use absolute path to avoid path issues
-$env_path = $_SERVER['DOCUMENT_ROOT'] . '/sipemdes1/Module/Config/Env.php';
-require_once $env_path;
+// Use relative path to avoid path issues
+require_once "../../Module/Config/Env.php";
 
 if (!empty($_POST["UserNama"])) {
     // Sanitize input to prevent SQL injection (enhancement from referensi)  

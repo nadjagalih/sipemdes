@@ -13,7 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-session_start();
+// Start session only if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 // Use absolute path for database connection
@@ -37,7 +40,10 @@ if (!empty($_POST["UserNama"])) {
         </div>
         <div class="form-group row"><label class="col-lg-4 col-form-label">Hak Akses</label>
             <div class="col-lg-8">
-                <?php include "../../App/Control/FunctionSelectAksesKecamatan.php"; ?>
+                <?php 
+                $EditIdUser = ''; // Define variable for new user (empty for add mode)
+                include "../../App/Control/FunctionSelectAksesKecamatan.php"; 
+                ?>
             </div>
         </div>
         <!-- <div class="form-group row"><label class="col-lg-4 col-form-label">NIK</label>
@@ -60,7 +66,10 @@ if (!empty($_POST["UserNama"])) {
 
         <div class="form-group row"><label class="col-lg-4 col-form-label">Kecamatan</label>
             <div class="col-lg-8">
-                <?php include "../../App/Control/FunctionSelectKecamatanKec.php"; ?>
+                <?php 
+                $EditIdKecamatanFK = ''; // Define variable for new user (empty for add mode)
+                include "../../App/Control/FunctionSelectKecamatanKec.php"; 
+                ?>
             </div>
         </div>
 

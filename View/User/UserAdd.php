@@ -63,16 +63,16 @@
                                 <input type="text" 
                                        name="UserNama" 
                                        id="UserNama" 
-                                       placeholder="Masukkan Username" 
-                                       class="form-control" 
-                                       required 
-                                       autocomplete="off"
                                        data-validation="username"
                                        data-validation-endpoint="User/CheckAvailability.php"
-                                       data-validation-target="UserAvailabilityStatus">
-                                <span id="UserAvailabilityStatus" class="form-text m-b-none"></span>
+                                       data-validation-target="UserAvailabilityStatus"
+                                       data-validation-param="UserNama"
+                                       placeholder="Masukkan Username" 
+                                       class="form-control" required autocomplete="off">
+
                             </div>
                         </div>
+                        <span id="UserAvailabilityStatus" class="form-text m-b-none"></span>
 
                     </form>
                 </div>
@@ -80,3 +80,5 @@
         </div>
     </div>
 </div>
+
+<script src="../Assets/js/username-validation.js"></script>

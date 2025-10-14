@@ -79,3 +79,5 @@
         </div>
     </div>
 </div>
+
+<script src="../Assets/js/username-validation.js"></script>

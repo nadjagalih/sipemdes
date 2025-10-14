@@ -1,6 +1,5 @@
 # Vendor folders
 vendor/Media
-vendor/Charts
 Vendor/Assets/html5pdf
 
 # Large files (prevent files > 100MB)

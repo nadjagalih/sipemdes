@@ -128,7 +128,7 @@ if ($QueryAward && mysqli_num_rows($QueryAward) > 0) {
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a href="#" onclick="confirmDeleteAward('<?php echo $IdAward; ?>', '<?php echo addslashes($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>')">
+                                <a href="#" class="delete-award-btn" data-award-id="<?php echo $IdAward; ?>" data-award-name="<?php echo htmlspecialchars($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>">
                                     <i class="fa fa-trash text-danger"></i> Hapus
                                 </a>
                             </li>

@@ -3,27 +3,31 @@ require_once "../Module/Security/CSPHandler.php";
 ?>
 <script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     $(document).ready(function() {
-        $.ajax({
-            type: 'POST',
-            url: "Report/Pegawai/GetKecamatan.php",
-            cache: false,
-            success: function(msg) {
-                $("#Kecamatan").html(msg);
-            }
-        });
         $("#Kecamatan").change(function() {
             var Kecamatan = $("#Kecamatan").val();
-            $.ajax({
-                type: 'POST',
-                url: "Report/Pegawai/GetDesa.php",
-                data: {
-                    Kecamatan: Kecamatan
-                },
-                cache: false,
-                success: function(msg) {
-                    $("#Desa").html(msg);
-                }
-            });
+            console.log("Kecamatan selected: " + Kecamatan);
+            if(Kecamatan != '') {
+                $.ajax({
+                    type: 'POST',
+                    url: "Report/Pegawai/GetDesa.php",
+                    data: {
+                        Kecamatan: Kecamatan
+                    },
+                    cache: false,
+                    success: function(msg) {
+                        console.log("AJAX Success response: ", msg);
+                        $("#Desa").html(msg);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("AJAX Error: " + error);
+                        console.log("XHR Status: " + xhr.status);
+                        console.log("Response Text: " + xhr.responseText);
+                        $("#Desa").html('<option value="">Error loading desa</option>');
+                    }
+                });
+            } else {
+                $("#Desa").html('<option value="">Filter Desa</option>');
+            }
         });
     });
 </script>
@@ -60,6 +64,14 @@ require_once "../Module/Security/CSPHandler.php";
                                 <div class="col-lg-6">
                                     <select name="Kecamatan" id="Kecamatan" style="width: 100%;" class="select2_kecamatan form-control" required>
                                         <option value="">Filter Kecamatan</option>
+                                        <?php
+                                        $QueryKecamatanList = mysqli_query($db, "SELECT * FROM master_kecamatan ORDER BY Kecamatan ASC");
+                                        while ($RowKecamatanList = mysqli_fetch_assoc($QueryKecamatanList)) {
+                                            $IdKecamatanList = isset($RowKecamatanList['IdKecamatan']) ? $RowKecamatanList['IdKecamatan'] : '';
+                                            $NamaKecamatanList = isset($RowKecamatanList['Kecamatan']) ? $RowKecamatanList['Kecamatan'] : '';
+                                        ?>
+                                            <option value="<?php echo htmlspecialchars($IdKecamatanList); ?>"><?php echo htmlspecialchars($NamaKecamatanList); ?></option>
+                                        <?php } ?>
                                     </select>
                                 </div>
                             </div>
@@ -209,23 +221,34 @@ require_once "../Module/Security/CSPHandler.php";
                                         $NIK = $DataPegawai['NIK'];
                                         $Nama = $DataPegawai['Nama'];
 
-                                        $TanggalLahir = $DataPegawai['TanggalLahir'];
-                                        $exp = explode('-', $TanggalLahir);
-                                        $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+                                        $TanggalLahir = isset($DataPegawai['TanggalLahir']) ? $DataPegawai['TanggalLahir'] : '';
+                                        if (!empty($TanggalLahir)) {
+                                            $exp = explode('-', $TanggalLahir);
+                                            $ViewTglLahir = (isset($exp[2]) && isset($exp[1]) && isset($exp[0])) ? 
+                                                $exp[2] . "-" . $exp[1] . "-" . $exp[0] : $TanggalLahir;
+                                        } else {
+                                            $ViewTglLahir = '-';
+                                        }
 
-                                        $TanggalPensiun = $DataPegawai['TanggalPensiun'];
-                                        $exp1 = explode('-', $TanggalPensiun);
-                                        $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+                                        $TanggalPensiun = isset($DataPegawai['TanggalPensiun']) ? $DataPegawai['TanggalPensiun'] : '';
+                                        if (!empty($TanggalPensiun)) {
+                                            $exp1 = explode('-', $TanggalPensiun);
+                                            $ViewTglPensiun = (isset($exp1[2]) && isset($exp1[1]) && isset($exp1[0])) ? 
+                                                $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0] : $TanggalPensiun;
+                                        } else {
+                                            $ViewTglPensiun = '-';
+                                        }
 
                                         //HITUNG DETAIL TANGGAL PENSIUN
-                                        $TglPensiun = date_create($TanggalPensiun);
-                                        $TglSekarang = date_create();
-                                        $Temp = date_diff($TglSekarang, $TglPensiun);
+                                        if (!empty($TanggalPensiun) && $TanggalPensiun != '0000-00-00') {
+                                            $TglPensiun = date_create($TanggalPensiun);
+                                            $TglSekarang = date_create();
+                                            $Temp = date_diff($TglSekarang, $TglPensiun);
 
-                                        //CEK TANGGAL ASLI SAAT INI
-                                        $TglSekarang1 = Date('Y-m-d');
+                                            //CEK TANGGAL ASLI SAAT INI
+                                            $TglSekarang1 = Date('Y-m-d');
 
-                                        if ($TglSekarang1 >= $TanggalPensiun) {
+                                            if ($TglSekarang1 >= $TanggalPensiun) {
                                             $HasilTahun = 0 . ' Tahun ';
                                             $HasilBulan = 0 . ' Bulan ';
                                             $HasilHari = 0 . ' Hari ';
@@ -234,41 +257,60 @@ require_once "../Module/Security/CSPHandler.php";
                                             $HasilBulan = $Temp->m . ' Bulan ';
                                             $HasilHari = $Temp->d + 1 . ' Hari ';
                                         }
+                                        } else {
+                                            // No pension date or invalid date
+                                            $HasilTahun = '-';
+                                            $HasilBulan = '-';
+                                            $HasilHari = '-';
+                                        }
                                         //SELESAI
 
-                                        $JenKel = $DataPegawai['JenKel'];
-                                        $KodeDesa = $DataPegawai['KodeDesa'];
-                                        $NamaDesa = $DataPegawai['NamaDesa'];
-                                        $Kecamatan = $DataPegawai['Kecamatan'];
-                                        $Kabupaten = $DataPegawai['Kabupaten'];
-                                        $Alamat = $DataPegawai['Alamat'];
-                                        $RT = $DataPegawai['RT'];
-                                        $RW = $DataPegawai['RW'];
+                                        $JenKel = isset($DataPegawai['JenKel']) ? $DataPegawai['JenKel'] : '';
+                                        $KodeDesa = isset($DataPegawai['KodeDesa']) ? $DataPegawai['KodeDesa'] : '';
+                                        $NamaDesa = isset($DataPegawai['NamaDesa']) ? $DataPegawai['NamaDesa'] : '';
+                                        $Kecamatan = isset($DataPegawai['Kecamatan']) ? $DataPegawai['Kecamatan'] : '';
+                                        $Kabupaten = isset($DataPegawai['Kabupaten']) ? $DataPegawai['Kabupaten'] : '';
+                                        $Alamat = isset($DataPegawai['Alamat']) ? $DataPegawai['Alamat'] : '';
+                                        $RT = isset($DataPegawai['RT']) ? $DataPegawai['RT'] : '';
+                                        $RW = isset($DataPegawai['RW']) ? $DataPegawai['RW'] : '';
 
-                                        $Lingkungan = $DataPegawai['Lingkungan'];
-                                        $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
-                                        $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-                                        $Komunitas = $LingkunganBPD['NamaDesa'];
+                                        $Lingkungan = isset($DataPegawai['Lingkungan']) ? $DataPegawai['Lingkungan'] : '';
+                                        if (!empty($Lingkungan)) {
+                                            $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
+                                            $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
+                                            $Komunitas = isset($LingkunganBPD['NamaDesa']) ? $LingkunganBPD['NamaDesa'] : '';
+                                        } else {
+                                            $Komunitas = '';
+                                        }
 
-                                        $KecamatanBPD = $DataPegawai['Kec'];
-                                        $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
-                                        $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-                                        $KomunitasKec = $KecamatanBPD['Kecamatan'];
+                                        $KecamatanBPD = isset($DataPegawai['Kec']) ? $DataPegawai['Kec'] : '';
+                                        if (!empty($KecamatanBPD)) {
+                                            $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
+                                            $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
+                                            $KomunitasKec = isset($KecamatanBPD['Kecamatan']) ? $KecamatanBPD['Kecamatan'] : '';
+                                        } else {
+                                            $KomunitasKec = '';
+                                        }
 
                                         $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
-                                        $Setting = $DataPegawai['Setting'];
-                                        $JenisMutasi = $DataPegawai['JenisMutasi'];
+                                        $Setting = isset($DataPegawai['Setting']) ? $DataPegawai['Setting'] : '';
+                                        $JenisMutasi = isset($DataPegawai['JenisMutasi']) ? $DataPegawai['JenisMutasi'] : '';
 
-                                        $TglSKMutasi = $DataPegawai['TanggalMutasi'];
-                                        $exp2 = explode('-', $TglSKMutasi);
-                                        $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
+                                        $TglSKMutasi = isset($DataPegawai['TanggalMutasi']) ? $DataPegawai['TanggalMutasi'] : '';
+                                        if (!empty($TglSKMutasi)) {
+                                            $exp2 = explode('-', $TglSKMutasi);
+                                            $TanggalMutasi = (isset($exp2[2]) && isset($exp2[1]) && isset($exp2[0])) ? 
+                                                $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0] : $TglSKMutasi;
+                                        } else {
+                                            $TanggalMutasi = '-';
+                                        }
 
-                                        $NomorSK = $DataPegawai['NomorSK'];
-                                        $SKMutasi = $DataPegawai['FileSKMutasi'];
-                                        $Jabatan = $DataPegawai['Jabatan'];
-                                        $KetJabatan = $DataPegawai['KeteranganJabatan'];
-                                        $Siltap = number_format($DataPegawai['Siltap'], 0, ",", ".");
-                                        $Telp = $DataPegawai['NoTelp'];
+                                        $NomorSK = isset($DataPegawai['NomorSK']) ? $DataPegawai['NomorSK'] : '';
+                                        $SKMutasi = isset($DataPegawai['FileSKMutasi']) ? $DataPegawai['FileSKMutasi'] : '';
+                                        $Jabatan = isset($DataPegawai['Jabatan']) ? $DataPegawai['Jabatan'] : '';
+                                        $KetJabatan = isset($DataPegawai['KeteranganJabatan']) ? $DataPegawai['KeteranganJabatan'] : '';
+                                        $Siltap = isset($DataPegawai['Siltap']) ? number_format($DataPegawai['Siltap'], 0, ",", ".") : '0';
+                                        $Telp = isset($DataPegawai['NoTelp']) ? $DataPegawai['NoTelp'] : '';
 
                                     ?>
 
@@ -307,7 +349,12 @@ require_once "../Module/Security/CSPHandler.php";
                                                 <?php
                                                 $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
                                                 $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-                                                $JenisKelamin = $DataJenKel['Keterangan'];
+                                                $JenisKelamin = '';
+                                                if ($DataJenKel && isset($DataJenKel['Keterangan'])) {
+                                                    $JenisKelamin = $DataJenKel['Keterangan'];
+                                                } else {
+                                                    $JenisKelamin = '-';
+                                                }
                                                 echo $JenisKelamin;
                                                 ?>
                                             </td>
@@ -324,7 +371,12 @@ require_once "../Module/Security/CSPHandler.php";
                                                 INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
                                         WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
                                                 $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-                                                $Pendidikan = $DataPendidikan['JenisPendidikan'];
+                                                $Pendidikan = '';
+                                                if ($DataPendidikan && isset($DataPendidikan['JenisPendidikan'])) {
+                                                    $Pendidikan = $DataPendidikan['JenisPendidikan'];
+                                                } else {
+                                                    $Pendidikan = '-';
+                                                }
                                                 echo $Pendidikan;
                                                 ?>
                                             </td>

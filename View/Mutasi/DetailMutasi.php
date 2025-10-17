@@ -118,7 +118,7 @@ if (isset($_GET['Kode'])) {
                                                     <button type="button" class="btn btn-outline btn-default"><i class="fa fa-edit"></i></button>
                                                     <button type="button" class="btn btn-outline btn-default"><i class="fa fa-book"></i></button>
                                                     <!-- <button type="button" class="btn btn-outline btn-default"><i class="fa fa-eraser"></i></button> -->
-                                                    <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $IdMutasi; ?> ?');">
+                                                    <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus jabatan NON-AKTIF dengan ID: <?php echo $IdMutasi; ?>?');">
                                                         <button class="btn btn-outline btn-danger  btn-md" data-toggle="tooltip" title="Delete"><i class="fa fa-eraser"></i></button>
                                                     </a>
                                                 <?php } elseif ($SetMutasi == 1) { ?>
@@ -128,7 +128,7 @@ if (isset($_GET['Kode'])) {
                                                     <a href="?pg=EditMutasiSK&Kode=<?php echo $IdMutasi; ?>">
                                                         <button class="btn btn-outline btn-success btn-md" data-toggle="tooltip" title="Upload SK"><i class="fa fa-book"></i></button>
                                                     </a>
-                                                    <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $IdMutasi; ?> ?');">
+                                                    <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus jabatan AKTIF dengan ID: <?php echo $IdMutasi; ?>? \n\nJika dihapus, jabatan NON-AKTIF terbaru akan otomatis diaktifkan.');">
                                                         <button class="btn btn-outline btn-danger  btn-md" data-toggle="tooltip" title="Delete"><i class="fa fa-eraser"></i></button>
                                                     </a>
                                                 <?php } ?>
@@ -240,7 +240,7 @@ if (isset($_GET['Kode'])) {
                                                         <a href="?pg=EditMutasiSK&Kode=<?php echo $IdMutasi; ?>">
                                                             <button class="btn btn-outline btn-success btn-md" data-toggle="tooltip" title="Upload SK"><i class="fa fa-book"></i></button>
                                                         </a>
-                                                        <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $IdMutasi; ?> ?');">
+                                                        <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus jabatan AKTIF dengan ID: <?php echo $IdMutasi; ?>? \n\nJika dihapus, jabatan NON-AKTIF terbaru akan otomatis diaktifkan.');">
                                                             <button class="btn btn-outline btn-danger  btn-md" data-toggle="tooltip" title="Delete"><i class="fa fa-eraser"></i></button>
                                                         </a>
                                                     <?php } ?>

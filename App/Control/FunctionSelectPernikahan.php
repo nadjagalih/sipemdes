@@ -8,8 +8,13 @@ if (!empty($Pernikahan)) {
     $queryEdit = mysqli_query($db, "SELECT * FROM master_status_pernikahan WHERE IdPernikahan = '$Pernikahan'");
     if ($queryEdit && mysqli_num_rows($queryEdit) > 0) {
         $dataEdit = mysqli_fetch_assoc($queryEdit);
-        $EditPernikahan = $dataEdit['StatusPernikahan'] ?? '';
+        $EditPernikahan = $dataEdit['Status'] ?? '';
     }
+}
+
+// Check if we have edit data from FunctionPegawaiEdit.php
+if (isset($EditNamaSTNikah) && !empty($EditNamaSTNikah)) {
+    $EditPernikahan = $EditNamaSTNikah;
 }
 
 if (empty($Pernikahan)) {
@@ -21,7 +26,7 @@ if (empty($Pernikahan)) {
         if ($QueryPernikahan && mysqli_num_rows($QueryPernikahan) > 0) {
             while ($DataPernikahan = mysqli_fetch_assoc($QueryPernikahan)) {
                 $IdPernikahanOption = $DataPernikahan['IdPernikahan'];
-                $PernikahanOption = $DataPernikahan['StatusPernikahan'];
+                $PernikahanOption = $DataPernikahan['Status'];
         ?>
             <option value="<?php echo $IdPernikahanOption; ?>"><?php echo $PernikahanOption; ?></option>
         <?php 
@@ -38,7 +43,7 @@ if (empty($Pernikahan)) {
         if ($QueryPernikahan && mysqli_num_rows($QueryPernikahan) > 0) {
             while ($DataPernikahan = mysqli_fetch_assoc($QueryPernikahan)) {
                 $IdPernikahanOption = $DataPernikahan['IdPernikahan'];
-                $PernikahanOption = $DataPernikahan['StatusPernikahan'];
+                $PernikahanOption = $DataPernikahan['Status'];
         ?>
             <option value="<?php echo $IdPernikahanOption; ?>"><?php echo $PernikahanOption; ?></option>
         <?php 

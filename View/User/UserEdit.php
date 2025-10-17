@@ -74,7 +74,7 @@ include "../App/Control/FunctionPegawaiEdit.php";
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <form action="../App/Model/ExcUser?Act=Edit" method="POST" enctype="multipart/form-data">
+                    <form action="../App/Model/ExcUserSimple?Act=Edit" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="IdUser" id="IdUser" value="<?php echo $EditIdUser; ?>">
                         <input type="hidden" name="IdPegawaiFK" id="IdPegawaiFK" value="<?php echo $IdPegawaiFK; ?>">
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Username</label>

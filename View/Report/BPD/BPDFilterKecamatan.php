@@ -1,16 +1,3 @@
-<script type="text/javascript">
-    $(document).ready(function() {
-        $.ajax({
-            type: 'POST',
-            url: "Report/BPD/GetKecamatan.php",
-            cache: false,
-            success: function(msg) {
-                $("#Kecamatan").html(msg);
-            }
-        });
-    });
-</script>
-
 <form action="?pg=BPDFilterKecamatan" method="post" enctype="multipart/form-data">
     <div class="row">
         <div class="col-lg-12">
@@ -43,6 +30,14 @@
                                 <div class="col-lg-6">
                                     <select name="Kecamatan" id="Kecamatan" style="width: 100%;" class="select2_kecamatan form-control" required>
                                         <option value="">Filter Kecamatan</option>
+                                        <?php
+                                        $QueryKecamatanList = mysqli_query($db, "SELECT * FROM master_kecamatan ORDER BY Kecamatan ASC");
+                                        while ($RowKecamatanList = mysqli_fetch_assoc($QueryKecamatanList)) {
+                                            $IdKecamatanList = isset($RowKecamatanList['IdKecamatan']) ? $RowKecamatanList['IdKecamatan'] : '';
+                                            $NamaKecamatanList = isset($RowKecamatanList['Kecamatan']) ? $RowKecamatanList['Kecamatan'] : '';
+                                        ?>
+                                            <option value="<?php echo htmlspecialchars($IdKecamatanList); ?>"><?php echo htmlspecialchars($NamaKecamatanList); ?></option>
+                                        <?php } ?>
                                     </select>
                                 </div>
                             </div>
@@ -64,14 +59,14 @@
 
         $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan ='$Kecamatan' ");
         $DataKecamatan = mysqli_fetch_assoc($QueryKecamatan);
-        $NamaKecamatan = $DataKecamatan['Kecamatan'];
+        $NamaKecamatan = ($DataKecamatan && isset($DataKecamatan['Kecamatan'])) ? $DataKecamatan['Kecamatan'] : '';
 
     ?>
         <div class="row">
             <div class="col-lg-12">
                 <div class="ibox ">
                     <div class="ibox-title">
-                        <h5>Hasil Data Filter BPD Desa Kecamatan <?php echo htmlspecialchars(NamaKecamatan); ?></h5>
+                        <h5>Hasil Data Filter BPD Desa Kecamatan <?php echo htmlspecialchars($NamaKecamatan); ?></h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -156,53 +151,53 @@
                                         $Lingkungan = $DataPegawai['Lingkungan'];
                                         $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
                                         $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-                                        $Komunitas = $LingkunganBPD['NamaDesa'];
+                                        $Komunitas = ($LingkunganBPD && isset($LingkunganBPD['NamaDesa'])) ? $LingkunganBPD['NamaDesa'] : '';
 
                                         $KecamatanBPD = $DataPegawai['Kec'];
                                         $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
                                         $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-                                        $KomunitasKec = $KecamatanBPD['Kecamatan'];
+                                        $KomunitasKec = ($KecamatanBPD && isset($KecamatanBPD['Kecamatan'])) ? $KecamatanBPD['Kecamatan'] : '';
 
-                                        $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec
+                                        $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
                                     ?>
 
                                         <tr class="gradeX">
                                             <td>
-                                                <?php echo htmlspecialchars(Nomor); ?>
+                                                <?php echo htmlspecialchars($Nomor); ?>
                                             </td>
 
                                             <?php
                                             if (empty($Foto)) {
                                             ?>
                                                 <td>
-                                                    <a href="?pg=BPDViewFoto&Kode=<?php echo htmlspecialchars(IdPegawaiFK); ?>" title="Edit Foto"><img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/no-image.jpg"></a>
+                                                    <a href="?pg=BPDViewFoto&Kode=<?php echo htmlspecialchars($IdPegawaiFK); ?>" title="Edit Foto"><img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/no-image.jpg"></a>
                                                 </td>
                                             <?php } else { ?>
                                                 <td>
-                                                    <a href="?pg=BPDViewFoto&Kode=<?php echo htmlspecialchars(IdPegawaiFK); ?>" title="Edit Foto"><img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo htmlspecialchars(Foto); ?>"></a>
+                                                    <a href="?pg=BPDViewFoto&Kode=<?php echo htmlspecialchars($IdPegawaiFK); ?>" title="Edit Foto"><img style="width:80px; height:auto" alt="image" class="message-avatar" src="../Vendor/Media/Pegawai/<?php echo htmlspecialchars($Foto); ?>"></a>
                                                 </td>
                                             <?php } ?>
 
                                             <td>
-                                                <?php echo htmlspecialchars(NIK); ?>
+                                                <?php echo htmlspecialchars($NIK); ?>
                                             </td>
                                             <td>
-                                                <strong><?php echo htmlspecialchars(Nama); ?></strong><br><br>
-                                                <?php echo htmlspecialchars(Address); ?>
+                                                <strong><?php echo htmlspecialchars($Nama); ?></strong><br><br>
+                                                <?php echo htmlspecialchars($Address); ?>
                                             </td>
                                             <td>
-                                                <?php echo htmlspecialchars(ViewTglLahir); ?><br>
+                                                <?php echo htmlspecialchars($ViewTglLahir); ?><br>
                                                 <?php
                                                 $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
                                                 $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-                                                $JenisKelamin = $DataJenKel['Keterangan'];
-                                                echo htmlspecialchars(JenisKelamin);
+                                                $JenisKelamin = ($DataJenKel && isset($DataJenKel['Keterangan'])) ? $DataJenKel['Keterangan'] : '';
+                                                echo htmlspecialchars($JenisKelamin);
                                                 ?>
                                             </td>
                                             <td>
-                                                <?php echo htmlspecialchars(NamaDesa); ?><br>
-                                                <?php echo htmlspecialchars(Kecamatan); ?><br>
-                                                <?php echo htmlspecialchars(Kabupaten); ?>
+                                                <?php echo htmlspecialchars($NamaDesa); ?><br>
+                                                <?php echo htmlspecialchars($Kecamatan); ?><br>
+                                                <?php echo htmlspecialchars($Kabupaten); ?>
                                             </td>
                                         </tr>
                                     <?php $Nomor++;

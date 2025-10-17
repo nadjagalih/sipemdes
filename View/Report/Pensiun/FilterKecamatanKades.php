@@ -1,11 +1,20 @@
-<script type="text/javascript">
+<?php
+require_once "../Module/Security/CSPHandler.php";
+?>
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     $(document).ready(function() {
+        console.log("Document ready - FilterKecamatanKades");
         $.ajax({
             type: 'POST',
             url: "Report/Pensiun/GetKecamatan.php",
             cache: false,
             success: function(msg) {
+                console.log("AJAX Success for Kecamatan loading:", msg);
                 $("#Kecamatan").html(msg);
+            },
+            error: function(xhr, status, error) {
+                console.log("AJAX Error loading Kecamatan:", error);
+                console.log("Response:", xhr.responseText);
             }
         });
     });
@@ -43,6 +52,14 @@
                                 <div class="col-lg-6">
                                     <select name="Kecamatan" id="Kecamatan" style="width: 100%;" class="select2_kecamatan form-control" required>
                                         <option value="">Filter Kecamatan</option>
+                                        <?php
+                                        $QueryKecamatanList = mysqli_query($db, "SELECT * FROM master_kecamatan ORDER BY Kecamatan ASC");
+                                        while ($RowKecamatanList = mysqli_fetch_assoc($QueryKecamatanList)) {
+                                            $IdKecamatanList = isset($RowKecamatanList['IdKecamatan']) ? $RowKecamatanList['IdKecamatan'] : '';
+                                            $NamaKecamatanList = isset($RowKecamatanList['Kecamatan']) ? $RowKecamatanList['Kecamatan'] : '';
+                                        ?>
+                                            <option value="<?php echo htmlspecialchars($IdKecamatanList); ?>"><?php echo htmlspecialchars($NamaKecamatanList); ?></option>
+                                        <?php } ?>
                                     </select>
                                 </div>
                             </div>

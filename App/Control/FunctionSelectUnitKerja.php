@@ -1,7 +1,16 @@
 <?php
 // Definisi dan validasi variabel
-$UnitKerja = isset($_GET['UnitKerja']) ? mysqli_real_escape_string($db, $_GET['UnitKerja']) : '';
+$UnitKerja = '';
 $EditNamaUnitKerja = '';
+
+// Get UnitKerja from various sources
+if (isset($_GET['UnitKerja'])) {
+    $UnitKerja = mysqli_real_escape_string($db, $_GET['UnitKerja']);
+} elseif (isset($DataPegawaiEdit['IdDesaFK'])) {
+    $UnitKerja = $DataPegawaiEdit['IdDesaFK'];
+} elseif (isset($IdDesaFK)) {
+    $UnitKerja = $IdDesaFK;
+}
 
 // Mode edit: ambil data unit kerja yang dipilih
 if (!empty($UnitKerja)) {

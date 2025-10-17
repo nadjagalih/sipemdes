@@ -39,8 +39,8 @@ include "../App/Control/FunctionUserEdit.php";
                         </div>
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Password</label>
                             <div class="col-lg-8">
-                                <input type="text" name="Pass" id="Pass" value="12345" class="form-control" readonly>
-                                <span class="form-text m-b-none" style="font-style: italic;">*) Reset Password Ke Default</span>
+                                <input type="text" name="Pass" id="Pass" value="" class="form-control" placeholder="Masukkan password baru">
+                                <span class="form-text m-b-none" style="font-style: italic;">*) Masukkan password baru untuk user ini</span>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -79,13 +79,23 @@ include "../App/Control/FunctionUserEdit.php";
     });
 
     // Fallback - force pace to complete after DOM is ready
+    // Also handle other DOM-ready tasks
     document.addEventListener('DOMContentLoaded', function() {
+        // Handle pace loading
         setTimeout(function() {
             if (typeof Pace !== 'undefined' && Pace.running) {
                 Pace.stop();
             }
             document.body.classList.add('pace-done');
         }, 2000); // Wait 2 seconds after DOM ready
+        
+        // Handle notification bar
+        if (localStorage.getItem('notifBarClosed') === 'true') {
+            const notifBar = document.querySelector('.notification-bar');
+            if (notifBar) {
+                notifBar.style.display = 'none';
+            }
+        }
     });
     
     // Function untuk close notification bar
@@ -100,14 +110,4 @@ include "../App/Control/FunctionUserEdit.php";
             }, 300);
         }
     }
-    
-    // Check apakah notification bar sudah di-close sebelumnya
-    document.addEventListener('DOMContentLoaded', function() {
-        if (localStorage.getItem('notifBarClosed') === 'true') {
-            const notifBar = document.querySelector('.notification-bar');
-            if (notifBar) {
-                notifBar.style.display = 'none';
-            }
-        }
-    });
 </script>

@@ -193,19 +193,31 @@ $IdKec = $_SESSION['IdKecamatan'];
                                         $exp = explode('-', $TanggalLahir);
                                         $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
 
-                                        $TanggalPensiun = $DataPegawai['TanggalPensiun'];
-                                        $exp1 = explode('-', $TanggalPensiun);
-                                        $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+                                        $TanggalPensiun = isset($DataPegawai['TanggalPensiun']) ? $DataPegawai['TanggalPensiun'] : '';
+                                        if (!empty($TanggalPensiun)) {
+                                            $exp1 = explode('-', $TanggalPensiun);
+                                            $ViewTglPensiun = (isset($exp1[2]) ? $exp1[2] : '') . "-" . (isset($exp1[1]) ? $exp1[1] : '') . "-" . (isset($exp1[0]) ? $exp1[0] : '');
+                                        } else {
+                                            $ViewTglPensiun = '-';
+                                        }
 
                                         //HITUNG DETAIL TANGGAL PENSIUN
-                                        $TglPensiun = date_create($TanggalPensiun);
-                                        $TglSekarang = date_create();
-                                        $Temp = date_diff($TglSekarang, $TglPensiun);
+                                        if (!empty($TanggalPensiun)) {
+                                            $TglPensiun = date_create($TanggalPensiun);
+                                            $TglSekarang = date_create();
+                                            $Temp = date_diff($TglSekarang, $TglPensiun);
+                                        } else {
+                                            $Temp = null;
+                                        }
 
                                         //CEK TANGGAL ASLI SAAT INI
-                                        $TglSekarang1 = Date('Y-m-d');
+                                        $TglSekarang1 = date('Y-m-d');
 
-                                        if ($TglSekarang1 >= $TanggalPensiun) {
+                                        if (empty($TanggalPensiun) || $Temp === null) {
+                                            $HasilTahun = '-';
+                                            $HasilBulan = '';
+                                            $HasilHari = '';
+                                        } elseif ($TglSekarang1 >= $TanggalPensiun) {
                                             $HasilTahun = 0 . ' Tahun ';
                                             $HasilBulan = 0 . ' Bulan ';
                                             $HasilHari = 0 . ' Hari ';
@@ -228,23 +240,23 @@ $IdKec = $_SESSION['IdKecamatan'];
                                         $Lingkungan = $DataPegawai['Lingkungan'];
                                         $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
                                         $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-                                        $Komunitas = $LingkunganBPD['NamaDesa'];
+                                        $Komunitas = ($LingkunganBPD && isset($LingkunganBPD['NamaDesa'])) ? $LingkunganBPD['NamaDesa'] : '-';
 
                                         $KecamatanBPD = $DataPegawai['Kec'];
                                         $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
                                         $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-                                        $KomunitasKec = $KecamatanBPD['Kecamatan'];
+                                        $KomunitasKec = ($KecamatanBPD && isset($KecamatanBPD['Kecamatan'])) ? $KecamatanBPD['Kecamatan'] : '-';
 
                                         $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
                                         $Setting = $DataPegawai['Setting'];
-                                        $JenisMutasi = $DataPegawai['JenisMutasi'];
+                                        $JenisMutasi = isset($DataPegawai['JenisMutasi']) ? $DataPegawai['JenisMutasi'] : '';
 
                                         $TglSKMutasi = $DataPegawai['TanggalMutasi'];
                                         $exp2 = explode('-', $TglSKMutasi);
                                         $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
 
                                         $NomorSK = $DataPegawai['NomorSK'];
-                                        $SKMutasi = $DataPegawai['FileSKMutasi'];
+                                        $SKMutasi = isset($DataPegawai['FileSKMutasi']) ? $DataPegawai['FileSKMutasi'] : '';
                                         $Jabatan = $DataPegawai['Jabatan'];
                                         $KetJabatan = $DataPegawai['KeteranganJabatan'];
                                         $Siltap = number_format($DataPegawai['Siltap'], 0, ",", ".");
@@ -283,7 +295,11 @@ $IdKec = $_SESSION['IdKecamatan'];
                                                 <?php
                                                 $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
                                                 $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-                                                $JenisKelamin = $DataJenKel['Keterangan'];
+                                                if ($DataJenKel && isset($DataJenKel['Keterangan'])) {
+                                                    $JenisKelamin = $DataJenKel['Keterangan'];
+                                                } else {
+                                                    $JenisKelamin = '-';
+                                                }
                                                 echo $JenisKelamin;
                                                 ?>
                                             </td>
@@ -300,7 +316,11 @@ $IdKec = $_SESSION['IdKecamatan'];
                                                 INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
                                         WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
                                                 $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-                                                $Pendidikan = $DataPendidikan['JenisPendidikan'];
+                                                if ($DataPendidikan && isset($DataPendidikan['JenisPendidikan'])) {
+                                                    $Pendidikan = $DataPendidikan['JenisPendidikan'];
+                                                } else {
+                                                    $Pendidikan = '-';
+                                                }
                                                 echo $Pendidikan;
                                                 ?>
                                             </td>

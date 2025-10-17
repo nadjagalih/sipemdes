@@ -3,23 +3,33 @@ session_start();
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 include '../../../Module/Config/Env.php';
+require_once('../../../Vendor/html2pdf/vendor/autoload.php');
+
+use Spipu\Html2Pdf\Html2Pdf;
 
 $Tanggal_Cetak = date('d-m-Y');
 $Waktu_Cetak = date('H:i:s');
 $DateCetak = $Tanggal_Cetak . "_" . $Waktu_Cetak;
 
-if (isset($_GET['Kecamatan'])) {
-    if (isset($_GET['Desa'])) {
-        $Kecamatan = sql_injeksi($_GET['Kecamatan']);
-        $Desa = sql_injeksi($_GET['Desa']);
+if (isset($_GET['Kecamatan']) && isset($_GET['Desa']) && !empty($_GET['Kecamatan']) && !empty($_GET['Desa'])) {
+    $Kecamatan = sql_injeksi($_GET['Kecamatan']);
+    $Desa = sql_injeksi($_GET['Desa']);
 
-        $QueryDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa ='$Desa' ");
+    $QueryDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa ='$Desa' ");
+    if ($QueryDesa && mysqli_num_rows($QueryDesa) > 0) {
         $DataDesa = mysqli_fetch_assoc($QueryDesa);
-        $NamaDesa = $DataDesa['NamaDesa'];
+        $NamaDesa = isset($DataDesa['NamaDesa']) ? $DataDesa['NamaDesa'] : 'Tidak Diketahui';
+    } else {
+        $NamaDesa = 'Tidak Diketahui';
+    }
 
-        $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan ='$Kecamatan' ");
+    $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan ='$Kecamatan' ");
+    if ($QueryKecamatan && mysqli_num_rows($QueryKecamatan) > 0) {
         $DataKecamatan = mysqli_fetch_assoc($QueryKecamatan);
-        $NamaKecamatan = $DataKecamatan['Kecamatan'];
+        $NamaKecamatan = isset($DataKecamatan['Kecamatan']) ? $DataKecamatan['Kecamatan'] : 'Tidak Diketahui';
+    } else {
+        $NamaKecamatan = 'Tidak Diketahui';
+    }
 
         $content =
             '<html>
@@ -101,71 +111,54 @@ if (isset($_GET['Kecamatan'])) {
                             master_desa.NamaDesa ASC,
                             history_mutasi.IdJabatanFK ASC");
         while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
-            $IdPegawaiFK = $DataPegawai['IdPegawaiFK'];
-            $Foto = $DataPegawai['Foto'];
-            $NIK = $DataPegawai['NIK'];
-            $Nama = $DataPegawai['Nama'];
+            $IdPegawaiFK = isset($DataPegawai['IdPegawaiFK']) ? $DataPegawai['IdPegawaiFK'] : '';
+            $Foto = isset($DataPegawai['Foto']) ? $DataPegawai['Foto'] : '';
+            $NIK = isset($DataPegawai['NIK']) ? $DataPegawai['NIK'] : '';
+            $Nama = isset($DataPegawai['Nama']) ? $DataPegawai['Nama'] : '';
 
-            $TanggalLahir = $DataPegawai['TanggalLahir'];
-            $exp = explode('-', $TanggalLahir);
-            $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
-
-            $TanggalPensiun = $DataPegawai['TanggalPensiun'];
-            $exp1 = explode('-', $TanggalPensiun);
-            $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
-
-            //HITUNG DETAIL TANGGAL PENSIUN
-            $TglPensiun = date_create($TanggalPensiun);
-            $TglSekarang = date_create();
-            $Temp = date_diff($TglSekarang, $TglPensiun);
-
-            //CEK TANGGAL ASLI SAAT INI
-            $TglSekarang1 = Date('Y-m-d');
-
-            if ($TglSekarang1 >= $TanggalPensiun) {
-                $HasilTahun = 0 . ' Tahun ';
-                $HasilBulan = 0 . ' Bulan ';
-                $HasilHari = 0 . ' Hari ';
-            } elseif ($TglSekarang1 < $TanggalPensiun) {
-                $HasilTahun = $Temp->y . ' Tahun ';
-                $HasilBulan = $Temp->m . ' Bulan ';
-                $HasilHari = $Temp->d + 1 . ' Hari ';
+            $TanggalLahir = isset($DataPegawai['TanggalLahir']) ? $DataPegawai['TanggalLahir'] : '';
+            if (!empty($TanggalLahir)) {
+                $exp = explode('-', $TanggalLahir);
+                $ViewTglLahir = (isset($exp[2]) && isset($exp[1]) && isset($exp[0])) ? $exp[2] . "-" . $exp[1] . "-" . $exp[0] : $TanggalLahir;
+            } else {
+                $ViewTglLahir = '-';
             }
-            //SELESAI
 
-            $JenKel = $DataPegawai['JenKel'];
-            $KodeDesa = $DataPegawai['KodeDesa'];
-            $NamaDesa = $DataPegawai['NamaDesa'];
-            $Kecamatan = $DataPegawai['Kecamatan'];
-            $Kabupaten = $DataPegawai['Kabupaten'];
-            $Alamat = $DataPegawai['Alamat'];
-            $RT = $DataPegawai['RT'];
-            $RW = $DataPegawai['RW'];
+            $JenKel = isset($DataPegawai['JenKel']) ? $DataPegawai['JenKel'] : '';
+            $KodeDesa = isset($DataPegawai['KodeDesa']) ? $DataPegawai['KodeDesa'] : '';
+            $NamaDesa = isset($DataPegawai['NamaDesa']) ? $DataPegawai['NamaDesa'] : '';
+            $Kecamatan = isset($DataPegawai['Kecamatan']) ? $DataPegawai['Kecamatan'] : '';
+            $Kabupaten = isset($DataPegawai['Kabupaten']) ? $DataPegawai['Kabupaten'] : '';
+            $Alamat = isset($DataPegawai['Alamat']) ? $DataPegawai['Alamat'] : '';
+            $RT = isset($DataPegawai['RT']) ? $DataPegawai['RT'] : '';
+            $RW = isset($DataPegawai['RW']) ? $DataPegawai['RW'] : '';
 
-            $Lingkungan = $DataPegawai['Lingkungan'];
+            $Lingkungan = isset($DataPegawai['Lingkungan']) ? $DataPegawai['Lingkungan'] : '';
             $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
             $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-            $Komunitas = $LingkunganBPD['NamaDesa'];
+            $Komunitas = isset($LingkunganBPD['NamaDesa']) ? $LingkunganBPD['NamaDesa'] : '';
 
-            $KecamatanBPD = $DataPegawai['Kec'];
+            $KecamatanBPD = isset($DataPegawai['Kec']) ? $DataPegawai['Kec'] : '';
             $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
             $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-            $KomunitasKec = $KecamatanBPD['Kecamatan'];
+            $KomunitasKec = isset($KecamatanBPD['Kecamatan']) ? $KecamatanBPD['Kecamatan'] : '';
 
             $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
-            $Setting = $DataPegawai['Setting'];
-            $JenisMutasi = $DataPegawai['JenisMutasi'];
+            $Setting = isset($DataPegawai['Setting']) ? $DataPegawai['Setting'] : '';
 
-            $TglSKMutasi = $DataPegawai['TanggalMutasi'];
-            $exp2 = explode('-', $TglSKMutasi);
-            $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
+            $TglSKMutasi = isset($DataPegawai['TanggalMutasi']) ? $DataPegawai['TanggalMutasi'] : '';
+            if (!empty($TglSKMutasi)) {
+                $exp2 = explode('-', $TglSKMutasi);
+                $TanggalMutasi = (isset($exp2[2]) && isset($exp2[1]) && isset($exp2[0])) ? $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0] : $TglSKMutasi;
+            } else {
+                $TanggalMutasi = '-';
+            }
 
-            $NomorSK = $DataPegawai['NomorSK'];
-            $SKMutasi = $DataPegawai['FileSKMutasi'];
-            $Jabatan = $DataPegawai['Jabatan'];
-            $KetJabatan = $DataPegawai['KeteranganJabatan'];
-            $Siltap = number_Format($DataPegawai['Siltap'], 0, ",", ".");
-            $Telp = $DataPegawai['NoTelp'];
+            $NomorSK = isset($DataPegawai['NomorSK']) ? $DataPegawai['NomorSK'] : '';
+            $Jabatan = isset($DataPegawai['Jabatan']) ? $DataPegawai['Jabatan'] : '';
+            $KetJabatan = isset($DataPegawai['KeteranganJabatan']) ? $DataPegawai['KeteranganJabatan'] : '';
+            $Siltap = isset($DataPegawai['Siltap']) ? number_format($DataPegawai['Siltap'], 0, ",", ".") : '0';
+            $Telp = isset($DataPegawai['NoTelp']) ? $DataPegawai['NoTelp'] : '';
 
             $content .=
                 '<tr>
@@ -191,7 +184,7 @@ if (isset($_GET['Kecamatan'])) {
                 <td width="80">' . $ViewTglLahir;
             $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
             $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-            $JenisKelamin = $DataJenKel['Keterangan'];
+            $JenisKelamin = isset($DataJenKel['Keterangan']) ? $DataJenKel['Keterangan'] : '-';
 
             $content .=
                 '<br>' . $JenisKelamin . '</td>';
@@ -206,7 +199,7 @@ if (isset($_GET['Kecamatan'])) {
                        INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
                        WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
             $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-            $Pendidikan = $DataPendidikan['JenisPendidikan'];
+            $Pendidikan = isset($DataPendidikan['JenisPendidikan']) ? $DataPendidikan['JenisPendidikan'] : '-';
             $content .=
                 '<td width="80">' . $Pendidikan . '</td>
                 <td width="160"><span style="font-size:12">' . $NomorSK . '</span><br><br>' . $TanggalMutasi . '</td>
@@ -220,17 +213,17 @@ if (isset($_GET['Kecamatan'])) {
                 </table>
                 </body>
                 </html>';
+
+    try {
+        $content2pdf = new Html2Pdf('L', 'F4', 'en');
+        $content2pdf->writeHTML($content);
+        $content2pdf->Output('Data Perangkat Desa ' . $NamaDesa . ' Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I');
+    } catch (Exception $e) {
+        echo 'Error saat membuat PDF: ' . $e->getMessage();
     }
+} else {
+    echo 'Parameter tidak lengkap. Silakan pilih kecamatan dan desa terlebih dahulu.';
 }
-
-require_once('../../../Vendor/html2pdf/vendor/autoload.php');
-
-use Spipu\Html2Pdf\Html2Pdf;
-
-$content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(10, 15, 15, 15), false);
-$content2pdf->writeHTML($content);
-// $html2pdf->output();
-$content2pdf->Output('Data Perangkat Desa ' . $NamaDesa . ' Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I'); //NAMA FILE, I/D/F/S
 ?>
 
 <!--  KETERANGAN OUTPUT

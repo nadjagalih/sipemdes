@@ -43,3 +43,7 @@ Thumbs.db
 # Cache directories
 cache/
 tmp/
+
+# markdown files
+*.md
+*.markdown

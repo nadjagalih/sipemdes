@@ -1,7 +1,7 @@
 <?php
 if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
     echo
-        "<script type='text/javascript'>
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
         setTimeout(function () {
             swal({
               title: '',
@@ -13,7 +13,7 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
     </script>";
 } elseif (isset($_GET['alert']) && $_GET['alert'] == 'Edit') {
     echo
-        "<script type='text/javascript'>
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
         setTimeout(function () {
             swal({
                 title: '',
@@ -25,7 +25,7 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
     </script>";
 } elseif (isset($_GET['alert']) && $_GET['alert'] == 'Delete') {
     echo
-        "<script type='text/javascript'>
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
         setTimeout(function () {
             swal({
                 title: '',
@@ -36,7 +36,7 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
         },10);
     </script>";
 } elseif (isset($_GET['alert']) && $_GET['alert'] == 'CekUser') {
-    echo "<script type='text/javascript'>
+    echo "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
                     setTimeout(function () {
                     swal({
                       title: '',
@@ -48,7 +48,7 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
             </script>";
 } elseif (isset($_GET['alert']) && $_GET['alert'] == 'Karakter') {
     echo
-        "<script type='text/javascript'>
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
                     setTimeout(function () {
                     swal({
                       title: '',
@@ -60,7 +60,7 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
         </script>";
 } elseif (isset($_GET['alert']) && $_GET['alert'] == 'Reset') {
     echo
-        "<script type='text/javascript'>
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
                     setTimeout(function () {
                     swal({
                       title: '',
@@ -70,14 +70,74 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
                      });
                     },10);
         </script>";
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'NoPasswordChange') {
+    echo
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
+                    setTimeout(function () {
+                    swal({
+                      title: 'Info',
+                      text:  'Password tidak diubah. Masukkan password baru untuk mengubah password.',
+                      type: 'info',
+                      showConfirmButton: true
+                     });
+                    },10);
+        </script>";
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'EmptyPassword') {
+    echo
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
+                    setTimeout(function () {
+                    swal({
+                      title: 'Info',
+                      text:  'Password tidak boleh kosong. Silakan masukkan password baru.',
+                      type: 'info',
+                      showConfirmButton: true
+                     });
+                    },10);
+        </script>";
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'NoRowsAffected') {
+    echo
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
+                    setTimeout(function () {
+                    swal({
+                      title: 'Debug Info',
+                      text:  'Password reset failed - No rows affected. User ID might not exist.',
+                      type: 'error',
+                      showConfirmButton: true
+                     });
+                    },10);
+        </script>";
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'QueryError') {
+    echo
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
+                    setTimeout(function () {
+                    swal({
+                      title: 'Debug Info',
+                      text:  'Password reset failed - Database query error.',
+                      type: 'error',
+                      showConfirmButton: true
+                     });
+                    },10);
+        </script>";
 } elseif (isset($_GET['alert']) && $_GET['alert'] == 'CekDelete') {
     echo
-        "<script type='text/javascript'>
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
                     setTimeout(function () {
                     swal({
                       title: '',
                       text:  'Data Tidak Bisa Dihapus, Karena Sudah Mempunyai History',
                       type: 'warning',
+                      showConfirmButton: true
+                     });
+                    },10);
+        </script>";
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'ErrorDelete') {
+    echo
+        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
+                    setTimeout(function () {
+                    swal({
+                      title: '',
+                      text:  'Terjadi Kesalahan Saat Menghapus Data',
+                      type: 'error',
                       showConfirmButton: true
                      });
                     },10);
@@ -99,9 +159,6 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
                 <strong>User</strong>
             </li>
         </ol>
-    </div>
-    <div class="col-lg-2">
-
     </div>
 </div>
 
@@ -178,7 +235,76 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
 </div>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
+    // Function untuk konfirmasi hapus dengan SweetAlert2
+    function confirmDelete(userId, userName) {
+        console.log('confirmDelete called with:', userId, userName);
+        
+        // Check if SweetAlert2 is available
+        if (typeof Swal === 'undefined') {
+            console.error('SweetAlert2 not loaded, using browser confirm');
+            if (confirm('Anda yakin ingin menghapus user: ' + userName + '?\n\nPerhatian: Semua data history terkait user ini akan ikut terhapus!')) {
+                window.location.href = "../App/Model/ExcUserAdminDesa?Act=Delete&Kode=" + userId;
+            }
+            return;
+        }
+
+        Swal.fire({
+            title: 'Konfirmasi Hapus',
+            html: 'Anda yakin ingin menghapus user: <strong>' + userName + '</strong>?<br><br><span style="color: #dc3545;">⚠️ Perhatian: Semua data history terkait user ini akan ikut terhapus!</span>',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            focusCancel: true
+        }).then((result) => {
+            console.log('SweetAlert result:', result);
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Menghapus Data...',
+                    text: 'Mohon tunggu, sedang menghapus data user...',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Redirect to delete URL after short delay
+                setTimeout(() => {
+                    window.location.href = "../App/Model/ExcUserAdminDesa?Act=Delete&Kode=" + userId;
+                }, 500);
+            }
+        }).catch((error) => {
+            console.error('SweetAlert error:', error);
+        });
+    }
+
+    // Alternative event listener approach
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click event listeners to all delete buttons
+        const deleteButtons = document.querySelectorAll('[data-user-id]');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const userId = this.getAttribute('data-user-id');
+                const userName = this.getAttribute('data-user-name');
+                console.log('Delete button clicked via event listener:', userId, userName);
+                confirmDelete(userId, userName);
+            });
+        });
+        
+        // Debug: Check if SweetAlert2 is loaded
+        console.log('SweetAlert2 loaded:', typeof Swal !== 'undefined');
+        console.log('Delete buttons found:', deleteButtons.length);
+    });
+
     // Force pace loading to complete after page is fully loaded
     window.addEventListener('load', function() {
         // Wait a bit for all scripts to finish

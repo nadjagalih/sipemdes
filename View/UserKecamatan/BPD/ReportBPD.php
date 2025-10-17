@@ -1,8 +1,5 @@
 <?php
-// Include safe helpers for production-ready error handling
-require_once __DIR__ . '/../../../helpers/safe_helpers.php';
-
-$IdKec = safeSession('IdKecamatan');
+$IdKec = isset($_SESSION['IdKecamatan']) ? $_SESSION['IdKecamatan'] : '';
 $QueryKecamatan = mysqli_query($db, "SELECT 
     master_kecamatan.*,
     master_setting_profile_dinas.Kabupaten
@@ -10,8 +7,8 @@ $QueryKecamatan = mysqli_query($db, "SELECT
     LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile
     WHERE master_kecamatan.IdKecamatan = '$IdKec' ");
 $DataQuery = mysqli_fetch_assoc($QueryKecamatan);
-$Kecamatan = safeGet($DataQuery, 'Kecamatan', 'Unknown');
-$Kabupaten = safeGet($DataQuery, 'Kabupaten', 'Unknown');
+$Kecamatan = isset($DataQuery['Kecamatan']) ? $DataQuery['Kecamatan'] : 'Unknown';
+$Kabupaten = isset($DataQuery['Kabupaten']) ? $DataQuery['Kabupaten'] : 'Unknown';
 ?>
 
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -147,50 +144,33 @@ $Kabupaten = safeGet($DataQuery, 'Kabupaten', 'Unknown');
                                     master_kecamatan.IdKecamatan ASC,
                                     master_desa.NamaDesa ASC");
                                 while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
-                                    // Use safe data access with schema
-                                    $safeBPDSchema = [
-                                        'IdPegawaiFK' => '',
-                                        'Foto' => '',
-                                        'NIK' => '',
-                                        'Nama' => '',
-                                        'TanggalLahir' => '',
-                                        'JenKel' => '',
-                                        'NamaDesa' => '',
-                                        'Kecamatan' => '',
-                                        'Kabupaten' => '',
-                                        'Alamat' => '',
-                                        'RT' => '',
-                                        'RW' => '',
-                                        'Lingkungan' => '',
-                                        'Kec' => ''
-                                    ];
-                                    $safeData = safeDataRow($DataPegawai, $safeBPDSchema);
+                                    // Direct data access with validation
+                                    $IdPegawaiFK = isset($DataPegawai['IdPegawaiFK']) ? $DataPegawai['IdPegawaiFK'] : '';
+                                    $Foto = isset($DataPegawai['Foto']) ? $DataPegawai['Foto'] : '';
+                                    $NIK = isset($DataPegawai['NIK']) ? $DataPegawai['NIK'] : '';
+                                    $Nama = isset($DataPegawai['Nama']) ? $DataPegawai['Nama'] : '';
                                     
-                                    $IdPegawaiFK = $safeData['IdPegawaiFK'];
-                                    $Foto = $safeData['Foto'];
-                                    $NIK = $safeData['NIK'];
-                                    $Nama = $safeData['Nama'];
+                                    // Date formatting
+                                    $TanggalLahir = isset($DataPegawai['TanggalLahir']) ? $DataPegawai['TanggalLahir'] : '';
+                                    $ViewTglLahir = !empty($TanggalLahir) ? date('d-m-Y', strtotime($TanggalLahir)) : '';
                                     
-                                    // Safe date formatting
-                                    $ViewTglLahir = safeDateFormat($safeData['TanggalLahir']);
-                                    
-                                    $JenKel = $safeData['JenKel'];
-                                    $NamaDesa = $safeData['NamaDesa'];
-                                    $KecamatanData = $safeData['Kecamatan'];
-                                    $KabupatenData = $safeData['Kabupaten'];
-                                    $Alamat = $safeData['Alamat'];
-                                    $RT = $safeData['RT'];
-                                    $RW = $safeData['RW'];
+                                    $JenKel = isset($DataPegawai['JenKel']) ? $DataPegawai['JenKel'] : '';
+                                    $NamaDesa = isset($DataPegawai['NamaDesa']) ? $DataPegawai['NamaDesa'] : '';
+                                    $KecamatanData = isset($DataPegawai['Kecamatan']) ? $DataPegawai['Kecamatan'] : '';
+                                    $KabupatenData = isset($DataPegawai['Kabupaten']) ? $DataPegawai['Kabupaten'] : '';
+                                    $Alamat = isset($DataPegawai['Alamat']) ? $DataPegawai['Alamat'] : '';
+                                    $RT = isset($DataPegawai['RT']) ? $DataPegawai['RT'] : '';
+                                    $RW = isset($DataPegawai['RW']) ? $DataPegawai['RW'] : '';
 
-                                    $Lingkungan = $safeData['Lingkungan'];
+                                    $Lingkungan = isset($DataPegawai['Lingkungan']) ? $DataPegawai['Lingkungan'] : '';
                                     $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
                                     $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-                                    $Komunitas = safeGet($LingkunganBPD, 'NamaDesa', '');
+                                    $Komunitas = isset($LingkunganBPD['NamaDesa']) ? $LingkunganBPD['NamaDesa'] : '';
 
-                                    $KecamatanBPD = $safeData['Kec'];
+                                    $KecamatanBPD = isset($DataPegawai['Kec']) ? $DataPegawai['Kec'] : '';
                                     $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
                                     $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-                                    $KomunitasKec = safeGet($KecamatanBPD, 'Kecamatan', '');
+                                    $KomunitasKec = isset($KecamatanBPD['Kecamatan']) ? $KecamatanBPD['Kecamatan'] : '';
 
                                     $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
                                 ?>
@@ -224,7 +204,7 @@ $Kabupaten = safeGet($DataQuery, 'Kabupaten', 'Unknown');
                                             <?php
                                             $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
                                             $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-                                            $JenisKelamin = safeGet($DataJenKel, 'Keterangan', 'N/A');
+                                            $JenisKelamin = isset($DataJenKel['Keterangan']) ? $DataJenKel['Keterangan'] : 'N/A';
                                             echo htmlspecialchars($JenisKelamin);
                                             ?>
                                         </td>

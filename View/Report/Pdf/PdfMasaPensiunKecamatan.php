@@ -2,7 +2,13 @@
 session_start();
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
+// Start output buffering to prevent premature output
+ob_start();
+
 include '../../../Module/Config/Env.php';
+require_once('../../../Vendor/html2pdf/vendor/autoload.php');
+
+use Spipu\Html2Pdf\Html2Pdf;
 
 $Tanggal_Cetak = date('d-m-Y');
 $Waktu_Cetak = date('H:i:s');
@@ -158,15 +164,30 @@ if (isset($_GET['Kecamatan'])) {
         $content .=
             '<tr>
                 <td width="40" align="center">' . $Nomor . '</td>';
-        if (empty($Foto)) {
-            $content .=
-                '<td width="80" align="center">
-                <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
-            </td>';
+        
+        // Check if photo exists and is accessible
+        $photoPath = '../../../Vendor/Media/Pegawai/';
+        $noImagePath = $photoPath . 'no-image.jpg';
+        $userPhotoPath = $photoPath . $Foto;
+        
+        if (empty($Foto) || !file_exists($userPhotoPath)) {
+            // Use no-image.jpg if photo is empty or doesn't exist
+            if (file_exists($noImagePath)) {
+                $content .=
+                    '<td width="80" align="center">
+                    <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
+                </td>';
+            } else {
+                // If no-image.jpg also doesn't exist, use text placeholder
+                $content .=
+                    '<td width="80" align="center">
+                    <div style="width:65px;height:65px;border:1px solid #ccc;text-align:center;line-height:65px;font-size:10px;">No Photo</div>
+                </td>';
+            }
         } else {
             $content .=
                 '<td width="80" align="center">
-                <img src="../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
+                <img src="../../../Vendor/Media/Pegawai/' . htmlspecialchars($Foto) . '" width="65" height="auto" align="center">
             </td>';
         }
         $content .= '<td width="130">' . $NIK . '</td>
@@ -198,20 +219,23 @@ if (isset($_GET['Kecamatan'])) {
                 </table>
                 </body>
                 </html>';
+
+// Clear any previous output
+ob_clean();
+
+try {
+    $content2pdf = new Html2Pdf('L', 'F4', 'en');
+    $content2pdf->writeHTML($content);
+    $content2pdf->Output('Data Masa Pensiun Perangkat Desa Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I');
+} catch (Exception $e) {
+    // Clear buffer and show error
+    ob_clean();
+    echo 'Error saat membuat PDF: ' . $e->getMessage();
 }
 
-require_once('../../../Vendor/html2pdf/vendor/autoload.php');
-
-use Spipu\Html2Pdf\Html2Pdf;
-
-$content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(15, 15, 15, 15), false);
-$content2pdf->writeHTML($content);
-// $html2pdf->output();
-$content2pdf->Output('Data Masa Pensiun Perangkat Desa Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I'); //NAMA FILE, I/D/F/S
+// End output buffering
+ob_end_flush();
+} else {
+    echo 'Parameter tidak lengkap. Silakan pilih kecamatan terlebih dahulu.';
+}
 ?>
-
-<!--  KETERANGAN OUTPUT
- “I” mengirim file untuk ditampilkan di browser.
- “D” mengirim file ke browser dan memaksa download file.
- “F” simpan ke file server lokal.
- “S” mengembalikan dokumen sebagai string. -->

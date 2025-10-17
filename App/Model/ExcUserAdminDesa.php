@@ -93,6 +93,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
         if (isset($_GET['Kode'])) {
             $IdUser = sql_injeksi(($_GET['Kode']));
 
+            // Check if user has history records
             $QMutasi = mysqli_query($db, "SELECT IdPegawaiFK FROM history_mutasi WHERE IdPegawaiFK = '$IdUser' ");
             $CountMutasi = mysqli_num_rows($QMutasi);
 
@@ -108,27 +109,74 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $QPendidikan = mysqli_query($db, "SELECT IdPegawaiFK FROM history_pendidikan WHERE IdPegawaiFK = '$IdUser' ");
             $CountPendidikan = mysqli_num_rows($QPendidikan);
 
-            if ($CountMutasi <> 0 or $CountAnak <> 0 or $CountOrtu <> 0 or $CountSuamiIstri <> 0 or $CountPendidikan <> 0) {
-                header("location:../../View/v?pg=UserViewAdminDesa&alert=CekDelete");
-            } else {
-                $Delete = mysqli_query($db, "DELETE FROM main_user WHERE IdUser = '$IdUser' ");
-                $Delete1 = mysqli_query($db, "DELETE FROM master_pegawai WHERE IdPegawaiFK = '$IdUser' ");
+            // Cascade delete: Delete all related history records first
+            if ($CountMutasi > 0) {
+                mysqli_query($db, "DELETE FROM history_mutasi WHERE IdPegawaiFK = '$IdUser'");
+            }
+            if ($CountAnak > 0) {
+                mysqli_query($db, "DELETE FROM hiskel_anak WHERE IdPegawaiFK = '$IdUser'");
+            }
+            if ($CountOrtu > 0) {
+                mysqli_query($db, "DELETE FROM hiskel_ortu WHERE IdPegawaiFK = '$IdUser'");
+            }
+            if ($CountSuamiIstri > 0) {
+                mysqli_query($db, "DELETE FROM hiskel_suami_istri WHERE IdPegawaiFK = '$IdUser'");
+            }
+            if ($CountPendidikan > 0) {
+                mysqli_query($db, "DELETE FROM history_pendidikan WHERE IdPegawaiFK = '$IdUser'");
+            }
 
-                if ($Delete) {
-                    header("location:../../View/v?pg=UserViewAdminDesa&alert=Delete");
-                }
+            // Now delete user and pegawai records
+            $Delete = mysqli_query($db, "DELETE FROM main_user WHERE IdUser = '$IdUser' ");
+            $Delete1 = mysqli_query($db, "DELETE FROM master_pegawai WHERE IdPegawaiFK = '$IdUser' ");
+
+            if ($Delete && $Delete1) {
+                header("location:../../View/v?pg=UserViewAdminDesa&alert=Delete");
+            } else {
+                header("location:../../View/v?pg=UserViewAdminDesa&alert=ErrorDelete");
             }
         }
     } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Reset') {
         if (isset($_POST['Reset'])) {
 
             $IdUser = sql_injeksi($_POST['IdUser']);
-            $Pass = sql_injeksi(password_hash($_POST['Pass'], PASSWORD_DEFAULT));
-            $EditReset = mysqli_query($db, "UPDATE main_user SET NamePassword = '$Pass'
+            $Pass = sql_injeksi($_POST['Pass']);
+            
+            // Debug: Check if we received the data
+            error_log("Reset Password Debug - IdUser: " . $IdUser);
+            error_log("Reset Password Debug - Password: " . $Pass);
+            
+            // Check if password is empty
+            if (empty($Pass)) {
+                error_log("Reset Password Debug - Password is empty, no update needed");
+                header("location:../../View/v?pg=UserViewAdminDesa&alert=NoPasswordChange");
+                return;
+            }
+            
+            // Always hash the password for security
+            $HashedPass = password_hash($Pass, PASSWORD_DEFAULT);
+            
+            // Debug: Check the hashed password
+            error_log("Reset Password Debug - Hashed: " . $HashedPass);
+            
+            $EditReset = mysqli_query($db, "UPDATE main_user SET NamePassword = '$HashedPass'
             WHERE IdUser = '$IdUser' ");
 
+            // Debug: Check if query executed
             if ($EditReset) {
-                header("location:../../View/v?pg=UserViewAdminDesa&alert=Reset");
+                error_log("Reset Password Debug - Query successful");
+                // Check how many rows were affected
+                $affected_rows = mysqli_affected_rows($db);
+                error_log("Reset Password Debug - Affected rows: " . $affected_rows);
+                
+                if ($affected_rows > 0) {
+                    header("location:../../View/v?pg=UserViewAdminDesa&alert=Reset");
+                } else {
+                    header("location:../../View/v?pg=UserViewAdminDesa&alert=NoRowsAffected");
+                }
+            } else {
+                error_log("Reset Password Debug - Query failed: " . mysqli_error($db));
+                header("location:../../View/v?pg=UserViewAdminDesa&alert=QueryError");
             }
         }
     }

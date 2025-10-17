@@ -126,15 +126,13 @@ require_once('../../../Vendor/html2pdf/vendor/autoload.php');
 
 use Spipu\Html2Pdf\Html2Pdf;
 
-$content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(15, 15, 15, 15), false);
-$content2pdf->writeHTML($content);
-// $html2pdf->output();
-$content2pdf->Output('Data BPD Desa Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I'); //NAMA FILE, I/D/F/S
-exit();
+try {
+    $content2pdf = new Html2Pdf('L', 'F4', 'fr');
+    $content2pdf->writeHTML($content);
+    // $html2pdf->output();
+    $content2pdf->Output('Data BPD Desa Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I'); //NAMA FILE, I/D/F/S
+    exit();
+} catch (Exception $e) {
+    echo 'Error generating PDF: ' . $e->getMessage();
+}
 ?>
-
-<!--  KETERANGAN OUTPUT
- “I” mengirim file untuk ditampilkan di browser.
- “D” mengirim file ke browser dan memaksa download file.
- “F” simpan ke file server lokal.
- “S” mengembalikan dokumen sebagai string. -->

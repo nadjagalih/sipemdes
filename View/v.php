@@ -243,44 +243,11 @@ $_SESSION['start_time'] = time();
             $('.dataTables-kecamatan').DataTable({
                 pageLength: 25,
                 responsive: true,
-                dom: 'Bfrtip',
+                dom: 'frtip',
                 searching: true,
                 lengthChange: false,
                 paging: false,
-                info: false,
-                buttons: [{
-                        extend: 'copy'
-                    },
-                    {
-                        extend: 'csv'
-                    },
-                    {
-                        extend: 'excel',
-                        title: 'ExampleFile'
-                    },
-                    {
-                        extend: 'pdf',
-                        orientation: 'landscape',
-                        pageSize: 'A4',
-                        exportOptions: {
-                            columns: ':not(.no-cetak)'
-                        },
-                        title: 'ExampleFile'
-                    },
-
-                    {
-                        extend: 'print',
-                        customize: function(win) {
-                            $(win.document.body).addClass('white-bg');
-                            $(win.document.body).css('font-size', '10px');
-
-                            $(win.document.body).find('table')
-                                .addClass('compact')
-                                .css('font-size', 'inherit');
-                        }
-                    }
-                ]
-
+                info: false
             });
 
         });

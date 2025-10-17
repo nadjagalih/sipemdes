@@ -8,8 +8,13 @@ if (!empty($GolDarah)) {
     $queryEdit = mysqli_query($db, "SELECT * FROM master_golongan_darah WHERE IdGolDarah = '$GolDarah'");
     if ($queryEdit && mysqli_num_rows($queryEdit) > 0) {
         $dataEdit = mysqli_fetch_assoc($queryEdit);
-        $EditGolDarah = $dataEdit['GolonganDarah'] ?? '';
+        $EditGolDarah = $dataEdit['Golongan'] ?? '';
     }
+}
+
+// Check if we have edit data from FunctionPegawaiEdit.php
+if (isset($EditNamaGolDarah) && !empty($EditNamaGolDarah)) {
+    $EditGolDarah = $EditNamaGolDarah;
 }
 
 if (empty($GolDarah)) {
@@ -21,7 +26,7 @@ if (empty($GolDarah)) {
         if ($QueryGolDarah && mysqli_num_rows($QueryGolDarah) > 0) {
             while ($DataGolDarah = mysqli_fetch_assoc($QueryGolDarah)) {
                 $IdGolDarahOption = $DataGolDarah['IdGolDarah'];
-                $GolDarahOption = $DataGolDarah['GolonganDarah'];
+                $GolDarahOption = $DataGolDarah['Golongan'];
         ?>
             <option value="<?php echo $IdGolDarahOption; ?>"><?php echo $GolDarahOption; ?></option>
         <?php 
@@ -38,7 +43,7 @@ if (empty($GolDarah)) {
         if ($QueryGolDarah && mysqli_num_rows($QueryGolDarah) > 0) {
             while ($DataGolDarah = mysqli_fetch_assoc($QueryGolDarah)) {
                 $IdGolDarahOption = $DataGolDarah['IdGolDarah'];
-                $GolDarahOption = $DataGolDarah['GolonganDarah'];
+                $GolDarahOption = $DataGolDarah['Golongan'];
         ?>
             <option value="<?php echo $IdGolDarahOption; ?>"><?php echo $GolDarahOption; ?></option>
         <?php 

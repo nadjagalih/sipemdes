@@ -1,15 +1,40 @@
 <script type="text/javascript">
     $(document).ready(function() {
+        console.log('BPDPDFFilterKecamatan: Document ready');
+        
+        // Load kecamatan data via AJAX with enhanced error handling
         $.ajax({
             type: 'POST',
             url: "Report/BPD/GetKecamatan.php",
             cache: false,
             success: function(msg) {
+                console.log('BPDPDFFilterKecamatan: AJAX success', msg);
                 $("#Kecamatan").html(msg);
+            },
+            error: function(xhr, status, error) {
+                console.log('BPDPDFFilterKecamatan: AJAX error', error);
+                $("#Kecamatan").html('<option value="">Error loading data</option>');
             }
         });
     });
 </script>
+
+<?php
+// Load kecamatan data directly with PHP as backup
+$kecamatanOptions = '<option value="">Filter Kecamatan</option>';
+try {
+    $QueryKecamatanDirect = mysqli_query($db, "SELECT * FROM master_kecamatan ORDER BY Kecamatan ASC");
+    if ($QueryKecamatanDirect) {
+        while ($DataKecamatanDirect = mysqli_fetch_assoc($QueryKecamatanDirect)) {
+            $IdKecamatan = htmlspecialchars($DataKecamatanDirect['IdKecamatan']);
+            $NamaKecamatan = htmlspecialchars($DataKecamatanDirect['Kecamatan']);
+            $kecamatanOptions .= "<option value=\"$IdKecamatan\">$NamaKecamatan</option>";
+        }
+    }
+} catch (Exception $e) {
+    error_log("BPDPDFFilterKecamatan: Error loading kecamatan - " . $e->getMessage());
+}
+?>
 
 <form action="Report/Pdf/PdfBPDFilterKecamatan" method="GET" enctype="multipart/form-data" target="_BLANK">
     <div class="row">
@@ -42,7 +67,7 @@
                             <div class="form-group row"><label class="col-lg-2 col-form-label">Kecamatan</label>
                                 <div class="col-lg-6">
                                     <select name="Kecamatan" id="Kecamatan" style="width: 100%;" class="select2_kecamatan form-control" required>
-                                        <option value="">Filter Kecamatan</option>
+                                        <?php echo $kecamatanOptions; ?>
                                     </select>
                                 </div>
                             </div>

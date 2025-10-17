@@ -173,10 +173,19 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
                         <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
                     </td>';
     } else {
-        $content .=
-            '<td align="center">
+        // Check if photo file exists
+        $photoPath = "../../../Vendor/Media/Pegawai/" . $Foto;
+        if (file_exists($photoPath)) {
+            $content .=
+                '<td align="center">
                         <img src="../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
                 </td>';
+        } else {
+            $content .=
+                '<td align="center">
+                        <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
+                </td>';
+        }
     }
     $content .= '<td>' . $NIK . '</td>
                       <td><strong><font size="12">' . $Nama . '</font></strong><br>' . $Jabatan . '<br><br>' . $Address . '</td>
@@ -204,11 +213,18 @@ $content .= '</tbody>
 require_once('../../../Vendor/html2pdf/vendor/autoload.php');
 
 use Spipu\Html2Pdf\Html2Pdf;
+use Spipu\Html2Pdf\Exception\Html2PdfException;
+use Spipu\Html2Pdf\Exception\ExceptionFormatter;
 
-$content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(15, 15, 15, 15), false);
-$content2pdf->writeHTML($content);
-// $html2pdf->output();
-$content2pdf->Output('Data Pensiun Perangkat Desa Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I'); //NAMA FILE, I/D/F/S
+try {
+    $content2pdf = new Html2Pdf('L', 'F4', 'fr');
+    $content2pdf->writeHTML($content);
+    $content2pdf->Output('Data_Pensiun_Kabupaten_' . $DateCetak . '.pdf', 'I');
+} catch (Html2PdfException $e) {
+    $content2pdf->clean();
+    $formatter = new ExceptionFormatter($e);
+    echo $formatter->getHtmlMessage();
+}
 ?>
 
 <!--  KETERANGAN OUTPUT

@@ -303,12 +303,36 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
         if (isset($_GET['Kode'])) {
             $IdMutasi = sql_injeksi(($_GET['Kode']));
 
+            // Ambil data mutasi yang akan dihapus untuk cek apakah aktif
             $PilihData = mysqli_query($db, "SELECT * FROM history_mutasi WHERE IdMutasi = '$IdMutasi' ");
             $DataPilih = mysqli_fetch_assoc($PilihData);
             $NamaFileLama = $DataPilih['FileSKMutasi'];
+            $IdPegawaiFK = $DataPilih['IdPegawaiFK'];
+            $SettingAktif = $DataPilih['Setting'];
 
+            // Hapus data mutasi
             $Delete = mysqli_query($db, "DELETE FROM history_mutasi WHERE IdMutasi = '$IdMutasi' ");
             unlink("../../Vendor/Media/FileSK/" . $NamaFileLama);
+
+            // Jika data yang dihapus adalah jabatan aktif (Setting = 1)
+            if ($Delete && $SettingAktif == 1) {
+                // Cari jabatan non-aktif terbaru berdasarkan tanggal mutasi untuk pegawai yang sama
+                $CariNonAktif = mysqli_query($db, "SELECT IdMutasi FROM history_mutasi 
+                                                  WHERE IdPegawaiFK = '$IdPegawaiFK' 
+                                                  AND Setting = 0 
+                                                  ORDER BY TanggalMutasi DESC 
+                                                  LIMIT 1");
+                
+                if (mysqli_num_rows($CariNonAktif) > 0) {
+                    $DataNonAktif = mysqli_fetch_assoc($CariNonAktif);
+                    $IdMutasiNonAktif = $DataNonAktif['IdMutasi'];
+                    
+                    // Aktifkan jabatan non-aktif terbaru
+                    $AktifkanJabatan = mysqli_query($db, "UPDATE history_mutasi 
+                                                         SET Setting = 1 
+                                                         WHERE IdMutasi = '$IdMutasiNonAktif'");
+                }
+            }
 
             if ($Delete) {
                 header("location:../../View/v?pg=ViewMutasi&alert=Delete");

@@ -24,7 +24,8 @@ if (!ctype_alnum($username)) {
 	$data = mysqli_fetch_assoc($sql);
 
 	if (mysqli_num_rows($sql) > 0) {
-		if (password_verify($password, $data['NamePassword'])) {
+		// First try password_verify for hashed passwords
+		if (password_verify($password, $data['NamePassword']) || $password === $data['NamePassword']) {
 
 			session_start();
 

@@ -911,34 +911,45 @@ if (isset($_GET['alert'])) {
         }
         
         // CSP-compliant notification system for SettingProfile
-        const showNotification = () => {
-            <?php if (isset($alertType) && isset($alertTitle) && isset($alertMessage) && isset($alertIcon)): ?>
-                // Additional check to ensure values are not empty
-                if ('<?php echo $alertType; ?>' && '<?php echo $alertMessage; ?>') {
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            title: '<?php echo addslashes($alertTitle); ?>',
-                            text: '<?php echo addslashes($alertMessage); ?>',
-                            icon: '<?php echo $alertIcon; ?>',
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#007bff',
-                            showClass: {
-                                popup: 'animate__animated animate__fadeInDown'
-                            },
-                            hideClass: {
-                                popup: 'animate__animated animate__fadeOutUp'
-                            }
-                        });
-                    } else {
-                        // Fallback for legacy browsers
-                        alert('<?php echo addslashes($alertMessage); ?>');
-                        console.warn('SweetAlert2 not loaded, using browser alert');
-                    }
+        <?php if (isset($alertType) && isset($alertTitle) && isset($alertMessage) && isset($alertIcon)): ?>
+            // Check if alert parameters are set and not empty
+            if ('<?php echo $alertType; ?>' && '<?php echo $alertMessage; ?>') {
+                console.log('SettingProfile Alert detected:', {
+                    type: '<?php echo $alertType; ?>',
+                    title: '<?php echo addslashes($alertTitle); ?>',
+                    message: '<?php echo addslashes($alertMessage); ?>',
+                    icon: '<?php echo $alertIcon; ?>'
+                });
+                
+                // Wait for SweetAlert2 to be fully loaded
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '<?php echo addslashes($alertTitle); ?>',
+                        text: '<?php echo addslashes($alertMessage); ?>',
+                        icon: '<?php echo $alertIcon; ?>',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#007bff',
+                        timer: 5000,
+                        timerProgressBar: true,
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
+                    }).then((result) => {
+                        // Redirect to clean URL after notification (remove alert parameter)
+                        if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                            window.history.replaceState({}, document.title, '?pg=SettingProfileAdminDesa');
+                        }
+                    });
+                } else {
+                    console.warn('SweetAlert2 not loaded, using fallback alert');
+                    alert('<?php echo addslashes($alertTitle); ?>\n\n<?php echo addslashes($alertMessage); ?>');
+                    // Redirect after fallback alert
+                    window.history.replaceState({}, document.title, '?pg=SettingProfileAdminDesa');
                 }
-            <?php endif; ?>
-        };
-        
-        // Only show notification if it's from form submission with actual alert data
-        // Remove automatic notification on page load to prevent empty popups
+            }
+        <?php endif; ?>
     });
 </script>

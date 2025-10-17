@@ -602,3 +602,67 @@ POST: Array
 )
 
 Data: NoTelepon=081234567890, AlamatDesa=Test alamat desa dawuhan trenggalek, Lat=-8.009832, Lng=111.737828, IdDesa=20201110200952155
+2025-10-17 08:25:09 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 081234567890
+    [AlamatDesa] => Test alamat desa dawuhan trenggalek
+    [Latitude] => -8.003835
+    [Longitude] => 111.740218
+    [Save] => 
+)
+
+Data: NoTelepon=081234567890, AlamatDesa=Test alamat desa dawuhan trenggalek, Lat=-8.003835, Lng=111.740218, IdDesa=20201110200952155
+2025-10-17 08:25:13 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 081234567890
+    [AlamatDesa] => Test alamat desa dawuhan trenggalek
+    [Latitude] => -8.00383500
+    [Longitude] => 111.74021800
+    [Save] => 
+)
+
+Data: NoTelepon=081234567890, AlamatDesa=Test alamat desa dawuhan trenggalek, Lat=-8.00383500, Lng=111.74021800, IdDesa=20201110200952155
+2025-10-17 08:33:40 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 081234567890
+    [AlamatDesa] => Test alamat desa dawuhan trenggalek
+    [Latitude] => -8.004128
+    [Longitude] => 111.741425
+    [Save] => 
+)
+
+Data: NoTelepon=081234567890, AlamatDesa=Test alamat desa dawuhan trenggalek, Lat=-8.004128, Lng=111.741425, IdDesa=20201110200952155
+2025-10-17 08:37:09 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 081234567890
+    [AlamatDesa] => Test alamat desa dawuhan trenggalek
+    [Latitude] => -8.006144
+    [Longitude] => 111.738819
+    [Save] => 
+)
+
+Data: NoTelepon=081234567890, AlamatDesa=Test alamat desa dawuhan trenggalek, Lat=-8.006144, Lng=111.738819, IdDesa=20201110200952155

@@ -859,7 +859,9 @@ if (isset($_GET['alert'])) {
             <?php endif; ?>
         };
         
-        // Only show notification if it's from form submission with actual alert data
-        // Remove automatic notification on page load to prevent empty popups
+        // Call notification function if alert parameter exists
+        <?php if (isset($_GET['alert'])): ?>
+            showNotification();
+        <?php endif; ?>
     });
 </script>

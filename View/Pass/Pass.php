@@ -13,70 +13,82 @@ if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Basic alert handling tanpa header redirect untuk menghindari error
-if (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'SUKSES',
-                          text: 'Sukses Ganti Password, Silahkan Login Ulang',
-                          icon: 'success',
-                          showConfirmButton: true
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                window.location.href = '../Auth/SignOut';
-                            }
-                        });
-                    }, 10);
+// Enhanced alert handling with proper CSP compliance and SweetAlert2 loading check
+$alertType = isset($_GET['alert']) ? $_GET['alert'] : '';
+$nonce = CSPHandler::getNonce();
+
+if (!empty($alertType)) {
+    // Konfigurasi notifikasi
+    $notifications = [
+        'Sukses' => [
+            'title' => 'SUKSES',
+            'text' => 'Sukses Ganti Password, Silahkan Login Ulang',
+            'icon' => 'success',
+            'redirect' => '../Auth/SignOut'
+        ],
+        'Panjang' => [
+            'title' => 'INFORMATION',
+            'text' => 'Panjang Minimal Password 8 Karakter',
+            'icon' => 'warning'
+        ],
+        'CSRFError' => [
+            'title' => 'ERROR',
+            'text' => 'Token keamanan tidak valid. Silakan coba lagi.',
+            'icon' => 'error'
+        ],
+        'PasswordSalah' => [
+            'title' => 'ERROR',
+            'text' => 'Password lama yang Anda masukkan salah',
+            'icon' => 'error'
+        ],
+        'DatabaseError' => [
+            'title' => 'ERROR',
+            'text' => 'Gagal menyimpan password ke database. Silakan coba lagi.',
+            'icon' => 'error'
+        ]
+    ];
+
+    if (isset($notifications[$alertType])) {
+        $notif = $notifications[$alertType];
+        $hasRedirect = isset($notif['redirect']);
+        
+        echo "<script nonce='" . $nonce . "'>
+        // Fungsi untuk menampilkan notifikasi dengan pengecekan SweetAlert2
+        function showPasswordNotification() {
+            if (typeof Swal !== 'undefined') {
+                console.log('SweetAlert2 loaded - showing notification');
+                Swal.fire({
+                    title: '" . addslashes($notif['title']) . "',
+                    text: '" . addslashes($notif['text']) . "',
+                    icon: '" . $notif['icon'] . "',
+                    showConfirmButton: true,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#1ab394',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                })" . ($hasRedirect ? ".then(function(result) {
+                    if (result.isConfirmed) {
+                        window.location.href = '" . $notif['redirect'] . "';
+                    }
+                })" : "") . ";
+            } else {
+                console.log('SweetAlert2 not loaded - using alert fallback');
+                alert('" . addslashes($notif['title']) . "\\n\\n" . addslashes($notif['text']) . "');" 
+                . ($hasRedirect ? "
+                window.location.href = '" . $notif['redirect'] . "';" : "") . "
+            }
+        }
+        
+        // Tunggu DOM dan SweetAlert2 ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(showPasswordNotification, 100);
+            });
+        } else {
+            setTimeout(showPasswordNotification, 100);
+        }
         </script>";
-} else
-if (isset($_GET['alert']) && $_GET['alert'] == 'Panjang') {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'INFORMATION',
-                          text: 'Panjang Minimal Password 8 Karakter',
-                          icon: 'warning',
-                          showConfirmButton: true
-                        });
-                    }, 10);
-        </script>";
-} else
-if (isset($_GET['alert']) && $_GET['alert'] == 'CSRFError') {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'ERROR',
-                          text: 'Token keamanan tidak valid. Silakan coba lagi.',
-                          icon: 'error',
-                          showConfirmButton: true
-                        });
-                    }, 10);
-        </script>";
-} else
-if (isset($_GET['alert']) && $_GET['alert'] == 'PasswordSalah') {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'ERROR',
-                          text: 'Password lama yang Anda masukkan salah',
-                          icon: 'error',
-                          showConfirmButton: true
-                        });
-                    }, 10);
-        </script>";
-} else
-if (isset($_GET['alert']) && $_GET['alert'] == 'DatabaseError') {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'ERROR',
-                          text: 'Gagal menyimpan password ke database. Silakan coba lagi.',
-                          icon: 'error',
-                          showConfirmButton: true
-                        });
-                    }, 10);
-        </script>";
+    }
 }
 ?>
 

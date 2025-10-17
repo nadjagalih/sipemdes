@@ -24,7 +24,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             if (isset($_POST['IdUser'])) {
                 $PasswordBaru = isset($_POST['PasswordBaru']) ? sql_injeksi($_POST['PasswordBaru']) : '';
 
-                if (strlen($PasswordBaru) >= 5) {
+                if (strlen($PasswordBaru) >= 8) {
                     $IdUser = sql_injeksi($_POST['IdUser']);
                     $PasswordBaruHashed = password_hash($PasswordBaru, PASSWORD_DEFAULT);
 

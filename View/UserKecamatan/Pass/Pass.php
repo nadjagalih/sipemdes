@@ -14,69 +14,84 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 
 // Basic alert handling tanpa header redirect untuk menghindari error
-if (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'SUKSES',
-                          text: 'Sukses Ganti Password, Silahkan Login Ulang',
-                          icon: 'success',
-                          showConfirmButton: true
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                window.location.href = '../AuthKecamatan/SignOut';
-                            }
-                        });
-                    }, 10);
-        </script>";
-} else
-if (isset($_GET['alert']) && $_GET['alert'] == 'Panjang') {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'INFORMATION',
-                          text: 'Panjang Minimal Password 5 Karakter',
-                          icon: 'warning',
-                          showConfirmButton: true
-                        });
-                    }, 10);
-        </script>";
-} else
-if (isset($_GET['alert']) && $_GET['alert'] == 'CSRFError') {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'ERROR',
-                          text: 'Token keamanan tidak valid. Silakan coba lagi.',
-                          icon: 'error',
-                          showConfirmButton: true
-                        });
-                    }, 10);
-        </script>";
-} else
-if (isset($_GET['alert']) && strpos($_GET['alert'], 'Gagal') !== false) {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'ERROR',
-                          text: '" . htmlspecialchars($_GET['alert']) . "',
-                          icon: 'error',
-                          showConfirmButton: true
-                        });
-                    }, 10);
-        </script>";
-} else
-if (isset($_GET['alert']) && $_GET['alert'] != 'Sukses' && $_GET['alert'] != 'Panjang') {
-    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
-                    setTimeout(function () {
-                        Swal.fire({
-                          title: 'INFORMATION',
-                          text: '" . htmlspecialchars($_GET['alert']) . "',
-                          icon: 'info',
-                          showConfirmButton: true
-                        });
-                    }, 10);
-        </script>";
+if (isset($_GET['alert'])) {
+    $alert = $_GET['alert'];
+    $notificationScript = '';
+    
+    if ($alert == 'Sukses') {
+        $notificationScript = "
+            Swal.fire({
+                title: 'SUKSES',
+                text: 'Sukses Ganti Password, Silahkan Login Ulang',
+                icon: 'success',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    window.location.href = '../AuthKecamatan/SignOut';
+                }
+            });
+        ";
+    } elseif ($alert == 'Panjang') {
+        $notificationScript = "
+            Swal.fire({
+                title: 'PERINGATAN',
+                text: 'Panjang Minimal Password 8 Karakter',
+                icon: 'warning',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        ";
+    } elseif ($alert == 'CSRFError') {
+        $notificationScript = "
+            Swal.fire({
+                title: 'ERROR',
+                text: 'Token keamanan tidak valid. Silakan coba lagi.',
+                icon: 'error',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        ";
+    } elseif (strpos($alert, 'Gagal') !== false) {
+        $notificationScript = "
+            Swal.fire({
+                title: 'ERROR',
+                text: '" . htmlspecialchars($alert, ENT_QUOTES) . "',
+                icon: 'error',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        ";
+    } else {
+        $notificationScript = "
+            Swal.fire({
+                title: 'INFORMASI',
+                text: '" . htmlspecialchars($alert, ENT_QUOTES) . "',
+                icon: 'info',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        ";
+    }
+    
+    // Output script dengan nonce
+    echo "<script " . CSPHandler::scriptNonce() . ">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tunggu SweetAlert2 ter-load
+            if (typeof Swal !== 'undefined') {
+                " . $notificationScript . "
+            } else {
+                // Fallback jika SweetAlert2 belum ter-load
+                setTimeout(function() {
+                    if (typeof Swal !== 'undefined') {
+                        " . $notificationScript . "
+                    } else {
+                        console.error('SweetAlert2 not loaded');
+                    }
+                }, 500);
+            }
+        });
+    </script>";
 }
 ?>
 
@@ -136,8 +151,8 @@ if (isset($_GET['alert']) && $_GET['alert'] != 'Sukses' && $_GET['alert'] != 'Pa
                         <div class="form-group row">
                             <label class="col-lg-4 col-form-label">Password Baru</label>
                             <div class="col-lg-8">
-                                <input type="password" class="form-control" name="PasswordBaru" id="PasswordBaru" placeholder="Password Baru" autocomplete="off" required minlength="5">
-                                <span class="form-text m-b-none" style="font-style: italic;">*) Minimal Panjang Password 5 Karakter</span>
+                                <input type="password" class="form-control" name="PasswordBaru" id="PasswordBaru" placeholder="Password Baru" autocomplete="off" required minlength="8">
+                                <span class="form-text m-b-none" style="font-style: italic;">*) Minimal Panjang Password 8 Karakter</span>
                             </div>
                         </div>
 
@@ -163,16 +178,21 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             const password = document.getElementById('PasswordBaru').value;
             
-            // Simple length validation
-            if (password.length < 5) {
+            // Simple length validation - minimal 8 karakter
+            if (password.length < 8) {
                 e.preventDefault();
                 // Gunakan SweetAlert2 untuk konsistensi dengan CSP
-                Swal.fire({
-                    title: 'PERINGATAN',
-                    text: 'Password minimal 5 karakter',
-                    icon: 'warning',
-                    showConfirmButton: true
-                });
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'PERINGATAN',
+                        text: 'Password minimal 8 karakter',
+                        icon: 'warning',
+                        showConfirmButton: true,
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    alert('Password minimal 8 karakter');
+                }
                 return false;
             }
             

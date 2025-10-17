@@ -165,15 +165,30 @@ if (isset($_GET['Kecamatan'])) {
             $content .=
                 '<tr>
                     <td width="40" align="center">' . $Nomor . '</td>';
-            if (empty($Foto)) {
+            
+            // Validasi foto: cek apakah file exists dan tidak null
+            $fotoPath = '../../../Vendor/Media/Pegawai/';
+            $fotoDefault = $fotoPath . 'no-image.jpg';
+            $fotoExists = false;
+            
+            if (!empty($Foto)) {
+                $fotoFull = $fotoPath . $Foto;
+                // Cek apakah file benar-benar ada di server
+                if (file_exists($fotoFull) && is_readable($fotoFull)) {
+                    $fotoExists = true;
+                }
+            }
+            
+            if ($fotoExists) {
                 $content .=
                     '<td width="80" align="center">
-                        <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
+                        <img src="' . $fotoPath . $Foto . '" width="65" height="auto" align="center">
                 </td>';
             } else {
+                // Gunakan foto default jika foto tidak ada atau null
                 $content .=
                     '<td width="80" align="center">
-                        <img src="../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
+                        <img src="' . $fotoDefault . '" width="65" height="auto" align="center">
                 </td>';
             }
             $content .= '<td width="130">' . $NIK . '</td>

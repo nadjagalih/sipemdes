@@ -179,7 +179,7 @@ if (isset($_GET['ExportPDF'])) {
             $Setting = $DataPegawai['Setting'];
             $content .= '<tr>
                             <td width="40" align="center">' . $Nomor . '</td>';
-            if (empty($Foto)) {
+            if (empty($Foto) || !file_exists("../../../Vendor/Media/Pegawai/" . $Foto)) {
                 $content .=
                     '<td width="80" align="center">
                             <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
@@ -218,7 +218,7 @@ if (isset($_GET['ExportPDF'])) {
                     INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
                     WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
             $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-            $Pendidikan = $DataPendidikan['JenisPendidikan'];
+            $Pendidikan = ($DataPendidikan && isset($DataPendidikan['JenisPendidikan'])) ? $DataPendidikan['JenisPendidikan'] : '-';
             $content .= '<td align="center">' . $Pendidikan . '</td>
             <td><span style="color:blue">' . $TanggalSK . '</span><br>
                 <strong>' . $NomerSK .
@@ -392,7 +392,7 @@ if (isset($_GET['ExportPDF'])) {
             $Setting = $DataPegawai['Setting'];
             $content .= '<tr>
                             <td width="40" align="center">' . $Nomor . '</td>';
-            if (empty($Foto)) {
+            if (empty($Foto) || !file_exists("../../../Vendor/Media/Pegawai/" . $Foto)) {
                 $content .=
                     '<td width="80" align="center">
                             <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
@@ -431,7 +431,7 @@ if (isset($_GET['ExportPDF'])) {
                     INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
                     WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
             $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-            $Pendidikan = $DataPendidikan['JenisPendidikan'];
+            $Pendidikan = ($DataPendidikan && isset($DataPendidikan['JenisPendidikan'])) ? $DataPendidikan['JenisPendidikan'] : '-';
             $content .= '<td align="center">' . $Pendidikan . '</td>
             <td><span style="color:blue">' . $TanggalSK . '</span><br>
                 <strong>' . $NomerSK .

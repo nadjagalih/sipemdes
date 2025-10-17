@@ -165,16 +165,22 @@ if (isset($_GET['Kecamatan']) && isset($_GET['Desa']) && !empty($_GET['Kecamatan
                     <td width="40" align="center">' . $Nomor . '</td>';
             $content .=
                 '<td width="90">' . $Kecamatan . '<br><strong>' . $NamaDesa . '</strong><br>' . $KodeDesa . '</td>';
-            if (empty($Foto)) {
+            
+            // Validasi foto dengan pengecekan file exists
+            $fotoPath = '../../../Vendor/Media/Pegawai/' . $Foto;
+            $fotoExists = !empty($Foto) && file_exists($fotoPath);
+            
+            if ($fotoExists) {
+                $content .=
+                    '<td width="80" align="center">
+                        <img src="' . $fotoPath . '" width="65" height="auto" align="center">
+                    </td>';
+            } else {
+                // Gunakan no-image.jpg jika foto tidak ada atau null
                 $content .=
                     '<td width="80" align="center">
                         <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
                     </td>';
-            } else {
-                $content .=
-                    '<td width="80" align="center">
-                    <img src="../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
-                </td>';
             }
             
             $content .=

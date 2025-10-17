@@ -163,16 +163,28 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $content .=
         '<tr>
                 <td width="40" align="center">' . $Nomor . '</td>';
+    
+    // Cek apakah foto ada dan file benar-benar exist
     if (empty($Foto)) {
         $content .=
             '<td width="80" align="center">
                 <img src="../../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
             </td>';
     } else {
-        $content .=
-            '<td width="80" align="center">
-                <img src="../../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
-            </td>';
+        // Cek apakah file foto benar-benar ada
+        $fotoPath = __DIR__ . '/../../../../Vendor/Media/Pegawai/' . $Foto;
+        if (file_exists($fotoPath)) {
+            $content .=
+                '<td width="80" align="center">
+                    <img src="../../../../Vendor/Media/Pegawai/' . htmlspecialchars($Foto) . '" width="65" height="auto" align="center">
+                </td>';
+        } else {
+            // Jika file tidak ada, gunakan no-image.jpg
+            $content .=
+                '<td width="80" align="center">
+                    <img src="../../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
+                </td>';
+        }
     }
     $content .= '<td width="130">' . $NIK . '</td>
                     <td width="320"><strong><font size="12">' . $Nama . '</font></strong><br>' . $Jabatan . '<br><br>' . $Address . '</td>

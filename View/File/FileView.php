@@ -1,66 +1,41 @@
 <?php
-if (empty($_GET['alert'])) {
-    echo "";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadSukses') {
-    echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Upload Berhasil',
-                    text: 'File telah berhasil diupload.',
-                    type: 'success'
-                });
-            }, 100);
-          </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'FileMax') {
-    echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Upload gagal',
-                    text: 'File melebihi 5 MB.',
-                    type: 'warning'
-                });
-            }, 100);
-          </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'FileExt') {
-    echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Upload gagal',
-                    text: 'Tipe File Tidak Didukung (hanya file pdf).',
-                    type: 'warning'
-                });
-            }, 100);
-          </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'DeleteSuccess') {
-    echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Hapus Berhasil',
-                    text: 'File telah berhasil dihapus.',
-                    type: 'success'
-                });
-            }, 100);
-          </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'DeleteError') {
-    echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Hapus Gagal',
-                    text: 'Terjadi kesalahan saat menghapus file.',
-                    type: 'error'
-                });
-            }, 100);
-          </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'InvalidID') {
-    echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'ID Tidak Valid',
-                    text: 'ID file yang dipilih tidak valid.',
-                    type: 'warning'
-                });
-            }, 100);
-          </script>";
+// Only show delete notifications here; upload success is handled in FileUpload.php
+$alert = isset($_GET['alert']) ? $_GET['alert'] : '';
+if (!empty($alert) && in_array($alert, ['DeleteSuccess', 'DeleteError', 'InvalidID'])) {
+    // Prepare CSP nonce if available
+    $nonceAttr = '';
+    if (class_exists('CSPHandler')) {
+        try {
+            $nonceAttr = CSPHandler::scriptNonce();
+        } catch (Exception $e) {
+            // fallback to empty
+            $nonceAttr = '';
+        }
+    }
+
+    if ($alert == 'DeleteSuccess') {
+        $title = 'Hapus Berhasil';
+        $text = 'File telah berhasil dihapus.';
+        $icon = 'success';
+    } elseif ($alert == 'DeleteError') {
+        $title = 'Hapus Gagal';
+        $text = 'Terjadi kesalahan saat menghapus file.';
+        $icon = 'error';
+    } else { // InvalidID
+        $title = 'ID Tidak Valid';
+        $text = 'ID file yang dipilih tidak valid.';
+        $icon = 'warning';
+    }
+
+    echo "<script " . $nonceAttr . " type='text/javascript'>\n";
+    echo "  document.addEventListener('DOMContentLoaded', function() {\n";
+    echo "    if (typeof Swal !== 'undefined') {\n";
+    echo "      Swal.fire({ title: '" . addslashes($title) . "', text: '" . addslashes($text) . "', icon: '" . $icon . "', confirmButtonText: 'OK' });\n";
+    echo "    } else {\n";
+    echo "      alert('" . addslashes($title . ' - ' . $text) . "');\n";
+    echo "    }\n";
+    echo "  });\n";
+    echo "</script>";
 }
 
 $IdKecamatan = $_SESSION['IdKecamatan'] ?? '';

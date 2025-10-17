@@ -17,7 +17,7 @@ if (!empty($Lingkungan)) {
 
 if (empty($Lingkungan)) {
 ?>
-    <select name="IdDesa" id="IdDesa" style="width: 100%;" class="select2_desa form-control">
+    <select name="IdDesa" id="IdDesa" style="width: 100%;" class="select2_desa form-control" required>
         <option value="">Pilih Desa/Kelurahan</option>
         <?php
         $QueryDesa = mysqli_query($db, "SELECT
@@ -44,7 +44,7 @@ if (empty($Lingkungan)) {
         ?>
     </select>
 <?php } else { ?>
-    <select name="IdDesa" id="IdDesa" style="width: 100%;" class="select2_desa form-control">
+    <select name="IdDesa" id="IdDesa" style="width: 100%;" class="select2_desa form-control" required>
         <option value="<?php echo $Lingkungan; ?>"><?php echo $EditNamaDesa; ?></option>
         <?php
         $QueryDesa = mysqli_query($db, "SELECT

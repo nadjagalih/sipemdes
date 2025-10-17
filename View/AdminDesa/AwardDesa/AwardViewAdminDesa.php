@@ -1,5 +1,6 @@
 <?php
 // Main view page untuk list award yang tersedia untuk admin desa
+require_once __DIR__ . "/../../../Module/Security/CSPHandler.php";
 include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
 ?>
 
@@ -1001,24 +1002,14 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                             $MasaPenjurianMulai = $DataAward['MasaPenjurianMulai'];
                             $MasaPenjurianSelesai = $DataAward['MasaPenjurianSelesai'];
                             
-                            // Check status
+                            // Check status - Simplified: hanya cek status aktif/non-aktif
                             $currentDate = date('Y-m-d');
                             $statusClass = '';
                             $statusText = '';
                             
                             if ($StatusAktif == 'Aktif') {
-                                if (!empty($MasaPenjurianMulai) && !empty($MasaPenjurianSelesai)) {
-                                    if ($currentDate > $MasaPenjurianSelesai) {
-                                        $statusClass = 'status-selesai';
-                                        $statusText = 'SELESAI';
-                                    } else {
-                                        $statusClass = 'status-aktif';
-                                        $statusText = 'AKTIF';
-                                    }
-                                } else {
-                                    $statusClass = 'status-aktif';
-                                    $statusText = 'AKTIF';
-                                }
+                                $statusClass = 'status-aktif';
+                                $statusText = 'AKTIF';
                             } else {
                                 $statusClass = 'status-tutup';
                                 $statusText = 'NONAKTIF';
@@ -1055,8 +1046,10 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                                                 <i class="fa fa-eye"></i> Lihat Karya
                                             </a>
                                         <?php else: ?>
-                                            <?php if ($StatusAktif == 'Aktif' && $statusText != 'SELESAI'): ?>
-                                                <button type="button" class="btn btn-pilih-award" onclick="openDaftarModal('<?php echo $IdAward; ?>', '<?php echo addslashes($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>')">
+                                            <?php if ($StatusAktif == 'Aktif'): ?>
+                                                <button type="button" class="btn btn-pilih-award btn-daftar-award" 
+                                                    data-award-id="<?php echo $IdAward; ?>" 
+                                                    data-award-name="<?php echo htmlspecialchars($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>">
                                                     <i class="fa fa-plus"></i> Daftar Karya
                                                 </button>
                                             <?php else: ?>
@@ -1375,7 +1368,7 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
                 <p class="success-message" id="successMessage">
                     Data berhasil disimpan
                 </p>
-                <button type="button" class="btn btn-success-ok" onclick="closeSuccessModal()">
+                <button type="button" class="btn btn-success-ok" id="btnCloseSuccess">
                     OK
                 </button>
             </div>
@@ -1383,7 +1376,7 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
     </div>
 </div>
 
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
 function openDaftarModal(idAward, namaPenghargaan) {
     // Set nilai award
     document.getElementById('IdAward').value = idAward;
@@ -1491,10 +1484,29 @@ function closeSuccessModal() {
         location.reload(); // Refresh halaman setelah modal tertutup
     }, 300);
 }
+
+// Event delegation untuk tombol daftar award (CSP-safe)
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle klik tombol daftar award
+    document.body.addEventListener('click', function(e) {
+        if (e.target && e.target.closest('.btn-daftar-award')) {
+            const btn = e.target.closest('.btn-daftar-award');
+            const idAward = btn.getAttribute('data-award-id');
+            const namaPenghargaan = btn.getAttribute('data-award-name');
+            openDaftarModal(idAward, namaPenghargaan);
+        }
+    });
+    
+    // Handle klik tombol close success modal
+    const btnCloseSuccess = document.getElementById('btnCloseSuccess');
+    if (btnCloseSuccess) {
+        btnCloseSuccess.addEventListener('click', closeSuccessModal);
+    }
+});
 </script>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Force pace loading to complete after page is fully loaded
     window.addEventListener('load', function() {
         // Wait a bit for all scripts to finish
@@ -1524,19 +1536,6 @@ function closeSuccessModal() {
             document.body.classList.add('pace-done');
         }, 2000); // Wait 2 seconds after DOM ready
     });
-    
-    // Function untuk close notification bar
-    function closeNotificationBar() {
-        const notifBar = document.querySelector('.notification-bar');
-        if (notifBar) {
-            notifBar.style.animation = 'slideUp 0.3s ease-out forwards';
-            setTimeout(() => {
-                notifBar.style.display = 'none';
-                // Store in localStorage untuk session ini
-                localStorage.setItem('notifBarClosed', 'true');
-            }, 300);
-        }
-    }
     
     // Check apakah notification bar sudah di-close sebelumnya
     document.addEventListener('DOMContentLoaded', function() {

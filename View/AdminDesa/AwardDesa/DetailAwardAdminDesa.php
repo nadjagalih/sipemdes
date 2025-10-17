@@ -209,7 +209,6 @@ if (isset($_GET['alert'])) {
                                         <th>Posisi</th>
                                         <th>Status</th>
                                         <th>Tanggal Daftar</th>
-                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -259,23 +258,17 @@ if (isset($_GET['alert'])) {
                                             <span class="badge <?php echo $statusBadge; ?>"><?php echo $statusText; ?></span>
                                         </td>
                                         <td><?php echo date('d M Y H:i', strtotime($DataKaryaAward['TanggalDaftar'])); ?></td>
+                                        <!--
                                         <td>
                                             <div class="btn-group">
-                                                <button type="button" class="btn btn-sm btn-info" onclick="detailKaryaAward('<?php echo $DataKaryaAward['IdPesertaAward']; ?>', '<?php echo addslashes($DataKaryaAward['JudulKarya']); ?>', '<?php echo addslashes($DataKaryaAward['Keterangan'] ?? ''); ?>', '<?php echo $DataKaryaAward['LinkKarya']; ?>', '<?php echo $DataKaryaAward['NamaKategori']; ?>')">
-                                                    <i class="fa fa-eye"></i>
-                                                </button>
                                                 <?php if ($DataKaryaAward['StatusAward'] == 'Aktif'): ?>
-                                                <!--
                                                 <a href="?pg=EditKaryaAward&kode=<?php echo $DataKaryaAward['IdPesertaAward']; ?>&award=<?php echo $IdAward; ?>" class="btn btn-sm btn-warning">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
-                                                -->
-                                                <button type="button" class="btn btn-sm btn-danger" onclick="hapusKaryaAward('<?php echo $DataKaryaAward['IdPesertaAward']; ?>', '<?php echo addslashes($DataKaryaAward['JudulKarya']); ?>')">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
                                                 <?php endif; ?>
                                             </div>
                                         </td>
+                                        -->
                                     </tr>
                                     <?php endwhile; ?>
                                 </tbody>

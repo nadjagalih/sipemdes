@@ -100,8 +100,8 @@
                                     <div class="col-lg-8"><input type="text" name="Pekerjaan" id="Pekerjaan" placeholder="Masukkan Pekerjaan" class="form-control" autocomplete="off">
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
-                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-3" class="btn btn-success ">Batal</a>
+                                <button class="btn btn-primary" type="submit" name="Save" id="SaveAnak">Save</button>
+                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-3" class="btn btn-success">Batal</a>
                             </div>
                         </div>
                     </form>

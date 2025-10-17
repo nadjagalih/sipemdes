@@ -161,7 +161,7 @@ if ($IdTemp) {
                                 </div>
                                 
                                 <?php if (!$hasSpouseData): ?>
-                                    <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
+                                    <button class="btn btn-primary" type="submit" name="Save" id="SaveSuamiIstri">Save</button>
                                     <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-2" class="btn btn-success">Batal</a>
                                 <?php else: ?>
                                     <div class="alert alert-warning" style="margin-top: 20px;">
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('No spouse data - form is available for input');
         
         // Enable form submission dengan validation
-        var saveButton = document.getElementById('Save');
+        var saveButton = document.getElementById('SaveSuamiIstri');
         if (saveButton) {
             saveButton.addEventListener('click', function(e) {
                 console.log('Save button clicked - validating form...');

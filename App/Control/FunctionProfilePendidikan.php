@@ -59,7 +59,7 @@
                                         <span style="font-style: italic; color:black;">Contoh : 16-01-1980</span>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
+                                <button class="btn btn-primary" type="submit" name="Save" id="SavePendidikan">Save</button>
                                 <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-1" class="btn btn-success">Batal</a>
                             </div>
                         </div>

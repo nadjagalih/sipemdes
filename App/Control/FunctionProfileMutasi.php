@@ -277,7 +277,7 @@
                                         </div>
                                     </div>
 
-                                    <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
+                                    <button class="btn btn-primary" type="submit" name="Save" id="SaveMutasi">Save</button>
                                     <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-5" class="btn btn-success ">Batal</a>
                                 </div>
                             </div>

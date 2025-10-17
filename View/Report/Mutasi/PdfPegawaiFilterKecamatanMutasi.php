@@ -1,6 +1,8 @@
 <?php
 session_start();
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+// Suppress warnings for missing image files during PDF generation
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', '0');
 
 include '../../../Module/Config/Env.php';
 
@@ -81,15 +83,27 @@ if (isset($_GET['Proses'])) {
         $content .=
             '<tr>
                 <td width="60" align="center">' . $Nomor . '</td>';
-        if (empty($Foto)) {
-            $content .=
-                '<td width="100" align="center">
-                <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
-            </td>';
+        
+        // Check if photo file exists
+        $photoPath = '../../../Vendor/Media/Pegawai/' . $Foto;
+        $noImagePath = '../../../Vendor/Media/Pegawai/no-image.jpg';
+        
+        if (empty($Foto) || !file_exists($photoPath)) {
+            // Use no-image if photo is empty or file doesn't exist
+            if (file_exists($noImagePath)) {
+                $content .=
+                    '<td width="100" align="center">
+                    <img src="' . $noImagePath . '" width="65" height="auto" align="center">
+                </td>';
+            } else {
+                // If no-image also doesn't exist, use placeholder text
+                $content .=
+                    '<td width="100" align="center">No Photo</td>';
+            }
         } else {
             $content .=
                 '<td width="100" align="center">
-                    <img src="../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
+                    <img src="' . $photoPath . '" width="65" height="auto" align="center">
                 </td>';
         }
         $content .=

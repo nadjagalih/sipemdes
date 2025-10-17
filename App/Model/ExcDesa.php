@@ -26,13 +26,19 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $Desa = sql_injeksi($_POST['Desa']);
             $IdKecamatan = sql_injeksi($_POST['IdKecamatan']);
             $IdKabupaten = sql_injeksi($_POST['IdKabupaten']);
+            $NoTelepon = sql_injeksi($_POST['NoTelepon']);
+            $AlamatDesa = sql_injeksi($_POST['AlamatDesa']);
+            $Latitude = sql_injeksi($_POST['Latitude']);
+            $Longitude = sql_injeksi($_POST['Longitude']);
 
 
-            $Save = mysqli_query($db, "INSERT INTO master_desa(IdDesa, KodeDesa, NamaDesa, IdKecamatanFK, IdKabupatenFK)
-            VALUE('$IdDesa','$KodeDesa','$Desa','$IdKecamatan','$IdKabupaten')");
+            $Save = mysqli_query($db, "INSERT INTO master_desa(IdDesa, KodeDesa, NamaDesa, IdKecamatanFK, IdKabupatenFK, NoTelepon, alamatDesa, Latitude, Longitude)
+            VALUE('$IdDesa','$KodeDesa','$Desa','$IdKecamatan','$IdKabupaten','$NoTelepon','$AlamatDesa','$Latitude','$Longitude')");
 
             if ($Save) {
                 header("location:../../View/v?pg=DesaView&alert=Save");
+            } else {
+                header("location:../../View/v?pg=DesaAdd&alert=Error");
             }
         }
     } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
@@ -42,16 +48,26 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $Desa = sql_injeksi($_POST['Desa']);
             $IdKecamatanEdit = sql_injeksi($_POST['IdKecamatan']);
             $IdKabupatenEdit = sql_injeksi($_POST['IdKabupaten']);
+            $NoTelepon = sql_injeksi($_POST['NoTelepon']);
+            $AlamatDesa = sql_injeksi($_POST['AlamatDesa']);
+            $Latitude = sql_injeksi($_POST['Latitude']);
+            $Longitude = sql_injeksi($_POST['Longitude']);
 
 
             $Edit = mysqli_query($db, "UPDATE master_desa SET KodeDesa = '$KodeDesa',
             NamaDesa = '$Desa',
             IdKecamatanFK = '$IdKecamatanEdit',
-            IdKabupatenFk = '$IdKabupatenEdit'
+            IdKabupatenFk = '$IdKabupatenEdit',
+            NoTelepon = '$NoTelepon',
+            alamatDesa = '$AlamatDesa',
+            Latitude = '$Latitude',
+            Longitude = '$Longitude'
             WHERE IdDesa = '$IdDesa' ");
 
             if ($Edit) {
-                header("location:../../View/v?pg=DesaView&alert=Edit");
+                header("location:../../View/v?pg=DesaEdit&Kode=$IdDesa&alert=Edit");
+            } else {
+                header("location:../../View/v?pg=DesaEdit&Kode=$IdDesa&alert=Error");
             }
         }
     } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {

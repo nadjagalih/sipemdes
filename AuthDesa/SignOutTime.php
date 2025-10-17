@@ -9,7 +9,7 @@ unset($_SESSION['PassUser']);
 session_unset();
 session_destroy();
 
-header("location: SignIn?alert=SignOutTime");
+header("location: ../main.php?alert=SignOutTime");
 if (isset($db) && $db) {
     mysqli_close($db);
 }

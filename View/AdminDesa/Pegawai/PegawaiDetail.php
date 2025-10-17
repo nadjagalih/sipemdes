@@ -7,7 +7,7 @@
  <?php
  // Sistem Notifikasi Universal untuk semua operasi CRUD
  if (isset($_GET['alert'])) {
-     $$alert = isset($_GET['alert']) ? sql_injeksi($_GET['alert']) : '';
+     $alert = isset($_GET['alert']) ? sql_injeksi($_GET['alert']) : '';
      
      // Konfigurasi pesan berdasarkan jenis alert
      $notifications = [
@@ -43,6 +43,7 @@
          'ErrorSave' => ['title' => 'Gagal!', 'message' => 'Data gagal disimpan', 'icon' => 'error'],
          'ErrorEdit' => ['title' => 'Gagal!', 'message' => 'Data gagal diubah', 'icon' => 'error'],
          'ErrorDelete' => ['title' => 'Gagal!', 'message' => 'Data gagal dihapus', 'icon' => 'error'],
+         'ErrorDeleteActive' => ['title' => 'Tidak Dapat Dihapus!', 'message' => 'Pendidikan aktif tidak dapat dihapus. Silakan pilih pendidikan lain sebagai aktif terlebih dahulu.', 'icon' => 'error'],
      ];
      
      // Cek apakah alert ada dalam konfigurasi
@@ -50,24 +51,107 @@
          $notification = $notifications[$alert];
          $swalType = ($notification['icon'] == 'success') ? 'success' : (($notification['icon'] == 'error') ? 'error' : 'info');
          
-         echo '<script>
+         // Enhanced CSP nonce generation with fallback
+         $nonce = '';
+         $nonceAttr = '';
+         
+         if (class_exists('CSPHandler')) {
+             try {
+                 $nonce = CSPHandler::scriptNonce();
+                 $nonceAttr = $nonce;
+             } catch (Exception $e) {
+                 error_log("CSPHandler error in notification: " . $e->getMessage());
+                 $nonceAttr = ''; // Fallback tanpa nonce
+             }
+         } else {
+             // Manual nonce generation sebagai fallback
+             if (function_exists('random_bytes')) {
+                 $manualNonce = base64_encode(random_bytes(16));
+                 $nonceAttr = 'nonce="' . $manualNonce . '"';
+                 error_log("Manual nonce generated for notification: " . $manualNonce);
+             } else {
+                 error_log("No CSP nonce available for notification script");
+                 $nonceAttr = ''; // Fallback tanpa nonce
+             }
+         }
+         
+         echo '<script ' . $nonceAttr . '>
              document.addEventListener("DOMContentLoaded", function() {
-                 // Pastikan SweetAlert sudah ter-load
-                 if (typeof swal !== "undefined") {
-                     swal({
-                         title: "' . $notification['title'] . '",
-                         text: "' . $notification['message'] . '",
-                         type: "' . $swalType . '",
+                 // Debug untuk memastikan script dipanggil dengan CSP compliance
+                 console.log("CSP-compliant notification script loaded with alert: ' . $alert . '");
+                 
+                 // Pastikan SweetAlert2 sudah ter-load
+                 if (typeof Swal !== "undefined") {
+                     console.log("SweetAlert2 detected, showing CSP-compliant notification");
+                     Swal.fire({
+                         title: "' . addslashes($notification['title']) . '",
+                         text: "' . addslashes($notification['message']) . '",
+                         icon: "' . $swalType . '",
                          showConfirmButton: true,
                          confirmButtonText: "OK",
                          confirmButtonColor: "#3085d6",
-                         timer: 4000,
+                         timer: 5000,
                          allowOutsideClick: true,
-                         allowEscapeKey: true
+                         allowEscapeKey: true,
+                         customClass: {
+                             container: "notification-swal"
+                         },
+                         zIndex: 10000
+                     }).catch(function(error) {
+                         console.error("SweetAlert2 error (possible CSP issue):", error);
+                         // Fallback jika SweetAlert2 error
+                         alert("' . addslashes($notification['title']) . ' - ' . addslashes($notification['message']) . '");
                      });
                  } else {
+                     console.log("SweetAlert2 not available (possible CSP block), using fallback alert");
                      // Fallback jika SweetAlert tidak tersedia
-                     alert("' . $notification['title'] . ' - ' . $notification['message'] . '");
+                     alert("' . addslashes($notification['title']) . ' - ' . addslashes($notification['message']) . '");
+                 }
+             });
+         </script>';
+     } else if (!empty($alert)) {
+         // Fallback untuk alert yang tidak terdefinisi dengan CSP compliance
+         $nonce = '';
+         $nonceAttr = '';
+         
+         if (class_exists('CSPHandler')) {
+             try {
+                 $nonce = CSPHandler::scriptNonce();
+                 $nonceAttr = $nonce;
+             } catch (Exception $e) {
+                 error_log("CSPHandler error in fallback notification: " . $e->getMessage());
+                 $nonceAttr = '';
+             }
+         } else {
+             if (function_exists('random_bytes')) {
+                 $manualNonce = base64_encode(random_bytes(16));
+                 $nonceAttr = 'nonce="' . $manualNonce . '"';
+             } else {
+                 $nonceAttr = '';
+             }
+         }
+         
+         echo '<script ' . $nonceAttr . '>
+             document.addEventListener("DOMContentLoaded", function() {
+                 console.log("CSP-compliant unknown alert type: ' . $alert . '");
+                 if (typeof Swal !== "undefined") {
+                     Swal.fire({
+                         title: "Informasi",
+                         text: "Operasi berhasil dilakukan",
+                         icon: "info",
+                         showConfirmButton: true,
+                         confirmButtonText: "OK",
+                         timer: 3000,
+                         customClass: {
+                             container: "notification-swal"
+                         },
+                         zIndex: 10000
+                     }).catch(function(error) {
+                         console.error("SweetAlert2 error (possible CSP issue):", error);
+                         alert("Informasi - Operasi berhasil dilakukan");
+                     });
+                 } else {
+                     alert("Informasi - Operasi berhasil dilakukan");
                  }
              });
          </script>';

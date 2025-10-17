@@ -4,24 +4,55 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 include '../../../../Module/Config/Env.php';
 
-$Tanggal_Cetak = date('d-m-Y');
-$Waktu_Cetak = date('H:i:s');
-$DateCetak = $Tanggal_Cetak . "_" . $Waktu_Cetak;
+// Enhanced error handling dan input validation
+try {
+    $Tanggal_Cetak = date('d-m-Y');
+    $Waktu_Cetak = date('H:i:s');
+    $DateCetak = $Tanggal_Cetak . "_" . $Waktu_Cetak;
 
-$IdDesa = $_SESSION['IdDesa'];
+    // Safe session handling
+    if (!isset($_SESSION['IdDesa']) || empty($_SESSION['IdDesa'])) {
+        throw new Exception("Session IdDesa tidak valid");
+    }
+    
+    $IdDesa = mysqli_real_escape_string($db, $_SESSION['IdDesa']);
 
-$QueryDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa ='$IdDesa' ");
-$DataDesa = mysqli_fetch_assoc($QueryDesa);
-$NamaDesa = $DataDesa['NamaDesa'];
-$Kecamatan = $DataDesa['IdKecamatanFK'];
+    // Safe query untuk Desa
+    $QueryDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$IdDesa'");
+    if (!$QueryDesa) {
+        throw new Exception("Error query master_desa: " . mysqli_error($db));
+    }
+    
+    $DataDesa = mysqli_fetch_assoc($QueryDesa);
+    if (!$DataDesa) {
+        throw new Exception("Data desa tidak ditemukan untuk IdDesa: $IdDesa");
+    }
+    
+    $NamaDesa = htmlspecialchars($DataDesa['NamaDesa'], ENT_QUOTES, 'UTF-8');
+    $Kecamatan = mysqli_real_escape_string($db, $DataDesa['IdKecamatanFK']);
 
-$QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan ='$Kecamatan' ");
-$DataKecamatan = mysqli_fetch_assoc($QueryKecamatan);
-$NamaKecamatan = $DataKecamatan['Kecamatan'];
+    // Safe query untuk Kecamatan
+    $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$Kecamatan'");
+    if (!$QueryKecamatan) {
+        throw new Exception("Error query master_kecamatan: " . mysqli_error($db));
+    }
+    
+    $DataKecamatan = mysqli_fetch_assoc($QueryKecamatan);
+    $NamaKecamatan = $DataKecamatan ? htmlspecialchars($DataKecamatan['Kecamatan'], ENT_QUOTES, 'UTF-8') : 'Unknown';
 
-$QProfile = mysqli_query($db, "SELECT * FROM master_setting_profile_dinas");
-$DataProfile = mysqli_fetch_assoc($QProfile);
-$Kabupaten = $DataProfile['Kabupaten'];
+    // Safe query untuk Profile
+    $QProfile = mysqli_query($db, "SELECT * FROM master_setting_profile_dinas");
+    if (!$QProfile) {
+        throw new Exception("Error query master_setting_profile_dinas: " . mysqli_error($db));
+    }
+    
+    $DataProfile = mysqli_fetch_assoc($QProfile);
+    $Kabupaten = $DataProfile ? htmlspecialchars($DataProfile['Kabupaten'], ENT_QUOTES, 'UTF-8') : 'Unknown';
+
+} catch (Exception $e) {
+    error_log("Error in PegawaiDesaPdf.php: " . $e->getMessage());
+    die("Error: " . $e->getMessage());
+}
 
 $content =
     '<html>
@@ -50,6 +81,7 @@ $QueryPegawai = mysqli_query($db, "SELECT
                             master_pegawai.NIK,
                             master_pegawai.Nama,
                             master_pegawai.TanggalLahir,
+                            master_pegawai.TanggalPensiun,
                             master_pegawai.JenKel,
                             master_pegawai.IdDesaFK,
                             master_pegawai.Alamat,
@@ -91,7 +123,7 @@ $QueryPegawai = mysqli_query($db, "SELECT
                             master_pegawai.Setting = 1 AND
                             main_user.IdLevelUserFK <> 1 AND
                             main_user.IdLevelUserFK <> 2 AND
-                            master_pegawai.Kecamatan = '$Kecamatan' AND
+                            history_mutasi.Setting = 1 AND
                             master_pegawai.IdDesaFK = '$IdDesa'
                             GROUP BY
                             master_pegawai.IdPegawaiFK
@@ -99,72 +131,135 @@ $QueryPegawai = mysqli_query($db, "SELECT
                             master_kecamatan.IdKecamatan ASC,
                             master_desa.NamaDesa ASC,
                             master_jabatan.IdJabatan ASC");
+
+// Enhanced error handling untuk query utama
+if (!$QueryPegawai) {
+    throw new Exception("Error query pegawai: " . mysqli_error($db));
+}
+
 while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $IdPegawaiFK = $DataPegawai['IdPegawaiFK'];
     $Foto = $DataPegawai['Foto'];
-    $NIK = $DataPegawai['NIK'];
-    $Nama = $DataPegawai['Nama'];
+    $NIK = htmlspecialchars($DataPegawai['NIK'], ENT_QUOTES, 'UTF-8');
+    $Nama = htmlspecialchars($DataPegawai['Nama'], ENT_QUOTES, 'UTF-8');
 
+    // Safe handling untuk TanggalLahir
     $TanggalLahir = $DataPegawai['TanggalLahir'];
-    $exp = explode('-', $TanggalLahir);
-    $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+    if (!empty($TanggalLahir)) {
+        $exp = explode('-', $TanggalLahir);
+        if (count($exp) >= 3) {
+            $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+        } else {
+            $ViewTglLahir = $TanggalLahir;
+        }
+    } else {
+        $ViewTglLahir = '-';
+    }
 
-    $TanggalPensiun = $DataPegawai['TanggalPensiun'];
-    $exp1 = explode('-', $TanggalPensiun);
-    $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+    // Safe handling untuk TanggalPensiun dengan proper error checking
+    if (isset($DataPegawai['TanggalPensiun']) && !empty($DataPegawai['TanggalPensiun'])) {
+        $TanggalPensiun = $DataPegawai['TanggalPensiun'];
+        $exp1 = explode('-', $TanggalPensiun);
+        if (count($exp1) >= 3) {
+            $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+        } else {
+            $ViewTglPensiun = $TanggalPensiun;
+        }
+    } else {
+        $TanggalPensiun = '';
+        $ViewTglPensiun = '-';
+    }
 
-    //HITUNG DETAIL TANGGAL PENSIUN
-    $TglPensiun = date_create($TanggalPensiun);
-    $TglSekarang = date_create();
-    $Temp = date_diff($TglSekarang, $TglPensiun);
+    //HITUNG DETAIL TANGGAL PENSIUN dengan error handling
+    if (!empty($TanggalPensiun)) {
+        try {
+            $TglPensiun = date_create($TanggalPensiun);
+            $TglSekarang = date_create();
+            
+            if ($TglPensiun && $TglSekarang) {
+                $Temp = date_diff($TglSekarang, $TglPensiun);
 
-    //CEK TANGGAL ASLI SAAT INI
-    $TglSekarang1 = Date('Y-m-d');
+                //CEK TANGGAL ASLI SAAT INI
+                $TglSekarang1 = Date('Y-m-d');
 
-    if ($TglSekarang1 >= $TanggalPensiun) {
-        $HasilTahun = 0 . ' Tahun ';
-        $HasilBulan = 0 . ' Bulan ';
-        $HasilHari = 0 . ' Hari ';
-    } elseif ($TglSekarang1 < $TanggalPensiun) {
-        $HasilTahun = $Temp->y . ' Tahun ';
-        $HasilBulan = $Temp->m . ' Bulan ';
-        $HasilHari = $Temp->d + 1 . ' Hari ';
+                if ($TglSekarang1 >= $TanggalPensiun) {
+                    $HasilTahun = 0 . ' Tahun ';
+                    $HasilBulan = 0 . ' Bulan ';
+                    $HasilHari = 0 . ' Hari ';
+                } elseif ($TglSekarang1 < $TanggalPensiun) {
+                    $HasilTahun = $Temp->y . ' Tahun ';
+                    $HasilBulan = $Temp->m . ' Bulan ';
+                    $HasilHari = $Temp->d + 1 . ' Hari ';
+                }
+            } else {
+                $HasilTahun = '-';
+                $HasilBulan = '';
+                $HasilHari = '';
+            }
+        } catch (Exception $e) {
+            error_log("Error calculating pension date: " . $e->getMessage());
+            $HasilTahun = '-';
+            $HasilBulan = '';
+            $HasilHari = '';
+        }
+    } else {
+        $HasilTahun = '-';
+        $HasilBulan = '';
+        $HasilHari = '';
     }
     //SELESAI
 
     $JenKel = $DataPegawai['JenKel'];
-    $KodeDesa = $DataPegawai['KodeDesa'];
-    $NamaDesa = $DataPegawai['NamaDesa'];
-    $Kecamatan = $DataPegawai['Kecamatan'];
-    $Kabupaten = $DataPegawai['Kabupaten'];
-    $Alamat = $DataPegawai['Alamat'];
+    $KodeDesa = htmlspecialchars($DataPegawai['KodeDesa'], ENT_QUOTES, 'UTF-8');
+    $NamaDesa = htmlspecialchars($DataPegawai['NamaDesa'], ENT_QUOTES, 'UTF-8');
+    $Kecamatan = htmlspecialchars($DataPegawai['Kecamatan'], ENT_QUOTES, 'UTF-8');
+    $Kabupaten = htmlspecialchars($DataPegawai['Kabupaten'], ENT_QUOTES, 'UTF-8');
+    $Alamat = htmlspecialchars($DataPegawai['Alamat'], ENT_QUOTES, 'UTF-8');
     $RT = $DataPegawai['RT'];
     $RW = $DataPegawai['RW'];
 
     $Lingkungan = $DataPegawai['Lingkungan'];
-    $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
-    $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-    $Komunitas = $LingkunganBPD['NamaDesa'];
+    $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '" . mysqli_real_escape_string($db, $Lingkungan) . "' ");
+    if ($AmbilDesa && ($LingkunganBPD = mysqli_fetch_assoc($AmbilDesa))) {
+        $Komunitas = htmlspecialchars($LingkunganBPD['NamaDesa'], ENT_QUOTES, 'UTF-8');
+    } else {
+        $Komunitas = 'Unknown';
+    }
 
     $KecamatanBPD = $DataPegawai['Kec'];
-    $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
-    $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-    $KomunitasKec = $KecamatanBPD['Kecamatan'];
+    $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '" . mysqli_real_escape_string($db, $KecamatanBPD) . "' ");
+    if ($AmbilKecamatan && ($KecamatanBPDData = mysqli_fetch_assoc($AmbilKecamatan))) {
+        $KomunitasKec = htmlspecialchars($KecamatanBPDData['Kecamatan'], ENT_QUOTES, 'UTF-8');
+    } else {
+        $KomunitasKec = 'Unknown';
+    }
 
     $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
     $Setting = $DataPegawai['Setting'];
-    $JenisMutasi = $DataPegawai['JenisMutasi'];
+    
+    // Safe handling untuk JenisMutasi
+    $JenisMutasi = isset($DataPegawai['JenisMutasi']) ? htmlspecialchars($DataPegawai['JenisMutasi'], ENT_QUOTES, 'UTF-8') : '-';
 
-    $TglSKMutasi = $DataPegawai['TanggalMutasi'];
-    $exp2 = explode('-', $TglSKMutasi);
-    $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
+    // Safe handling untuk TanggalMutasi
+    if (isset($DataPegawai['TanggalMutasi']) && !empty($DataPegawai['TanggalMutasi'])) {
+        $TglSKMutasi = $DataPegawai['TanggalMutasi'];
+        $exp2 = explode('-', $TglSKMutasi);
+        if (count($exp2) >= 3) {
+            $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
+        } else {
+            $TanggalMutasi = $TglSKMutasi;
+        }
+    } else {
+        $TanggalMutasi = '-';
+    }
 
-    $NomorSK = $DataPegawai['NomorSK'];
-    $SKMutasi = $DataPegawai['FileSKMutasi'];
-    $Jabatan = $DataPegawai['Jabatan'];
-    $KetJabatan = $DataPegawai['KeteranganJabatan'];
+    // Safe handling untuk field yang mungkin tidak ada
+    $NomorSK = isset($DataPegawai['NomorSK']) ? htmlspecialchars($DataPegawai['NomorSK'], ENT_QUOTES, 'UTF-8') : '-';
+    $SKMutasi = isset($DataPegawai['FileSKMutasi']) ? htmlspecialchars($DataPegawai['FileSKMutasi'], ENT_QUOTES, 'UTF-8') : '';
+    $Jabatan = htmlspecialchars($DataPegawai['Jabatan'], ENT_QUOTES, 'UTF-8');
+    $KetJabatan = htmlspecialchars($DataPegawai['KeteranganJabatan'], ENT_QUOTES, 'UTF-8');
     $Siltap = number_Format($DataPegawai['Siltap'], 0, ",", ".");
-    $Telp = $DataPegawai['NoTelp'];
+    $Telp = htmlspecialchars($DataPegawai['NoTelp'], ENT_QUOTES, 'UTF-8');
 
     $content .=
         '<tr>
@@ -179,30 +274,43 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     } else {
         $content .=
             '<td align="center">
-                    <img src="../../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
+                    <img src="../../../../Vendor/Media/Pegawai/' . htmlspecialchars($Foto, ENT_QUOTES, 'UTF-8') . '" width="65" height="auto" align="center">
                 </td>';
     }
     $content .=
         '<td width="220"><strong><span style="font-size:14">' . $Nama . '</span></strong><br><br>' . $Address . '</td>
                     <td>' . $ViewTglLahir;
-    $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
-    $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-    $JenisKelamin = $DataJenKel['Keterangan'];
+    
+    // Safe handling untuk JenKel query
+    $JenisKelamin = 'Unknown';
+    if (!empty($JenKel)) {
+        $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '" . mysqli_real_escape_string($db, $JenKel) . "' ");
+        if ($QueryJenKel && ($DataJenKel = mysqli_fetch_assoc($QueryJenKel))) {
+            $JenisKelamin = htmlspecialchars($DataJenKel['Keterangan'], ENT_QUOTES, 'UTF-8');
+        }
+    }
 
     $content .=
         '<br>' . $JenisKelamin . '</td>';
-    $QPendidikan = mysqli_query($db, "SELECT
-                       history_pendidikan.IdPegawaiFK,
-                       history_pendidikan.IdPendidikanFK,
-                       master_pendidikan.IdPendidikan,
-                       master_pendidikan.JenisPendidikan,
-                       history_pendidikan.Setting
-                       FROM
-                       history_pendidikan
-                       INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
-                       WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
-    $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-    $Pendidikan = $DataPendidikan['JenisPendidikan'];
+    
+    // Safe handling untuk Pendidikan query
+    $Pendidikan = 'Unknown';
+    if (!empty($IdPegawaiFK)) {
+        $QPendidikan = mysqli_query($db, "SELECT
+                           history_pendidikan.IdPegawaiFK,
+                           history_pendidikan.IdPendidikanFK,
+                           master_pendidikan.IdPendidikan,
+                           master_pendidikan.JenisPendidikan,
+                           history_pendidikan.Setting
+                           FROM
+                           history_pendidikan
+                           INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
+                           WHERE history_pendidikan.IdPegawaiFK = '" . mysqli_real_escape_string($db, $IdPegawaiFK) . "' AND history_pendidikan.Setting=1 ");
+        if ($QPendidikan && ($DataPendidikan = mysqli_fetch_assoc($QPendidikan))) {
+            $Pendidikan = htmlspecialchars($DataPendidikan['JenisPendidikan'], ENT_QUOTES, 'UTF-8');
+        }
+    }
+    
     $content .=
         '<td width="80">' . $Pendidikan . '</td>
                 <td width="180"><span style="font-size:12">' . $NomorSK . '</span><br><br>' . $TanggalMutasi . '</td>

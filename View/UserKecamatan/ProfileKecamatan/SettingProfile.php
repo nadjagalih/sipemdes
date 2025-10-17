@@ -1,83 +1,52 @@
 <?php
 // Setting Profile Admin Kecamatan - View dan Process
-// Include safe helpers for production-ready error handling
-require_once __DIR__ . '/../../../helpers/safe_helpers.php';
-require_once __DIR__ . '/../../../Module/Security/CSPHandler.php';
-
 ob_start(); // Start output buffering
-safeSessionStart();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
-
-// Set CSP headers
-CSPHandler::setCSPHeaders();
-
-// Include database connection
-require_once __DIR__ . '/../../../Module/Config/Env.php';
 
 // Include files
 include_once "../App/Control/FunctionSettingProfileAdminKecamatan.php";
+require_once "../Module/Security/CSPHandler.php";
 
-// Alert Handler dengan safe GET access
-$alert = safeGetParam('alert');
-if (!safeEmpty($alert)) {
-    if ($alert == 'Edit') {
-        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
-            setTimeout(function () {
-                swal({
-                    title: 'Berhasil!',
-                    text: 'Data Profile Kecamatan Berhasil Diperbarui',
-                    type: 'success',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
-    } elseif ($alert == 'Gagal') {
-        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
-            setTimeout(function () {
-                swal({
-                    title: 'Gagal!',
-                    text: 'Gagal Memperbarui Data Profile Kecamatan',
-                    type: 'error',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
-    } elseif ($alert == 'ErrorTelepon') {
-        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
-            setTimeout(function () {
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Nomor Telepon Harus Diisi',
-                    type: 'warning',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
-    } elseif ($alert == 'ErrorKoordinat') {
-        echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
-            setTimeout(function () {
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Silakan Klik pada Peta untuk Menentukan Koordinat',
-                    type: 'warning',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
+// Enhanced Alert Handler dengan SweetAlert2 dan CSP-compliant
+$alertType = '';
+$alertTitle = '';
+$alertMessage = '';
+$alertIcon = '';
+
+if (isset($_GET['alert'])) {
+    switch ($_GET['alert']) {
+        case 'Edit':
+            $alertType = 'EditProfile';
+            $alertTitle = 'Berhasil!';
+            $alertMessage = 'Data Profile Kecamatan Berhasil Diperbarui';
+            $alertIcon = 'success';
+            break;
+        case 'Gagal':
+            $alertType = 'ErrorProfile';
+            $alertTitle = 'Gagal!';
+            $alertMessage = 'Gagal Memperbarui Data Profile Kecamatan';
+            $alertIcon = 'error';
+            break;
+        case 'ErrorTelepon':
+            $alertType = 'ErrorTelepon';
+            $alertTitle = 'Peringatan!';
+            $alertMessage = 'Nomor Telepon Harus Diisi';
+            $alertIcon = 'warning';
+            break;
+        case 'ErrorKoordinat':
+            $alertType = 'ErrorKoordinat';
+            $alertTitle = 'Peringatan!';
+            $alertMessage = 'Silakan Klik pada Peta untuk Menentukan Koordinat';
+            $alertIcon = 'warning';
+            break;
     }
 }
 
 // Debug: uncomment untuk cek session (hapus setelah testing)
-// echo "<pre>"; print_r($_SESSION); echo "</pre>";
-// echo "<pre>Current Data: "; print_r($currentData ?? 'No data'); echo "</pre>"; 
-// echo "<pre>Variables: Lat=" . ($currentLatitude ?? 'null') . ", Lng=" . ($currentLongitude ?? 'null') . ", Nama=" . ($namaKecamatan ?? 'null') . "</pre>";
-
-// Pastikan variabel terdefinisi dengan nilai default
-$currentLatitude = $currentLatitude ?? '';
-$currentLongitude = $currentLongitude ?? '';
-$namaKecamatan = $namaKecamatan ?? 'Kecamatan';
-$currentNoTelepon = $currentNoTelepon ?? '';
-$AlamatKecamatan = $AlamatKecamatan ?? '';
+// echo "<pre>"; print_r($_SESSION); echo "</pre>"; exit;
 ?>
 
 <!DOCTYPE html>
@@ -90,28 +59,14 @@ $AlamatKecamatan = $AlamatKecamatan ?? '';
 <!-- Bootstrap CSS -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
 <link href="../Assets/css/local-fonts.css" rel="stylesheet">
-<!-- SECURITY FIX: Added SRI for Font Awesome -->
-<link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" 
-      rel="stylesheet"
-      integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm"
-      crossorigin="anonymous">
+<link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
 
-<!-- Leaflet CSS - SRI already implemented -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
-      crossorigin=""/>
-<script <?php echo CSPHandler::scriptNonce(); ?> 
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- SECURITY FIX: Added SRI for SweetAlert -->
-<script <?php echo CSPHandler::scriptNonce(); ?> 
-        src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"
-        integrity="sha384-DH6zfTvl3SJHSFMFYe4kO5xq4HGAAVhxZ3J3dw7tNH85I2tZGX7PSr8hzjO25YRm"
-        crossorigin="anonymous"></script>
-
-<style>
+<!-- SweetAlert2 (Modern version with CSP support) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><style>
     /* Menggunakan struktur CSS yang sama dengan UserAdd.php */
     .wrapper-content .ibox {
         border-radius: 15px;
@@ -491,7 +446,6 @@ $AlamatKecamatan = $AlamatKecamatan ?? '';
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="container-fluid">
         <form action="../App/Model/ExcSettingProfileAdminKecamatan.php?Act=Save" method="POST" id="koordinatForm">
-            <?php echo CSRFProtection::getTokenField(); ?>
             <div class="row">
                 <div class="col-lg-4">
                     <div class="ibox ">
@@ -528,6 +482,7 @@ $AlamatKecamatan = $AlamatKecamatan ?? '';
                                         id="AlamatKantor"
                                         rows="3"
                                         placeholder="Masukkan alamat lengkap kantor..."
+                                        required
                                         autocomplete="off"><?php echo htmlspecialchars($AlamatKecamatan); ?></textarea>
                                 </div>
                             </div>
@@ -538,13 +493,13 @@ $AlamatKecamatan = $AlamatKecamatan ?? '';
                                     Koordinat Saat Ini
                                 </h6>
                                 <div class="coordinate-display">
-                                    <div>Latitude: <span id="currentLat"><?php echo htmlspecialchars($currentLatitude ?: 'Belum diset', ENT_QUOTES, 'UTF-8'); ?></span></div>
-                                    <div>Longitude: <span id="currentLng"><?php echo htmlspecialchars($currentLongitude ?: 'Belum diset', ENT_QUOTES, 'UTF-8'); ?></span></div>
+                                    <div>Latitude: <span id="currentLat"><?php echo $currentLatitude ?: 'Belum diset'; ?></span></div>
+                                    <div>Longitude: <span id="currentLng"><?php echo $currentLongitude ?: 'Belum diset'; ?></span></div>
                                 </div>
                             </div>
 
-                            <input type="hidden" name="Latitude" id="Latitude" value="<?php echo htmlspecialchars($currentLatitude, ENT_QUOTES, 'UTF-8'); ?>">
-                            <input type="hidden" name="Longitude" id="Longitude" value="<?php echo htmlspecialchars($currentLongitude, ENT_QUOTES, 'UTF-8'); ?>">
+                            <input type="hidden" name="Latitude" id="Latitude" value="<?php echo $currentLatitude; ?>">
+                            <input type="hidden" name="Longitude" id="Longitude" value="<?php echo $currentLongitude; ?>">
 
                             <!-- Tombol -->
                             <div style="margin-top: 1.5rem;">
@@ -606,51 +561,18 @@ $AlamatKecamatan = $AlamatKecamatan ?? '';
 <!-- Map Script -->
 <script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM loaded, initializing map...');
-        
-        // Add a small delay to ensure CSS is loaded
-        setTimeout(function() {
-            initializeMap();
-        }, 100);
-    });
-
-    function initializeMap() {
-        // Check if Leaflet is loaded
-        if (typeof L === 'undefined') {
-            console.error('Leaflet library not loaded');
-            document.getElementById('koordinatMap').innerHTML = 
-                '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d; text-align: center; flex-direction: column;">' +
-                '<i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px; color: #ffc107;"></i>' +
-                '<h5>Leaflet Library Error</h5>' +
-                '<p>Library peta tidak dapat dimuat. Silakan refresh halaman.</p>' +
-                '</div>';
-            return;
-        }
-
         // Koordinat default (Indonesia/Jawa)
-        var defaultLat = <?php echo !empty($currentLatitude) && is_numeric($currentLatitude) ? $currentLatitude : '-8.055'; ?>;
-        var defaultLng = <?php echo !empty($currentLongitude) && is_numeric($currentLongitude) ? $currentLongitude : '111.715'; ?>;
+        var defaultLat = <?php echo !empty($currentLatitude) ? $currentLatitude : '-8.055'; ?>;
+        var defaultLng = <?php echo !empty($currentLongitude) ? $currentLongitude : '111.715'; ?>;
 
-        console.log('Default coordinates:', defaultLat, defaultLng);
+        // Initialize map
+        var map = L.map('koordinatMap').setView([defaultLat, defaultLng], 13);
 
-        try {
-            // Check if map container exists
-            var mapContainer = document.getElementById('koordinatMap');
-            if (!mapContainer) {
-                console.error('Map container not found');
-                return;
-            }
-
-            // Initialize map
-            var map = L.map('koordinatMap').setView([defaultLat, defaultLng], 13);
-            console.log('Map initialized successfully');
-
-            // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-            console.log('Tile layer added successfully');
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
 
         // Marker untuk menunjukkan lokasi yang dipilih
         var marker = null;
@@ -865,8 +787,16 @@ $AlamatKecamatan = $AlamatKecamatan ?? '';
             document.getElementById('Longitude').value = lng.toFixed(6);
         }
 
-        // Form validation seperti di UserAdd.php
+        // Form validation dengan SweetAlert - Enhanced untuk CSP & Anti-Loop
+        var formSubmitted = false; // Prevent multiple submissions
+        
         document.getElementById('koordinatForm').addEventListener('submit', function(e) {
+            // Prevent multiple submissions
+            if (formSubmitted) {
+                e.preventDefault();
+                return false;
+            }
+            
             var noTelepon = document.getElementById('NoTelepon').value.trim();
             var latitude = document.getElementById('Latitude').value;
             var longitude = document.getElementById('Longitude').value;
@@ -878,67 +808,58 @@ $AlamatKecamatan = $AlamatKecamatan ?? '';
 
             if (!noTelepon) {
                 e.preventDefault();
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Nomor telepon harus diisi.',
-                    type: 'warning',
-                    confirmButtonColor: '#007bff'
-                });
+                alert('Peringatan! Nomor telepon harus diisi.');
                 return false;
             }
 
             if (!latitude || !longitude) {
                 e.preventDefault();
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Silakan klik pada peta untuk menentukan lokasi koordinat.',
-                    type: 'warning',
-                    confirmButtonColor: '#007bff'
-                });
+                alert('Peringatan! Silakan klik pada peta untuk menentukan koordinat.');
                 return false;
             }
 
-            // SEMENTARA BYPASS KONFIRMASI UNTUK TESTING
-            console.log('Form validation passed, submitting...');
-            // Form akan submit secara normal tanpa konfirmasi
+            // TEMPORARY: Simple form submission for debugging
+            console.log('Validation passed, allowing form submission...');
+            
+            // Just submit the form directly for debugging
             return true;
-
-            // Konfirmasi sebelum simpan (commented sementara)
-            /*
-            e.preventDefault();
-            swal({
-                title: 'Konfirmasi',
-                text: 'Apakah Anda yakin ingin menyimpan pengaturan ini?',
-                type: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#007bff',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Simpan!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.value || result === true) {
-                    // Debug: log form data
-                    console.log('Form akan di-submit');
-                    console.log('NoTelepon:', document.getElementById('NoTelepon').value);
-                    console.log('Latitude:', document.getElementById('Latitude').value);
-                    console.log('Longitude:', document.getElementById('Longitude').value);
-                    
-                    // Submit form secara normal seperti UserAdd.php
-                    document.getElementById('koordinatForm').submit();
-                }
-            });
-            */
         });
+    });
+</script>
+
+<!-- Script untuk notification seperti AdminDesa -->
+<script <?php echo CSPHandler::scriptNonce(); ?>>
+    document.addEventListener('DOMContentLoaded', function() {
         
-        } catch (error) {
-            console.error('Error initializing map:', error);
-            // Show user-friendly error message
-            document.getElementById('koordinatMap').innerHTML = 
-                '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d; text-align: center; flex-direction: column;">' +
-                '<i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px; color: #ffc107;"></i>' +
-                '<h5>Peta tidak dapat dimuat</h5>' +
-                '<p>Silakan refresh halaman atau coba lagi nanti.</p>' +
-                '</div>';
-        }
-    } // End of initializeMap function
+        // CSP-compliant notification system for SettingProfile
+        const showNotification = () => {
+            <?php if (isset($alertType) && isset($alertTitle) && isset($alertMessage) && isset($alertIcon)): ?>
+                // Additional check to ensure values are not empty
+                if ('<?php echo $alertType; ?>' && '<?php echo $alertMessage; ?>') {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: '<?php echo addslashes($alertTitle); ?>',
+                            text: '<?php echo addslashes($alertMessage); ?>',
+                            icon: '<?php echo $alertIcon; ?>',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#007bff',
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutUp'
+                            }
+                        });
+                    } else {
+                        // Fallback for legacy browsers
+                        alert('<?php echo addslashes($alertMessage); ?>');
+                        console.warn('SweetAlert2 not loaded, using browser alert');
+                    }
+                }
+            <?php endif; ?>
+        };
+        
+        // Only show notification if it's from form submission with actual alert data
+        // Remove automatic notification on page load to prevent empty popups
+    });
 </script>

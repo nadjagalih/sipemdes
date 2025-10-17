@@ -8,6 +8,7 @@ if (!empty($GolDarah)) {
     $queryEdit = mysqli_query($db, "SELECT * FROM master_golongan_darah WHERE IdGolDarah = '$GolDarah'");
     if ($queryEdit && mysqli_num_rows($queryEdit) > 0) {
         $dataEdit = mysqli_fetch_assoc($queryEdit);
+        // DB column is `Golongan` in master_golongan_darah
         $EditGolDarah = $dataEdit['Golongan'] ?? '';
     }
 }
@@ -26,6 +27,7 @@ if (empty($GolDarah)) {
         if ($QueryGolDarah && mysqli_num_rows($QueryGolDarah) > 0) {
             while ($DataGolDarah = mysqli_fetch_assoc($QueryGolDarah)) {
                 $IdGolDarahOption = $DataGolDarah['IdGolDarah'];
+                // column name is `Golongan`
                 $GolDarahOption = $DataGolDarah['Golongan'];
         ?>
             <option value="<?php echo $IdGolDarahOption; ?>"><?php echo $GolDarahOption; ?></option>

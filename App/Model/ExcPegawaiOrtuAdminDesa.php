@@ -49,7 +49,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             if ($Save) {
                 // Redirect back to detail page with pegawai ID and tab parameter
                 ob_end_clean(); // Clear output buffer
-                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Save&tab=tab-4");
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=SaveOrtu&tab=tab-4");
                 exit();
             }
         }
@@ -89,7 +89,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 
                 // Redirect back to detail page with pegawai ID and tab parameter
                 ob_end_clean(); // Clear output buffer
-                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Edit&tab=tab-4");
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=EditOrtu&tab=tab-4");
                 exit();
             }
         }
@@ -112,12 +112,12 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 if (isset($_GET['IdPegawai'])) {
                     $IdPegawai = sql_injeksi($_GET['IdPegawai']);
                     ob_end_clean(); // Clear output buffer
-                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Delete&tab=" . $tab);
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=DeleteOrtu&tab=" . $tab);
                     exit();
                 } else {
                     // Use IdPegawai from database
                     ob_end_clean(); // Clear output buffer
-                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFromDB) . "&alert=Delete&tab=" . $tab);
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFromDB) . "&alert=DeleteOrtu&tab=" . $tab);
                     exit();
                 }
             }

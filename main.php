@@ -4,6 +4,14 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 require_once "Module/Config/Env.php";
 
+// Load CSP Handler for security
+if (!class_exists('CSPHandler')) {
+    require_once "Module/Security/CSPHandler.php";
+}
+
+// Set CSP headers
+CSPHandler::setCSPHeaders();
+
 // Initialize alert variables
 $alertMessage = '';
 $alertType = '';
@@ -81,6 +89,10 @@ if (isset($_GET['alert'])) {
         case 'Status':
             $alertMessage = 'Akun Anda tidak aktif. Hubungi administrator';
             $alertType = 'error';
+            break;
+        case 'SignOutTime':
+            $alertMessage = 'Waktu login habis, silakan login ulang';
+            $alertType = 'warning';
             break;
         default:
             $alertMessage = 'Terjadi kesalahan, silakan coba lagi';
@@ -176,10 +188,16 @@ if (isset($_GET['alert'])) {
         .right-side label { color: #222222; }
         /* Field + icon wrapper */
         .field { position: relative; }
-        .field .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); pointer-events: none; }
+        .field .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted); pointer-events: none; z-index: 1; }
         .field .icon svg { width: 18px; height: 18px; stroke: currentColor; }
 
+        /* Toggle password button */
+        .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); padding: 4px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; z-index: 2; transition: color .15s ease; }
+        .toggle-password:hover { color: var(--primary); }
+        .toggle-password svg { width: 18px; height: 18px; stroke: currentColor; }
+
         .control { width: 100%; height: 48px; padding: 10px 12px 10px 44px; font-size: .875rem; font-weight: 500; line-height: 1.5rem; color: var(--text); background: #fff; border: 1px solid var(--border); border-radius: 6px; transition: box-shadow .15s ease, border-color .15s ease; }
+        .control.has-toggle { padding-right: 44px; }
         .control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 .2rem var(--focus); }
         .control::placeholder { color: #adb5bd; }
         select.control { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3e%3cpath d='M4.5 6l3.5 4L11.5 6' stroke='%236c757d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 14px; padding-right: 36px; }
@@ -297,9 +315,9 @@ if (isset($_GET['alert'])) {
                                 <!-- Lock icon -->
                                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10V7a5 5 0 0110 0v3M6 10h12a2 2 0 012 2v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7a2 2 0 012-2z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </span>
-                            <input id="password" name="NamePassword" type="password" class="control" placeholder="Masukkan password" autocomplete="new-password" required>
-                            <button type="button" id="togglePassword" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); padding: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">
-                                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; stroke: currentColor;">
+                            <input id="password" name="NamePassword" type="password" class="control has-toggle" placeholder="Masukkan password" autocomplete="new-password" required>
+                            <button type="button" id="togglePassword" class="toggle-password" title="Tampilkan/Sembunyikan Password" aria-label="Toggle password visibility">
+                                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                                     <circle cx="12" cy="12" r="3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
@@ -315,41 +333,62 @@ if (isset($_GET['alert'])) {
         </main>
     </div>
 
-    <script>
+    <script <?php echo CSPHandler::scriptNonce(); ?>>
         // Toggle password visibility
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
         const eyeIcon = document.getElementById('eyeIcon');
 
-        togglePassword.addEventListener('click', () => {
-            // Toggle the type attribute
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
+        if (togglePassword && passwordInput && eyeIcon) {
+            togglePassword.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Toggle the type attribute
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
 
-            // Toggle the eye icon - change to eye-slash when password is visible
-            if (type === 'text') {
-                // Show eye-slash icon (password is visible)
-                eyeIcon.innerHTML = `
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M21 4L3 20" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="12" cy="12" r="3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                `;
-            } else {
-                // Show normal eye icon (password is hidden)
-                eyeIcon.innerHTML = `
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="12" cy="12" r="3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                `;
-            }
-        });
+                // Toggle the eye icon - change to eye-slash when password is visible
+                if (type === 'text') {
+                    // Show eye-slash icon (password is visible)
+                    eyeIcon.innerHTML = `
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 4L3 20" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    `;
+                    togglePassword.setAttribute('title', 'Sembunyikan Password');
+                } else {
+                    // Show normal eye icon (password is hidden)
+                    eyeIcon.innerHTML = `
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    `;
+                    togglePassword.setAttribute('title', 'Tampilkan Password');
+                }
+                
+                // Focus back to input for better UX
+                passwordInput.focus();
+            });
+
+            // Also allow keyboard accessibility
+            togglePassword.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        }
 
         // Prevent form submission from saving to browser history
-        document.getElementById('loginForm').addEventListener('submit', function() {
-            // Clear form data after a short delay to prevent browser from saving it
-            setTimeout(() => {
-                this.reset();
-            }, 100);
-        });
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function() {
+                // Clear form data after a short delay to prevent browser from saving it
+                setTimeout(() => {
+                    this.reset();
+                }, 100);
+            });
+        }
     </script>
 </body>
 </html>

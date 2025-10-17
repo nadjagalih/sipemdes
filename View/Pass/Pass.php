@@ -2,6 +2,12 @@
 // Mulai output buffering untuk mencegah header error
 ob_start();
 
+// Include CSPHandler untuk nonce support
+require_once __DIR__ . '/../../Module/Security/CSPHandler.php';
+
+// Set CSP headers dengan nonce
+CSPHandler::setCSPHeaders();
+
 // Generate CSRF token jika belum ada
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -9,67 +15,67 @@ if (!isset($_SESSION['csrf_token'])) {
 
 // Basic alert handling tanpa header redirect untuk menghindari error
 if (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
-    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
+    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
                     setTimeout(function () {
-                    swal({
-                      title: 'SUKSES',
-                      text:  'Sukses Ganti Password, Silahkan Login Ulang',
-                      type: 'success',
-                      showConfirmButton: true
-                     },
-                          function(){
-                            window.location.href = '../Auth/SignOut';
-                          }
-                     );
-                    },10);
+                        Swal.fire({
+                          title: 'SUKSES',
+                          text: 'Sukses Ganti Password, Silahkan Login Ulang',
+                          icon: 'success',
+                          showConfirmButton: true
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                window.location.href = '../Auth/SignOut';
+                            }
+                        });
+                    }, 10);
         </script>";
 } else
 if (isset($_GET['alert']) && $_GET['alert'] == 'Panjang') {
-    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
+    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
                     setTimeout(function () {
-                    swal({
-                      title: 'INFORMATION',
-                      text:  'Panjang Minimal Password 8 Karakter',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
+                        Swal.fire({
+                          title: 'INFORMATION',
+                          text: 'Panjang Minimal Password 8 Karakter',
+                          icon: 'warning',
+                          showConfirmButton: true
+                        });
+                    }, 10);
         </script>";
 } else
 if (isset($_GET['alert']) && $_GET['alert'] == 'CSRFError') {
-    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
+    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
                     setTimeout(function () {
-                    swal({
-                      title: 'ERROR',
-                      text:  'Token keamanan tidak valid. Silakan coba lagi.',
-                      type: 'error',
-                      showConfirmButton: true
-                     });
-                    },10);
+                        Swal.fire({
+                          title: 'ERROR',
+                          text: 'Token keamanan tidak valid. Silakan coba lagi.',
+                          icon: 'error',
+                          showConfirmButton: true
+                        });
+                    }, 10);
         </script>";
 } else
 if (isset($_GET['alert']) && $_GET['alert'] == 'PasswordSalah') {
-    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
+    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
                     setTimeout(function () {
-                    swal({
-                      title: 'ERROR',
-                      text:  'Password lama yang Anda masukkan salah',
-                      type: 'error',
-                      showConfirmButton: true
-                     });
-                    },10);
+                        Swal.fire({
+                          title: 'ERROR',
+                          text: 'Password lama yang Anda masukkan salah',
+                          icon: 'error',
+                          showConfirmButton: true
+                        });
+                    }, 10);
         </script>";
 } else
 if (isset($_GET['alert']) && $_GET['alert'] == 'DatabaseError') {
-    echo "<script nonce='" . (isset($_SESSION['csp_nonce']) ? $_SESSION['csp_nonce'] : '') . "' type='text/javascript'>
+    echo "<script nonce='" . CSPHandler::getNonce() . "' type='text/javascript'>
                     setTimeout(function () {
-                    swal({
-                      title: 'ERROR',
-                      text:  'Gagal menyimpan password ke database. Silakan coba lagi.',
-                      type: 'error',
-                      showConfirmButton: true
-                     });
-                    },10);
+                        Swal.fire({
+                          title: 'ERROR',
+                          text: 'Gagal menyimpan password ke database. Silakan coba lagi.',
+                          icon: 'error',
+                          showConfirmButton: true
+                        });
+                    }, 10);
         </script>";
 }
 ?>
@@ -132,7 +138,7 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'DatabaseError') {
 </div>
 
 <!-- Simple validation script -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('passwordForm');
     
@@ -143,7 +149,13 @@ document.addEventListener('DOMContentLoaded', function() {
             // Simple length validation
             if (password.length < 8) {
                 e.preventDefault();
-                alert('Password minimal 8 karakter');
+                // Gunakan SweetAlert2 untuk konsistensi dengan CSP
+                Swal.fire({
+                    title: 'PERINGATAN',
+                    text: 'Password minimal 8 karakter',
+                    icon: 'warning',
+                    showConfirmButton: true
+                });
                 return false;
             }
             

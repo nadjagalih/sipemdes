@@ -316,7 +316,7 @@ include "../App/Control/FunctionDesaEdit.php";
                                         <i class="fas fa-save"></i> Update Data
                                     </button>
                                     <a href="?pg=DesaView" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left"></i> Batal
+                                        <i class="fas fa-arrow-left"></i> Kembali
                                     </a>
                                 </div>
                             </div>
@@ -551,6 +551,36 @@ include "../App/Control/FunctionDesaEdit.php";
     // Initialize on document ready
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 DOM loaded, preparing map...');
+        
+        // Check for success/error alerts
+        const urlParams = new URLSearchParams(window.location.search);
+        const alert = urlParams.get('alert');
+        
+        if (alert === 'Edit') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data desa berhasil diperbarui.',
+                confirmButtonColor: '#1c84c6',
+                confirmButtonText: 'OK'
+            });
+        } else if (alert === 'Save') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data desa berhasil disimpan.',
+                confirmButtonColor: '#1c84c6',
+                confirmButtonText: 'OK'
+            });
+        } else if (alert === 'Error') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: 'Terjadi kesalahan saat menyimpan data.',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        }
         
         // Wait for Leaflet to load
         var checkLeaflet = function() {

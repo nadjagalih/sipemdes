@@ -8,6 +8,7 @@ if (!empty($Pernikahan)) {
     $queryEdit = mysqli_query($db, "SELECT * FROM master_status_pernikahan WHERE IdPernikahan = '$Pernikahan'");
     if ($queryEdit && mysqli_num_rows($queryEdit) > 0) {
         $dataEdit = mysqli_fetch_assoc($queryEdit);
+        // DB column is `Status` in master_status_pernikahan
         $EditPernikahan = $dataEdit['Status'] ?? '';
     }
 }
@@ -26,6 +27,7 @@ if (empty($Pernikahan)) {
         if ($QueryPernikahan && mysqli_num_rows($QueryPernikahan) > 0) {
             while ($DataPernikahan = mysqli_fetch_assoc($QueryPernikahan)) {
                 $IdPernikahanOption = $DataPernikahan['IdPernikahan'];
+                // column name is `Status`
                 $PernikahanOption = $DataPernikahan['Status'];
         ?>
             <option value="<?php echo $IdPernikahanOption; ?>"><?php echo $PernikahanOption; ?></option>

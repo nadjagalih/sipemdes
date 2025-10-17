@@ -53,7 +53,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             if ($Save) {
                 // Redirect back to detail page with pegawai ID
                 ob_end_clean(); // Clear output buffer
-                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Save&tab=tab-2");
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=SaveSuamiIstri&tab=tab-2");
                 exit();
             }
         }
@@ -96,7 +96,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 
                 // Redirect back to detail page with pegawai ID
                 ob_end_clean(); // Clear output buffer
-                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=Edit&tab=tab-2");
+                header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFK) . "&alert=EditSuamiIstri&tab=tab-2");
                 exit();
             }
         }
@@ -117,12 +117,12 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     $IdPegawai = sql_injeksi($_GET['IdPegawai']);
                     $tab = isset($_GET['tab']) ? $_GET['tab'] : 'tab-2';
                     ob_end_clean(); // Clear output buffer
-                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=Delete&tab=" . $tab);
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawai) . "&alert=DeleteSuamiIstri&tab=" . $tab);
                     exit();
                 } else {
                     // Use IdPegawai from database
                     ob_end_clean(); // Clear output buffer
-                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFromDB) . "&alert=Delete&tab=tab-2");
+                    header("location:../../View/v?pg=PegawaiDetailAdminDesa&Kode=" . sql_url($IdPegawaiFromDB) . "&alert=DeleteSuamiIstri&tab=tab-2");
                     exit();
                 }
             }

@@ -73,13 +73,13 @@ if (mysqli_num_rows($QueryKategori) > 0) {
                                 </a>
                             </li>
                             <li>
-                                <a href="#" onclick="editKategori('<?php echo $IdKategoriAward; ?>')" style="padding: 10px 16px; color: #495057; font-size: 14px;">
+                                <a href="#" class="edit-kategori" data-id="<?php echo $IdKategoriAward; ?>" style="padding: 10px 16px; color: #495057; font-size: 14px;">
                                     <i class="fa fa-edit text-success"></i> Edit Kategori
                                 </a>
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a href="#" onclick="confirmDelete('../App/Model/ExcKategoriAward.php?Act=Delete&Kode=<?php echo $IdKategoriAward; ?>', 'Yakin ingin menghapus kategori ini? Semua peserta dalam kategori ini akan ikut terhapus.')" style="padding: 10px 16px; color: #495057; font-size: 14px;">
+                                <a href="#" class="delete-kategori" data-id="<?php echo $IdKategoriAward; ?>" data-name="<?php echo htmlspecialchars($NamaKategori, ENT_QUOTES); ?>" style="padding: 10px 16px; color: #495057; font-size: 14px;">
                                     <i class="fa fa-trash text-danger"></i> Hapus Kategori
                                 </a>
                             </li>

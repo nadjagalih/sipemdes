@@ -20,9 +20,9 @@ if (isset($db) && $db) {
     mysqli_close($db);
 }
 
-// Direct redirect to login page without countdown
+// Direct redirect to main page without countdown
 if (!headers_sent()) {
-    header("Location: SignIn.php");
+    header("Location: ../main.php");
     exit();
 }
 

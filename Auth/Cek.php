@@ -5,7 +5,7 @@ $username = sql_injeksi($_POST['NameAkses']);
 $password = sql_injeksi($_POST['NamePassword']);
 
 if (!ctype_alnum($username)) {
-	header("Location: SignIn?alert=Kosong");
+	header("Location: ../main.php?alert=Kosong");
 } else {
 	$sql = mysqli_query($db, "SELECT
 	main_user.IdUser,
@@ -45,7 +45,7 @@ if (!ctype_alnum($username)) {
 			unset($_SESSION['visited_pensiun_sadmin']);
 
 			if ($data['StatusLogin'] == 0) {
-				header("Location: SignIn?alert=Status");
+				header("Location: ../main.php?alert=Status");
 			} elseif ($data['StatusLogin'] == 1) {
 
 				if ($data['IdLevelUserFK'] == 1) {
@@ -57,10 +57,10 @@ if (!ctype_alnum($username)) {
 				}
 			}
 		} else {
-			header("Location: SignIn?alert=Cek");
+			header("Location: ../main.php?alert=Cek");
 		}
 	} else {
-		header("Location: SignIn?alert=Cek");
+		header("Location: ../main.php?alert=Cek");
 	}
 }
 ?>

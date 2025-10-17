@@ -443,6 +443,7 @@ if (!empty($IdKategoriAward)) {
             <form action="../App/Model/ExcKategoriAward.php?Act=Edit" method="POST">
                 <div class="modal-body">
                     <input type="hidden" name="IdKategoriAward" id="editIdKategoriAward">
+                    <?php echo CSRFProtection::getTokenField(); ?>
 
                     <div class="form-group">
                         <label>Nama Kategori <span class="text-danger">*</span></label>

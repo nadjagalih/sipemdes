@@ -48,10 +48,11 @@ include "../App/Control/FunctionKategoriFileEdit.php";
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcKategoriFile?Act=Edit" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="IdFileKategori`" id="IdFileKategori`" value="<?php echo $IdFileKategori; ?>" class="form-control" readonly>
+                        <?php if (function_exists('CSRFProtection::getTokenField')) { echo CSRFProtection::getTokenField(); } else { /* CSRF token helper missing, include security if needed */ } ?>
+                        <input type="hidden" name="IdFileKategori" id="IdFileKategori" value="<?php echo isset($IdFileKategori) ? htmlspecialchars($IdFileKategori, ENT_QUOTES, 'UTF-8') : ''; ?>" class="form-control" readonly>
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Kategori File</label>
                             <div class="col-lg-8">
-                                <input type="text" name="KategoriFile" id="KategoriFile" value="<?php echo $KategoriFile; ?>" placeholder="Masukkan Kategori File" class="form-control" required autocomplete="off">
+                                <input type="text" name="KategoriFile" id="KategoriFile" value="<?php echo isset($KategoriFile) ? htmlspecialchars($KategoriFile, ENT_QUOTES, 'UTF-8') : ''; ?>" placeholder="Masukkan Kategori File" class="form-control" required autocomplete="off">
                             </div>
                         </div>
 

@@ -1,3 +1,7 @@
+<!-- SweetAlert2 -->
+<link href="../Assets/sweetalert/sweetalert2.min.css" rel="stylesheet">
+<script src="../Assets/sweetalert/sweetalert2.min.js"></script>
+
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
         <h2>Data Desa</h2>
@@ -64,6 +68,42 @@
                         </div>
 
                         <div class="form-group row">
+                            <label class="col-lg-4 col-form-label">
+                                <i class="fas fa-phone"></i>
+                                No. Telepon
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" 
+                                    class="form-control" 
+                                    name="NoTelepon" 
+                                    id="NoTelepon" 
+                                    placeholder="Contoh: 0341-123456 / 08123456789" 
+                                    required
+                                    autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-4 col-form-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Alamat Desa
+                            </label>
+                            <div class="col-lg-8">
+                                <textarea 
+                                    class="form-control" 
+                                    name="AlamatDesa" 
+                                    id="AlamatDesa" 
+                                    rows="3" 
+                                    placeholder="Masukkan alamat lengkap desa..." 
+                                    required
+                                    autocomplete="off"></textarea>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="Latitude" id="Latitude" value="">
+                        <input type="hidden" name="Longitude" id="Longitude" value="">
+
+                        <div class="form-group row">
                             <div class="col-lg-offset-2 col-lg-10">
                                 <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
                                 <a href="?pg=DesaView" class="btn btn-success ">Batal</a>
@@ -75,3 +115,21 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Check for success/error alerts
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const alert = urlParams.get('alert');
+        
+        if (alert === 'Error') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+</script>

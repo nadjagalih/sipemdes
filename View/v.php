@@ -243,15 +243,132 @@ $_SESSION['start_time'] = time();
             $('.dataTables-kecamatan').DataTable({
                 pageLength: 25,
                 responsive: true,
-                dom: 'frtip',
+                dom: '<"row"<"col-sm-6"B><"col-sm-6"f>>rtip',
                 searching: true,
                 lengthChange: false,
                 paging: false,
-                info: false
+                info: false,
+                buttons: {
+                    dom: {
+                        container: {
+                            className: 'dt-buttons btn-group flex-wrap'
+                        },
+                        button: {
+                            className: 'btn btn-sm btn-outline-secondary'
+                        }
+                    },
+                    buttons: [
+                        {
+                            extend: 'copy',
+                            text: '<i class="fa fa-copy"></i> Copy',
+                            className: 'btn btn-sm btn-outline-primary'
+                        },
+                        {
+                            extend: 'csv',
+                            text: '<i class="fa fa-file-text"></i> CSV',
+                            className: 'btn btn-sm btn-outline-success'
+                        },
+                        {
+                            extend: 'excel',
+                            text: '<i class="fa fa-file-excel-o"></i> Excel',
+                            title: 'Data_Pemerintah_Desa',
+                            className: 'btn btn-sm btn-outline-success'
+                        },
+                        {
+                            extend: 'pdf',
+                            text: '<i class="fa fa-file-pdf-o"></i> PDF',
+                            orientation: 'landscape',
+                            pageSize: 'A4',
+                            exportOptions: {
+                                columns: ':not(.no-cetak)'
+                            },
+                            title: 'Data_Pemerintah_Desa',
+                            className: 'btn btn-sm btn-outline-danger'
+                        },
+                        {
+                            extend: 'print',
+                            text: '<i class="fa fa-print"></i> Print',
+                            className: 'btn btn-sm btn-outline-info',
+                            customize: function(win) {
+                                $(win.document.body).addClass('white-bg');
+                                $(win.document.body).css('font-size', '10px');
+
+                                $(win.document.body).find('table')
+                                    .addClass('compact')
+                                    .css('font-size', 'inherit');
+                            }
+                        }
+                    ]
+                }
             });
 
         });
     </script>
+
+    <style>
+        /* Enhanced styling untuk DataTables export buttons */
+        .dt-buttons {
+            margin-bottom: 15px;
+        }
+        
+        .dt-buttons .btn-group {
+            display: flex !important;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        .dt-buttons .btn {
+            margin: 2px !important;
+            border-radius: 4px;
+            font-size: 12px;
+            padding: 6px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+        
+        .dt-buttons .btn i {
+            font-size: 13px;
+        }
+        
+        /* Responsive design untuk mobile */
+        @media (max-width: 768px) {
+            .dt-buttons .btn {
+                font-size: 11px;
+                padding: 5px 8px;
+            }
+            
+            .dt-buttons .btn span {
+                display: none;
+            }
+            
+            .dt-buttons .btn i {
+                margin: 0;
+            }
+        }
+        
+        /* Hover effects */
+        .dt-buttons .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        
+        /* Search box styling */
+        .dataTables_filter {
+            text-align: right;
+            margin-bottom: 15px;
+        }
+        
+        .dataTables_filter input {
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            margin-left: 5px;
+        }
+    </style>
 
     <script <?php echo CSPHandler::scriptNonce(); ?>>
         $(".select2_kabupaten").select2();

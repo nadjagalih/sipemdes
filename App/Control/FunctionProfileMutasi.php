@@ -378,8 +378,13 @@
                                     class="btn btn-warning btn-sm" title="Edit Data">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
-                                <button onclick="confirmDeleteMutasi('<?php echo $IdMutasi; ?>', '<?php echo $JenisMutasi; ?>', '<?php echo $Jabatan; ?>', '<?php echo $IdTemp; ?>')" 
-                                    class="btn btn-danger btn-sm" title="Hapus Data">
+                                <button 
+                                    class="btn btn-danger btn-sm btn-delete-mutasi" 
+                                    title="Hapus Data"
+                                    data-id="<?php echo htmlspecialchars($IdMutasi); ?>"
+                                    data-jenis="<?php echo htmlspecialchars($JenisMutasi); ?>"
+                                    data-jabatan="<?php echo htmlspecialchars($Jabatan); ?>"
+                                    data-pegawai="<?php echo htmlspecialchars($IdTemp); ?>">
                                     <i class="fa fa-trash"></i> Hapus
                                 </button>
                             </div>
@@ -392,31 +397,224 @@
     </table>
 </div>
 
-<script>
-function confirmDeleteMutasi(idMutasi, jenisMutasi, jabatan, idPegawai) {
-    swal({
-        title: "Apakah Anda yakin?",
-        text: "Data mutasi " + jenisMutasi + " untuk jabatan " + jabatan + " akan dihapus secara permanen!",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Ya, hapus!",
-        cancelButtonText: "Batal",
-        closeOnConfirm: false
-    },
-    function(isConfirm) {
-        if (isConfirm) {
-            window.location.href = '../App/Model/ExcHistoryMutasiAdminDesa?Act=Delete&Kode=' + idMutasi + '&IdPegawai=' + idPegawai + '&tab=tab-5';
+<?php
+// Generate CSP nonce for inline script with enhanced security
+$nonce = '';
+$nonceAttr = '';
+
+// Enhanced CSP nonce generation with fallback
+if (class_exists('CSPHandler')) {
+    try {
+        $nonce = CSPHandler::scriptNonce();
+        $nonceAttr = $nonce;
+    } catch (Exception $e) {
+        error_log("CSPHandler error: " . $e->getMessage());
+        $nonceAttr = ''; // Fallback tanpa nonce
+    }
+} else {
+    // Manual nonce generation sebagai fallback
+    if (function_exists('random_bytes')) {
+        $manualNonce = base64_encode(random_bytes(16));
+        $nonceAttr = 'nonce="' . $manualNonce . '"';
+        error_log("Manual nonce generated: " . $manualNonce);
+    } else {
+        error_log("CSPHandler not available and random_bytes not supported");
+        $nonceAttr = ''; // Fallback tanpa nonce
+    }
+}
+
+// Log untuk debugging
+error_log("CSP nonce for FunctionProfileMutasi: " . $nonceAttr);
+?>
+
+<script <?php echo $nonceAttr; ?>>
+// Enhanced CSP-compliant script for Mutasi delete
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('FunctionProfileMutasi script loaded with CSP nonce');
+    console.log('SweetAlert2 available:', typeof Swal !== 'undefined');
+    console.log('jQuery available:', typeof $ !== 'undefined');
+    
+    // Delay untuk memastikan semua library sudah load
+    setTimeout(function() {
+        console.log('Setting up CSP-compliant delete event handlers for Mutasi...');
+        
+        // Native JavaScript Event Delegation (CSP-compliant)
+        document.addEventListener('click', function(e) {
+            var deleteBtn = e.target.closest('.btn-delete-mutasi');
+            if (deleteBtn) {
+                console.log('Mutasi delete button found:', deleteBtn);
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var idMutasi = deleteBtn.getAttribute('data-id');
+                var jenisMutasi = deleteBtn.getAttribute('data-jenis');
+                var jabatan = deleteBtn.getAttribute('data-jabatan');
+                var idPegawai = deleteBtn.getAttribute('data-pegawai');
+                
+                console.log('=== CSP-COMPLIANT MUTASI DELETE BUTTON CLICKED ===');
+                console.log('Data attributes:', {
+                    id: idMutasi,
+                    jenis: jenisMutasi,
+                    jabatan: jabatan,
+                    pegawai: idPegawai
+                });
+                
+                confirmDeleteMutasi(idMutasi, jenisMutasi, jabatan, idPegawai);
+                return false;
+            }
+        });
+        
+        // jQuery event delegation sebagai backup
+        if (typeof $ !== 'undefined') {
+            $(document).off('click.deleteMutasi').on('click.deleteMutasi', '.btn-delete-mutasi', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('jQuery Mutasi delete event triggered');
+                
+                var idMutasi = $(this).data('id');
+                var jenisMutasi = $(this).data('jenis');
+                var jabatan = $(this).data('jabatan');
+                var idPegawai = $(this).data('pegawai');
+                
+                console.log('jQuery Mutasi data:', {
+                    id: idMutasi,
+                    jenis: jenisMutasi,
+                    jabatan: jabatan,
+                    pegawai: idPegawai
+                });
+                
+                confirmDeleteMutasi(idMutasi, jenisMutasi, jabatan, idPegawai);
+                return false;
+            });
         }
+        
+    }, 1000); // Delay 1 detik untuk memastikan DataTables sudah selesai
+});
+
+// CSP-compliant confirmation function for Mutasi
+function confirmDeleteMutasi(idMutasi, jenisMutasi, jabatan, idPegawai) {
+    console.log('=== CSP-COMPLIANT MUTASI DELETE CONFIRMATION TRIGGERED ===');
+    console.log('Parameters:', {
+        idMutasi: idMutasi,
+        jenisMutasi: jenisMutasi,
+        jabatan: jabatan,
+        idPegawai: idPegawai
     });
+    console.log('SweetAlert2 check:', typeof Swal !== 'undefined');
+    
+    if (typeof Swal !== 'undefined') {
+        console.log('Showing CSP-compliant SweetAlert2 confirmation for Mutasi...');
+        
+        // CSP-compliant SweetAlert2 configuration
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            html: 'Data mutasi <strong>' + escapeHtml(jenisMutasi) + 
+                  '</strong> untuk jabatan <strong>' + escapeHtml(jabatan) + 
+                  '</strong> akan dihapus secara permanen!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            customClass: {
+                container: 'my-swal'
+            },
+            zIndex: 10000
+        }).then((result) => {
+            console.log('SweetAlert2 Mutasi result:', result);
+            
+            if (result.isConfirmed) {
+                console.log('Mutasi delete confirmed by user');
+                
+                // Show loading dengan CSP-compliant configuration
+                Swal.fire({
+                    title: 'Menghapus...',
+                    text: 'Mohon tunggu sebentar',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Build delete URL dengan proper encoding
+                var deleteUrl = '../App/Model/ExcHistoryMutasiAdminDesa?Act=Delete&Kode=' + 
+                               encodeURIComponent(idMutasi) + 
+                               '&IdPegawai=' + encodeURIComponent(idPegawai) + 
+                               '&tab=tab-5';
+                
+                console.log('Redirecting to:', deleteUrl);
+                
+                // Redirect after short delay
+                setTimeout(function() {
+                    window.location.href = deleteUrl;
+                }, 500);
+                
+            } else if (result.isDismissed) {
+                console.log('Mutasi delete cancelled by user');
+            }
+        }).catch((error) => {
+            console.error('SweetAlert2 error (possible CSP issue):', error);
+            // CSP-safe fallback confirmation
+            if (confirm('SweetAlert2 error (CSP?). Data mutasi "' + jenisMutasi + 
+                       '" untuk jabatan "' + jabatan + '" akan dihapus secara permanen. Apakah Anda yakin?')) {
+                var deleteUrl = '../App/Model/ExcHistoryMutasiAdminDesa?Act=Delete&Kode=' + 
+                               encodeURIComponent(idMutasi) + 
+                               '&IdPegawai=' + encodeURIComponent(idPegawai) + 
+                               '&tab=tab-5';
+                window.location.href = deleteUrl;
+            }
+        });
+        
+    } else {
+        console.log('SweetAlert2 not available (possible CSP block), using native confirm');
+        // CSP-safe fallback untuk browser yang tidak support SweetAlert2
+        if (confirm('Apakah Anda yakin? Data mutasi "' + jenisMutasi + '" untuk jabatan "' + jabatan + '" akan dihapus secara permanen!')) {
+            console.log('Mutasi delete confirmed via native confirm');
+            var deleteUrl = '../App/Model/ExcHistoryMutasiAdminDesa?Act=Delete&Kode=' + 
+                           encodeURIComponent(idMutasi) + 
+                           '&IdPegawai=' + encodeURIComponent(idPegawai) + 
+                           '&tab=tab-5';
+            console.log('Redirecting to:', deleteUrl);
+            window.location.href = deleteUrl;
+        } else {
+            console.log('Mutasi delete cancelled via native confirm');
+        }
+    }
+}
+
+// CSP-compliant HTML escaping function
+function escapeHtml(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 </script>
 
-<script>
-// Update label ketika file dipilih
-document.getElementById('File').addEventListener('change', function() {
-    var fileName = this.files[0] ? this.files[0].name : 'Pilih File SK (PDF)';
-    var label = this.nextElementSibling;
-    label.textContent = fileName;
+<script <?php echo $nonceAttr; ?>>
+// Enhanced CSP-compliant file selection script
+document.addEventListener('DOMContentLoaded', function() {
+    // Update label ketika file dipilih dengan CSP compliance
+    var fileInput = document.getElementById('File');
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            var fileName = this.files[0] ? this.files[0].name : 'Pilih File SK (PDF)';
+            var label = this.nextElementSibling;
+            if (label) {
+                label.textContent = fileName;
+            }
+            console.log('File selected:', fileName);
+        });
+    }
 });
 </script>

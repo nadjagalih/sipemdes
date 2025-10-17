@@ -7,18 +7,18 @@ include "../../Module/Config/Env.php";
 if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
+    exit;
 } else {
     
     // Debug untuk melihat apakah file ini diakses
-    // Uncomment baris berikut untuk debugging
-    file_put_contents('debug_log.txt', date('Y-m-d H:i:s') . " - ExcSettingProfile accessed\n", FILE_APPEND);
-    file_put_contents('debug_log.txt', "GET: " . print_r($_GET, true) . "\n", FILE_APPEND);
-    file_put_contents('debug_log.txt', "POST: " . print_r($_POST, true) . "\n", FILE_APPEND);
+    error_log(date('Y-m-d H:i:s') . " - ExcSettingProfile accessed");
+    error_log("GET: " . print_r($_GET, true));
+    error_log("POST: " . print_r($_POST, true));
     
     if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
 
-            // Ambil data dari POST
+            // Ambil data dari POST dengan sanitasi
             $NoTelepon = sql_injeksi($_POST['NoTelepon']);
             $AlamatKecamatan = sql_injeksi($_POST['AlamatKantor']); // Sesuaikan dengan name di form
             $Latitude = sql_injeksi($_POST['Latitude']);
@@ -26,7 +26,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $IdKecamatan = $_SESSION['IdKecamatan'];
 
             // Debug log data
-            file_put_contents('debug_log.txt', "Data: NoTelepon=$NoTelepon, AlamatKecamatan=$AlamatKecamatan, Lat=$Latitude, Lng=$Longitude, IdKecamatan=$IdKecamatan\n", FILE_APPEND);
+            error_log("Data: NoTelepon=$NoTelepon, AlamatKecamatan=$AlamatKecamatan, Lat=$Latitude, Lng=$Longitude, IdKecamatan=$IdKecamatan");
 
             // Validasi input
             if (empty($NoTelepon)) {
@@ -48,8 +48,10 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 WHERE IdKecamatan = '$IdKecamatan'");
 
             if ($Update) {
+                error_log("Profile kecamatan updated successfully for IdKecamatan: $IdKecamatan");
                 header("location:../../View/v?pg=SettingProfileKecamatan&alert=Edit");
             } else {
+                error_log("Failed to update profile kecamatan. MySQL Error: " . mysqli_error($db));
                 header("location:../../View/v?pg=SettingProfileKecamatan&alert=Gagal");
             }
         }

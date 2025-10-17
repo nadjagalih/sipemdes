@@ -1,147 +1,42 @@
 <?php
-if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-        setTimeout(function () {
-            swal({
-              title: '',
-              text:  'Data Berhasil Disimpan',
-              type: 'success',
-              showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Edit') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Dikoreksi',
-                type: 'success',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Delete') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Dihapus',
-                type: 'warning',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'CekUser') {
-    echo "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: '',
-                      text:  'User Yang Anda Masukkan Sudah Terdaftar',
-                      type: 'info',
-                      showConfirmButton: true
-                     });
-                    },10);
-            </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Karakter') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: '',
-                      text:  'Panjang Minimal Password 5 Karakter',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Reset') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: '',
-                      text:  'Password Berhasil Direset',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'NoPasswordChange') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'Info',
-                      text:  'Password tidak diubah. Masukkan password baru untuk mengubah password.',
-                      type: 'info',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'EmptyPassword') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'Info',
-                      text:  'Password tidak boleh kosong. Silakan masukkan password baru.',
-                      type: 'info',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'NoRowsAffected') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'Debug Info',
-                      text:  'Password reset failed - No rows affected. User ID might not exist.',
-                      type: 'error',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'QueryError') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'Debug Info',
-                      text:  'Password reset failed - Database query error.',
-                      type: 'error',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'CekDelete') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: '',
-                      text:  'Data Tidak Bisa Dihapus, Karena Sudah Mempunyai History',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
-} elseif (isset($_GET['alert']) && $_GET['alert'] == 'ErrorDelete') {
-    echo
-        "<script " . CSPHandler::scriptNonce() . " type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: '',
-                      text:  'Terjadi Kesalahan Saat Menghapus Data',
-                      type: 'error',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
+// Universal notification system using SweetAlert2 (Swal.fire) - CSP compliant
+$alert = isset($_GET['alert']) ? $_GET['alert'] : '';
+
+if (!empty($alert)) {
+    $notifications = [
+        'Save' => ['title' => 'Berhasil!', 'text' => 'Data berhasil disimpan', 'icon' => 'success'],
+        'Edit' => ['title' => 'Berhasil!', 'text' => 'Data berhasil diubah', 'icon' => 'success'],
+        'Delete' => ['title' => 'Berhasil!', 'text' => 'Data berhasil dihapus', 'icon' => 'success'],
+        'Reset' => ['title' => 'Berhasil!', 'text' => 'Password berhasil direset', 'icon' => 'success'],
+        'CekUser' => ['title' => 'Perhatian', 'text' => 'Username yang Anda masukkan sudah terdaftar', 'icon' => 'warning'],
+        'Karakter' => ['title' => 'Perhatian', 'text' => 'Panjang minimal password 5 karakter', 'icon' => 'warning'],
+        'NoPasswordChange' => ['title' => 'Info', 'text' => 'Password tidak diubah. Masukkan password baru untuk mengubah password.', 'icon' => 'info'],
+        'EmptyPassword' => ['title' => 'Info', 'text' => 'Password tidak boleh kosong. Silakan masukkan password baru.', 'icon' => 'info'],
+        'CekDelete' => ['title' => 'Tidak Dapat Dihapus', 'text' => 'Data tidak bisa dihapus, karena sudah mempunyai history', 'icon' => 'warning'],
+        'ErrorDelete' => ['title' => 'Gagal', 'text' => 'Terjadi kesalahan saat menghapus data', 'icon' => 'error'],
+        'NoRowsAffected' => ['title' => 'Error', 'text' => 'Reset password gagal - User ID tidak ditemukan', 'icon' => 'error'],
+        'QueryError' => ['title' => 'Error', 'text' => 'Reset password gagal - Database query error', 'icon' => 'error']
+    ];
+    
+    if (array_key_exists($alert, $notifications)) {
+        $notif = $notifications[$alert];
+        
+        echo "<script " . CSPHandler::scriptNonce() . ">\n";
+        echo "  document.addEventListener('DOMContentLoaded', function() {\n";
+        echo "    if (typeof Swal !== 'undefined') {\n";
+        echo "      Swal.fire({\n";
+        echo "        title: '" . addslashes($notif['title']) . "',\n";
+        echo "        text: '" . addslashes($notif['text']) . "',\n";
+        echo "        icon: '" . $notif['icon'] . "',\n";
+        echo "        confirmButtonText: 'OK',\n";
+        echo "        confirmButtonColor: '#3085d6'\n";
+        echo "      });\n";
+        echo "    } else {\n";
+        echo "      alert('" . addslashes($notif['title'] . ' - ' . $notif['text']) . "');\n";
+        echo "    }\n";
+        echo "  });\n";
+        echo "</script>\n";
+    }
 }
 ?>
 
@@ -187,12 +82,12 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
         }
         
         /* Styling untuk baris tabel */
-        .dataTables-kecamatan tbody tr:hover {
+        .dataTables-user tbody tr:hover {
             background-color: #f0f8ff !important;
         }
         
         /* Styling untuk sel tabel */
-        .dataTables-kecamatan td {
+        .dataTables-user td {
             border: 1px solid #dee2e6 !important;
             vertical-align: middle !important;
             padding: 8px !important;
@@ -210,7 +105,7 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
               
                 <div class="ibox-content">
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
+                        <table class="table table-striped table-bordered table-hover dataTables-user">
                             <thead style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
                                 <tr style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
                                     <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">No</th>
@@ -236,6 +131,35 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
 <script <?php echo CSPHandler::scriptNonce(); ?>>
+    // Override DataTables configuration untuk halaman User - no buttons, no search
+    $(document).ready(function() {
+        // Destroy existing DataTable if any (dengan class yang berbeda)
+        if ($.fn.DataTable.isDataTable('.dataTables-user')) {
+            $('.dataTables-user').DataTable().destroy();
+        }
+        
+        // Reinitialize dengan config khusus untuk User page
+        $('.dataTables-user').DataTable({
+            pageLength: 25,
+            responsive: true,
+            dom: 'rtip', // Hanya render: (r)esults, (t)able, (i)nfo, (p)agination - NO search (f), NO buttons (B)
+            searching: false, // Disable search
+            lengthChange: false,
+            paging: true,
+            info: true,
+            order: [[0, 'asc']], // Sort by No column
+            language: {
+                paginate: {
+                    previous: "Sebelumnya",
+                    next: "Selanjutnya"
+                },
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                zeroRecords: "Tidak ada data yang ditemukan"
+            }
+        });
+    });
+
     // Function untuk konfirmasi hapus dengan SweetAlert2
     function confirmDelete(userId, userName) {
         console.log('confirmDelete called with:', userId, userName);

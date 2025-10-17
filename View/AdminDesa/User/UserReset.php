@@ -1,5 +1,25 @@
 <?php
 include "../App/Control/FunctionUserEdit.php";
+
+// Notification system for UserReset
+$alert = isset($_GET['alert']) ? $_GET['alert'] : '';
+if ($alert == 'ResetSuccess' || $alert == 'Reset') {
+    echo "<script " . (class_exists('CSPHandler') ? CSPHandler::scriptNonce() : '') . ">\n";
+    echo "  document.addEventListener('DOMContentLoaded', function() {\n";
+    echo "    if (typeof Swal !== 'undefined') {\n";
+    echo "      Swal.fire({\n";
+    echo "        title: 'Berhasil!',\n";
+    echo "        text: 'Password berhasil direset',\n";
+    echo "        icon: 'success',\n";
+    echo "        confirmButtonText: 'OK',\n";
+    echo "        confirmButtonColor: '#3085d6'\n";
+    echo "      });\n";
+    echo "    } else {\n";
+    echo "      alert('Berhasil! Password berhasil direset');\n";
+    echo "    }\n";
+    echo "  });\n";
+    echo "</script>\n";
+}
 ?>
 
 <div class="row wrapper border-bottom white-bg page-heading">

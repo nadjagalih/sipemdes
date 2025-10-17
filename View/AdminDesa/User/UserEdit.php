@@ -1,6 +1,26 @@
 <?php
 include "../App/Control/FunctionUserEdit.php";
 include "../App/Control/FunctionPegawaiEdit.php";
+
+// Notification system for UserEdit
+$alert = isset($_GET['alert']) ? $_GET['alert'] : '';
+if ($alert == 'EditSuccess' || $alert == 'Edit') {
+    echo "<script " . (class_exists('CSPHandler') ? CSPHandler::scriptNonce() : '') . ">\n";
+    echo "  document.addEventListener('DOMContentLoaded', function() {\n";
+    echo "    if (typeof Swal !== 'undefined') {\n";
+    echo "      Swal.fire({\n";
+    echo "        title: 'Berhasil!',\n";
+    echo "        text: 'Data user berhasil diubah',\n";
+    echo "        icon: 'success',\n";
+    echo "        confirmButtonText: 'OK',\n";
+    echo "        confirmButtonColor: '#3085d6'\n";
+    echo "      });\n";
+    echo "    } else {\n";
+    echo "      alert('Berhasil! Data user berhasil diubah');\n";
+    echo "    }\n";
+    echo "  });\n";
+    echo "</script>\n";
+}
 ?>
 <script>
     function checkAvailability() {

@@ -105,7 +105,7 @@ if (isset($_GET['Kode'])) {
                                                 <?php if (is_null($FileSKMutasiBlob)) {
                                                     ?>
                                                     <a target='_BLANK'
-                                                        href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File
+                                                        href='../Module/File/ViewSKMutasi.php?id=<?php echo $IdMutasi; ?>'>Lihat File
                                                         SK</a>
                                                     <?php
                                                 } else {
@@ -239,7 +239,7 @@ if (isset($_GET['Kode'])) {
                                                     <br><?php if (is_null($FileSKMutasiBlob)) {
                                                         ?>
                                                         <a target='_BLANK'
-                                                            href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File
+                                                            href='../Module/File/ViewSKMutasi.php?id=<?php echo $IdMutasi; ?>'>Lihat File
                                                             SK</a>
                                                         <?php
                                                     } else {

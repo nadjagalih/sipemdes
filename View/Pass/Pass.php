@@ -31,6 +31,11 @@ if (!empty($alertType)) {
             'text' => 'Panjang Minimal Password 8 Karakter',
             'icon' => 'warning'
         ],
+        'FormatPassword' => [
+            'title' => 'PERINGATAN',
+            'text' => 'Password harus mengandung minimal: 8 karakter, 1 huruf kapital, dan 1 karakter khusus (!@#$%^&*)',
+            'icon' => 'warning'
+        ],
         'CSRFError' => [
             'title' => 'ERROR',
             'text' => 'Token keamanan tidak valid. Silakan coba lagi.',
@@ -132,7 +137,7 @@ if (!empty($alertType)) {
                             <label class="col-lg-4 col-form-label">Password Baru</label>
                             <div class="col-lg-8">
                                 <input type="password" class="form-control" name="PasswordBaru" id="PasswordBaru" placeholder="Password Baru" autocomplete="off" required minlength="8">
-                                <span class="form-text m-b-none" style="font-style: italic;">*) Minimal Panjang Password 8 Karakter</span>
+                                <span class="form-text m-b-none" style="font-style: italic;">*) Password harus mengandung minimal: 8 karakter, 1 huruf kapital, dan 1 karakter khusus (!@#$%^&*)</span>
                             </div>
                         </div>
 
@@ -158,21 +163,45 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             const password = document.getElementById('PasswordBaru').value;
             
-            // Simple length validation
+            // Validasi panjang password
             if (password.length < 8) {
                 e.preventDefault();
-                // Gunakan SweetAlert2 untuk konsistensi dengan CSP
-                Swal.fire({
-                    title: 'PERINGATAN',
-                    text: 'Password minimal 8 karakter',
-                    icon: 'warning',
-                    showConfirmButton: true
-                });
+                showPasswordValidationError('Password minimal 8 karakter');
+                return false;
+            }
+            
+            // Validasi huruf kapital
+            if (!/[A-Z]/.test(password)) {
+                e.preventDefault();
+                showPasswordValidationError('Password harus mengandung minimal 1 huruf kapital (A-Z)');
+                return false;
+            }
+            
+            // Validasi karakter khusus
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                e.preventDefault();
+                showPasswordValidationError('Password harus mengandung minimal 1 karakter khusus (!@#$%^&* dll)');
                 return false;
             }
             
             return true;
         });
+        
+        // Fungsi untuk menampilkan error validasi
+        function showPasswordValidationError(message) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'PERINGATAN',
+                    text: message,
+                    icon: 'warning',
+                    showConfirmButton: true,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#f39c12'
+                });
+            } else {
+                alert('PERINGATAN\n\n' + message);
+            }
+        }
     }
 });
 </script>

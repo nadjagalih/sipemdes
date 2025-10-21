@@ -1,4 +1,7 @@
 <?php
+// Include CSP Handler untuk nonce support
+require_once __DIR__ . '/../../../Module/Security/CSPHandler.php';
+
 $IdKec = $_SESSION['IdKecamatan'];
 ?>
 
@@ -102,8 +105,42 @@ $IdKec = $_SESSION['IdKecamatan'];
                     </div>
 
                     <div class="ibox-content">
+                        <!-- Custom filter dropdown untuk DataTables -->
+                        <div class="row" style="margin-bottom: 15px;">
+                            <div class="col-sm-6">
+                                <div class="dataTables_length" id="pegawaiTable_length">
+                                    <label>Show 
+                                        <select name="pegawaiTable_length" aria-controls="pegawaiTable" class="form-control input-sm" style="display: inline-block; width: auto;">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select> entries
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="dataTables_filter" id="pegawaiTable_filter" style="text-align: right;">
+                                    <label>
+                                        <select class="form-control input-sm" style="display: inline-block; width: 150px; margin-right: 10px;" id="desaFilter">
+                                            <option value="">Filter Desa</option>
+                                            <?php
+                                            $QueryDesaFilter = mysqli_query($db, "SELECT DISTINCT master_desa.IdDesa, master_desa.NamaDesa 
+                                                FROM master_desa 
+                                                WHERE master_desa.IdKecamatanFK = '$IdKec' 
+                                                ORDER BY master_desa.NamaDesa ASC");
+                                            while ($RowDesaFilter = mysqli_fetch_assoc($QueryDesaFilter)) {
+                                                echo "<option value='" . htmlspecialchars($RowDesaFilter['NamaDesa']) . "'>" . htmlspecialchars($RowDesaFilter['NamaDesa']) . "</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                        Search: <input type="search" class="form-control input-sm" placeholder="" aria-controls="pegawaiTable" id="customSearch" style="display: inline-block; width: 200px;">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
+                            <table class="table table-striped table-bordered table-hover dataTables-kecamatan" id="pegawaiTable">
                                 <thead>
                                     <tr align="center">
                                         <th rowspan="2">No</th>
@@ -345,5 +382,66 @@ $IdKec = $_SESSION['IdKecamatan'];
                 </div>
             </div>
         </div>
+
+        <!-- JavaScript untuk filter dropdown -->
+        <script <?php echo CSPHandler::scriptNonce(); ?>>
+        $(document).ready(function() {
+            console.log('Initializing DataTable with custom filters...');
+            
+            // Initialize DataTable dengan konfigurasi yang tepat
+            var table = $('#pegawaiTable').DataTable({
+                "dom": 'rt<"bottom"ip><"clear">',
+                "pageLength": 10,
+                "searching": true,
+                "paging": true,
+                "info": true,
+                "lengthChange": true,
+                "language": {
+                    "search": "",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "infoEmpty": "Showing 0 to 0 of 0 entries",
+                    "infoFiltered": "(filtered from _MAX_ total entries)",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    }
+                }
+            });
+
+            console.log('DataTable initialized successfully');
+
+            // Custom search input
+            $('#customSearch').on('keyup', function() {
+                console.log('Search input:', this.value);
+                table.search(this.value).draw();
+            });
+
+            // Custom length selector
+            $('select[name="pegawaiTable_length"]').on('change', function() {
+                console.log('Length changed to:', $(this).val());
+                table.page.len($(this).val()).draw();
+            });
+
+            // Desa filter functionality
+            $('#desaFilter').on('change', function() {
+                var selectedDesa = $(this).val();
+                console.log('Desa filter changed to:', selectedDesa);
+                
+                if (selectedDesa === '') {
+                    table.column(1).search('').draw(); // Column 1 is Desa column
+                } else {
+                    table.column(1).search(selectedDesa).draw();
+                }
+            });
+
+            // Debug: Check if elements exist
+            console.log('Dropdown exists:', $('#desaFilter').length > 0);
+            console.log('Search input exists:', $('#customSearch').length > 0);
+            console.log('Length selector exists:', $('select[name="pegawaiTable_length"]').length > 0);
+        });
+        </script>
     <?php } ?>
 </form>

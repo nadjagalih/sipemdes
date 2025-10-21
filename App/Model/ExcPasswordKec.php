@@ -24,22 +24,37 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             if (isset($_POST['IdUser'])) {
                 $PasswordBaru = isset($_POST['PasswordBaru']) ? sql_injeksi($_POST['PasswordBaru']) : '';
 
-                if (strlen($PasswordBaru) >= 8) {
-                    $IdUser = sql_injeksi($_POST['IdUser']);
-                    $PasswordBaruHashed = password_hash($PasswordBaru, PASSWORD_DEFAULT);
-
-                    $Koreksi = mysqli_query($db, "UPDATE main_user_kecamatan SET NamePassword = '$PasswordBaruHashed'
-                           WHERE IdUser = '$IdUser'");
-                    
-                    if ($Koreksi) {
-                        // Regenerate CSRF token untuk keamanan
-                        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-                        header("location:../../View/v?pg=PassKecamatan&alert=Sukses");
-                    } else {
-                        header("location:../../View/v?pg=PassKecamatan&alert=Gagal memperbarui password");
-                    }
-                } else {
+                // Validasi panjang password
+                if (strlen($PasswordBaru) < 8) {
                     header("location:../../View/v?pg=PassKecamatan&alert=Panjang");
+                    exit();
+                }
+                
+                // Validasi huruf kapital
+                if (!preg_match('/[A-Z]/', $PasswordBaru)) {
+                    header("location:../../View/v?pg=PassKecamatan&alert=FormatPassword");
+                    exit();
+                }
+                
+                // Validasi karakter khusus
+                if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $PasswordBaru)) {
+                    header("location:../../View/v?pg=PassKecamatan&alert=FormatPassword");
+                    exit();
+                }
+                
+                // Jika semua validasi lolos
+                $IdUser = sql_injeksi($_POST['IdUser']);
+                $PasswordBaruHashed = password_hash($PasswordBaru, PASSWORD_DEFAULT);
+
+                $Koreksi = mysqli_query($db, "UPDATE main_user_kecamatan SET NamePassword = '$PasswordBaruHashed'
+                       WHERE IdUser = '$IdUser'");
+                
+                if ($Koreksi) {
+                    // Regenerate CSRF token untuk keamanan
+                    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                    header("location:../../View/v?pg=PassKecamatan&alert=Sukses");
+                } else {
+                    header("location:../../View/v?pg=PassKecamatan&alert=Gagal memperbarui password");
                 }
             } else {
                 header("location:../../View/v?pg=PassKecamatan&alert=Data tidak lengkap");

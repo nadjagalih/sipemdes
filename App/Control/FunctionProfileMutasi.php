@@ -358,7 +358,7 @@
                         <td>Nomor SK : <?php echo $NomorSK; ?>
                             <br>
                             <?php if (!empty($SKMutasi)) { ?>
-                                <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
+                                <a target='_BLANK' href='../Module/File/ViewSKMutasi.php?id=<?php echo $IdMutasi; ?>'>Lihat File SK</a>
                             <?php } else { ?>
                                 <small class="text-muted">Belum ada file SK</small>
                             <?php } ?>

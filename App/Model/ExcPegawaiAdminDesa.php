@@ -133,35 +133,24 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             unlink("../../Vendor/Media/Pegawai/" . $Foto);
 
 
-            $QMutasi = mysqli_query($db, "SELECT IdPegawaiFK FROM history_mutasi WHERE IdPegawaiFK = '$IdPegawai' ");
-            $CountMutasi = mysqli_num_rows($QMutasi);
+            // Cascade Delete - Hapus semua data terkait tanpa mengecek history
+            // Hapus semua history dan relasi terlebih dahulu
+            $DeleteHiskelAnak = mysqli_query($db, "DELETE FROM hiskel_anak WHERE IdPegawaiFK = '$IdPegawai' ");
+            $DeleteHiskelOrtu = mysqli_query($db, "DELETE FROM hiskel_ortu WHERE IdPegawaiFK = '$IdPegawai' ");
+            $DeleteHiskelSuamiIstri = mysqli_query($db, "DELETE FROM hiskel_suami_istri WHERE IdPegawaiFK = '$IdPegawai' ");
+            $DeleteHisMutasi = mysqli_query($db, "DELETE FROM history_mutasi WHERE IdPegawaiFK = '$IdPegawai' ");
+            $DeleteHisPendidikan = mysqli_query($db, "DELETE FROM history_pendidikan WHERE IdPegawaiFK = '$IdPegawai' ");
+            
+            // Hapus user account
+            $DeleteUser = mysqli_query($db, "DELETE FROM main_user WHERE IdPegawai = '$IdPegawai' ");
+            
+            // Terakhir hapus master pegawai
+            $Delete = mysqli_query($db, "DELETE FROM master_pegawai WHERE IdPegawaiFK = '$IdPegawai' ");
 
-            $QAnak = mysqli_query($db, "SELECT IdPegawaiFK FROM hiskel_anak WHERE IdPegawaiFK = '$IdPegawai' ");
-            $CountAnak = mysqli_num_rows($QAnak);
-
-            $QOrtu = mysqli_query($db, "SELECT IdPegawaiFK FROM hiskel_ortu WHERE IdPegawaiFK = '$IdPegawai' ");
-            $CountOrtu = mysqli_num_rows($QOrtu);
-
-            $QSuamiIstri = mysqli_query($db, "SELECT IdPegawaiFK FROM hiskel_suami_istri WHERE IdPegawaiFK = '$IdPegawai' ");
-            $CountSuamiIstri = mysqli_num_rows($QSuamiIstri);
-
-            $QPendidikan = mysqli_query($db, "SELECT IdPegawaiFK FROM history_pendidikan WHERE IdPegawaiFK = '$IdPegawai' ");
-            $CountPendidikan = mysqli_num_rows($QPendidikan);
-
-            if ($CountMutasi <> 0 or $CountAnak <> 0 or $CountOrtu <> 0 or $CountSuamiIstri <> 0 or $CountPendidikan <> 0) {
-                header("location:../../View/v?pg=PegawaiViewAllAdminDesa&alert=CekDelete");
+            if ($Delete) {
+                header("location:../../View/v?pg=PegawaiViewAllAdminDesa&alert=Delete");
             } else {
-                $Delete = mysqli_query($db, "DELETE FROM master_pegawai WHERE IdPegawaiFK = '$IdPegawai' ");
-                $DeleteUser = mysqli_query($db, "DELETE FROM main_user WHERE IdPegawai = '$IdPegawai' ");
-                $DeleteHiskelAnak = mysqli_query($db, "DELETE FROM hiskel_anak WHERE IdPegawaiFK = '$IdPegawai' ");
-                $DeleteHiskelOrtu = mysqli_query($db, "DELETE FROM hiskel_ortu WHERE IdPegawaiFK = '$IdPegawai' ");
-                $DeleteHiskelSuamiIstri = mysqli_query($db, "DELETE FROM hiskel_suami_istri WHERE IdPegawaiFK = '$IdPegawai' ");
-                $DeleteHisMutasi = mysqli_query($db, "DELETE FROM history_mutasi WHERE IdPegawaiFK = '$IdPegawai' ");
-                $DeleteHisPendidikan = mysqli_query($db, "DELETE FROM history_pendidikan WHERE IdPegawaiFK = '$IdPegawai' ");
-
-                if ($Delete) {
-                    header("location:../../View/v?pg=PegawaiViewAllAdminDesa&alert=Delete");
-                }
+                header("location:../../View/v?pg=PegawaiViewAllAdminDesa&alert=Error");
             }
 
             // $Delete = mysqli_query($db, "DELETE FROM master_pegawai WHERE IdPegawaiFK = '$IdPegawai' ");

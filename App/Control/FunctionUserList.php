@@ -4,12 +4,26 @@ $limit = 50; // Record per halaman
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Query untuk menghitung total data
+// Search functionality
+$searchCondition = "";
+$searchParam = "";
+if (isset($_GET['search']) && !empty($_GET['search'])) {
+    $searchParam = sql_injeksi($_GET['search']);
+    $searchCondition = "WHERE (master_pegawai.Nama LIKE '%$searchParam%' 
+                        OR main_user.NameAkses LIKE '%$searchParam%' 
+                        OR master_desa.NamaDesa LIKE '%$searchParam%' 
+                        OR master_kecamatan.Kecamatan LIKE '%$searchParam%')";
+}
+
+// Query untuk menghitung total data dengan search
 $queryCount = mysqli_query($db, "SELECT COUNT(*) as total
 FROM
 master_pegawai
 INNER JOIN main_user ON master_pegawai.IdPegawaiFK = main_user.IdPegawai
-INNER JOIN leveling_user ON main_user.IdLevelUserFK = leveling_user.IdLevelUser");
+INNER JOIN leveling_user ON main_user.IdLevelUserFK = leveling_user.IdLevelUser
+LEFT JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
+LEFT JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
+$searchCondition");
 
 $countResult = mysqli_fetch_assoc($queryCount);
 $totalRecords = $countResult['total'];
@@ -35,7 +49,9 @@ FROM
 master_pegawai
 INNER JOIN main_user ON master_pegawai.IdPegawaiFK = main_user.IdPegawai
 INNER JOIN leveling_user ON main_user.IdLevelUserFK = leveling_user.IdLevelUser
-
+LEFT JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
+LEFT JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
+$searchCondition
 ORDER BY leveling_user.IdLevelUser ASC
 LIMIT $limit OFFSET $offset");
 while ($DataUser = mysqli_fetch_assoc($QueryUser)) {
@@ -128,14 +144,20 @@ while ($DataUser = mysqli_fetch_assoc($QueryUser)) {
             <div class="col-md-6">
                 <div class="dataTables_info">
                     Menampilkan <?php echo $offset + 1; ?> sampai <?php echo min($offset + $limit, $totalRecords); ?> dari <?php echo $totalRecords; ?> data
+                    <?php if (isset($_GET['search']) && !empty($_GET['search'])): ?>
+                        <br><small class="text-muted">Hasil pencarian untuk: "<?php echo htmlspecialchars($_GET['search']); ?>"</small>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="dataTables_paginate">
                     <ul class="pagination justify-content-end">
+                        <?php 
+                        $searchQuery = isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : '';
+                        ?>
                         <?php if ($page > 1): ?>
                             <li class="page-item">
-                                <a class="page-link" href="?pg=UserView&page=<?php echo $page - 1; ?>">Previous</a>
+                                <a class="page-link" href="?pg=UserView&page=<?php echo $page - 1; ?><?php echo $searchQuery; ?>">Previous</a>
                             </li>
                         <?php endif; ?>
 
@@ -145,13 +167,13 @@ while ($DataUser = mysqli_fetch_assoc($QueryUser)) {
                         
                         for ($i = $start; $i <= $end; $i++): ?>
                             <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
-                                <a class="page-link" href="?pg=UserView&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                <a class="page-link" href="?pg=UserView&page=<?php echo $i; ?><?php echo $searchQuery; ?>"><?php echo $i; ?></a>
                             </li>
                         <?php endfor; ?>
 
                         <?php if ($page < $totalPages): ?>
                             <li class="page-item">
-                                <a class="page-link" href="?pg=UserView&page=<?php echo $page + 1; ?>">Next</a>
+                                <a class="page-link" href="?pg=UserView&page=<?php echo $page + 1; ?><?php echo $searchQuery; ?>">Next</a>
                             </li>
                         <?php endif; ?>
                     </ul>

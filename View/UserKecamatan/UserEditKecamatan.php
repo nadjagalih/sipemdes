@@ -26,6 +26,80 @@ include "../App/Control/FunctionUserEditKecamatan.php";
         background: white;
         color: red;
     }
+
+    /* Notification Popup Styles */
+    .notification-popup {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+        border-radius: 10px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    }
+
+    .notification-popup.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .notification-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: 1px solid #28a745;
+    }
+
+    .notification-error {
+        background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        color: white;
+        border: 1px solid #dc3545;
+    }
+
+    .notification-content {
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .notification-icon {
+        font-size: 24px;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+
+    .notification-text {
+        flex: 1;
+    }
+
+    .notification-title {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .notification-message {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .notification-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0;
+        margin-left: 10px;
+        opacity: 0.8;
+        transition: opacity 0.2s ease;
+    }
+
+    .notification-close:hover {
+        opacity: 1;
+    }
 </style>
 
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -132,3 +206,56 @@ include "../App/Control/FunctionUserEditKecamatan.php";
         </div>
     </div>
 </div>
+
+<?php
+// Check for success/error messages from URL parameters
+$alertData = null;
+if (isset($_GET['success'])) {
+    switch ($_GET['success']) {
+        case 'add':
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'User kecamatan berhasil ditambahkan.',
+                'icon' => 'success'
+            ];
+            break;
+        case 'edit':
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'User kecamatan berhasil diperbarui.',
+                'icon' => 'success'
+            ];
+            break;
+        case 'delete':
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'User kecamatan berhasil dihapus.',
+                'icon' => 'warning'
+            ];
+            break;
+        default:
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'Operasi berhasil dilakukan.',
+                'icon' => 'success'
+            ];
+    }
+} elseif (isset($_GET['error'])) {
+    $alertData = [
+        'title' => 'Error!',
+        'message' => 'Terjadi kesalahan saat memproses data.',
+        'icon' => 'error'
+    ];
+}
+
+if ($alertData) {
+    // Set data untuk JavaScript menggunakan data attributes
+    echo '<div id="alert-data" 
+            data-title="' . htmlspecialchars($alertData['title'], ENT_QUOTES) . '" 
+            data-message="' . htmlspecialchars($alertData['message'], ENT_QUOTES) . '" 
+            data-icon="' . htmlspecialchars($alertData['icon'], ENT_QUOTES) . '" 
+            style="display: none;"></div>';
+}
+?>
+
+<script src="../Assets/js/notification-handler.js"></script>

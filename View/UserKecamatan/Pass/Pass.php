@@ -161,7 +161,10 @@ if (isset($_GET['alert'])) {
                         <div class="form-group row">
                             <label class="col-lg-4 col-form-label">Password Baru</label>
                             <div class="col-lg-8">
-                                <input type="password" class="form-control" name="PasswordBaru" id="PasswordBaru" placeholder="Password Baru" autocomplete="off" required minlength="8">
+                                <div style="position: relative;">
+                                    <input type="password" class="form-control" name="PasswordBaru" id="PasswordBaru" placeholder="Password Baru" autocomplete="off" required minlength="8" style="padding-right: 40px;">
+                                    <span toggle="#PasswordBaru" class="fa fa-eye field-icon toggle-password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #676a6c;"></span>
+                                </div>
                                 <span class="form-text m-b-none" style="font-style: italic;">*) Password harus mengandung minimal: 8 karakter, 1 huruf kapital, dan 1 karakter khusus (!@#$%^&*)</span>
                             </div>
                         </div>
@@ -182,6 +185,23 @@ if (isset($_GET['alert'])) {
 <!-- Simple validation script -->
 <script <?php echo CSPHandler::scriptNonce(); ?>>
 document.addEventListener('DOMContentLoaded', function() {
+    // Toggle password visibility
+    const togglePassword = document.querySelector('.toggle-password');
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const passwordInput = document.querySelector(this.getAttribute('toggle'));
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+    }
+    
     const form = document.getElementById('passwordForm');
     
     if (form) {

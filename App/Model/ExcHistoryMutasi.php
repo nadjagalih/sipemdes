@@ -64,8 +64,14 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     // OLD File Upload
                     // FileSK($FileUpload);
 
-                    // NEW BLOB
-                    $FileContent = addslashes(file_get_contents($LokasiFile));
+                    // NEW BLOB - Improved file content handling
+                    $FileContent = file_get_contents($LokasiFile);
+                    if ($FileContent === false) {
+                        error_log("Failed to read uploaded file: " . $LokasiFile);
+                        header("location:../../View/v?pg=ViewMutasi&alert=FileError");
+                        exit();
+                    }
+                    $FileContent = mysqli_real_escape_string($db, $FileContent);
 
                     //CARI ID PEGAWAI DENGAN SETTING 1
                     $Cek = mysqli_query($db, "SELECT IdPegawaiFK, Setting FROM history_mutasi WHERE IdPegawaiFK = '$IdPegawaiFK' AND Setting = 1 ");
@@ -79,9 +85,18 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     // $Save = mysqli_query($db, "INSERT INTO history_mutasi(IdMutasi,IdPegawaiFK,JenisMutasi,NomorSK,TanggalMutasi,FileSKMutasi,IdJabatanFK,KeteranganJabatan,Setting)
                     // VALUE('$IdMutasi','$IdPegawaiFK','$JenisMutasi','$NomerSK','$TanggalMutasi','$FileUpload','$Jabatan','$Keterangan','$Setting')");
 
-                    // NEW BLOB
+                    // NEW BLOB - Debug info
+                    error_log("Saving mutasi with file: " . $FileUpload);
+                    error_log("File content length: " . strlen($FileContent));
+                    
                     $Save = mysqli_query($db, "INSERT INTO history_mutasi (IdMutasi, IdPegawaiFK, JenisMutasi, NomorSK, TanggalMutasi, FileSKMutasi, FileSKMutasiBlob, IdJabatanFK, KeteranganJabatan, Setting)
-                    VALUE ('$IdMutasi', '$IdPegawaiFK', '$JenisMutasi', '$NomerSK', '$TanggalMutasi', '$FileUpload', '$FileContent', '$Jabatan', '$Keterangan', '$Setting')");
+                    VALUES ('$IdMutasi', '$IdPegawaiFK', '$JenisMutasi', '$NomerSK', '$TanggalMutasi', '$FileUpload', '$FileContent', '$Jabatan', '$Keterangan', '$Setting')");
+                    
+                    if (!$Save) {
+                        error_log("MySQL Error: " . mysqli_error($db));
+                        header("location:../../View/v?pg=ViewMutasi&alert=DatabaseError");
+                        exit();
+                    }
 
                     //OFF KAN PEGAWAI DAN USER JIKA MUTASI KELUAR PENSIUN MENINGGAL KODE 3 4 5
                     if ($JenisMutasi == 3 or $JenisMutasi == 4 or $JenisMutasi == 5) {
@@ -140,12 +155,15 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
                     if ($Save) {
                         header("location:../../View/v?pg=ViewMutasi&alert=Save");
+                        exit();
                     }
                 } elseif (in_array($FileExtention, $AllowExtention) == false) {
                     header("location:../../View/v?pg=ViewMutasi&alert=Cek");
+                    exit();
                 }
             } else {
                 header("location:../../View/v?pg=ViewMutasi&alert=FileMax");
+                exit();
             }
         }
     } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
@@ -250,6 +268,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($Edit) {
                 header("location:../../View/v?pg=ViewMutasi&alert=Edit");
+                exit();
             }
         }
     } elseif (isset($_GET['Act']) && $_GET['Act'] == 'EditSK') {
@@ -291,6 +310,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
                     if ($Edit) {
                         header("location:../../View/v?pg=ViewMutasi&alert=Edit");
+                        exit();
                     }
                 } elseif (in_array($FileExtention, $AllowExtention) == false) {
                     header("location:../../View/v?pg=ViewMutasi&alert=Cek");
@@ -336,6 +356,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($Delete) {
                 header("location:../../View/v?pg=ViewMutasi&alert=Delete");
+                exit();
             }
         }
     } elseif (isset($_GET['Act']) && $_GET['Act'] == 'SettingOn') {
@@ -364,6 +385,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($SettingAktif) {
                 header("location:../../View/v?pg=ViewMutasi&alert=Setting");
+                exit();
             }
         }
     }

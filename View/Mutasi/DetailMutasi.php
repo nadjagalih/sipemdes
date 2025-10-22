@@ -101,7 +101,7 @@ if (isset($_GET['Kode'])) {
                                             <td><?php echo $TanggalMutasi; ?> </td>
                                             <td>Nomor SK : <?php echo $NomorSK; ?>
                                                 <br>
-                                                <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
+                                                <a target='_BLANK' href='../Module/Variabel/ViewFileBLOB?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
                                             </td>
 
                                             <td>
@@ -216,7 +216,7 @@ if (isset($_GET['Kode'])) {
                                                 <td><?php echo $TanggalMutasi; ?> </td>
                                                 <td>Nomor SK : <?php echo $NomorSK; ?>
                                                     <br>
-                                                    <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
+                                                    <a target='_BLANK' href='../Module/Variabel/ViewFileBLOB?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
                                                 </td>
 
                                                 <td>

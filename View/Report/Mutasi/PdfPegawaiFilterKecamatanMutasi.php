@@ -63,7 +63,7 @@ if (isset($_GET['Proses'])) {
                                     INNER JOIN main_user ON master_pegawai.IdPegawaiFK = main_user.IdPegawai
                                     WHERE main_user.IdLevelUserFK <> 1 and
                                     main_user.IdLevelUserFK <> 2 and
-                                    master_pegawai.Kecamatan = '$Kecamatan'
+                                    master_kecamatan.IdKecamatan = '$Kecamatan'
                                     ORDER BY
                                     master_kecamatan.IdKecamatan ASC,
                                     master_desa.NamaDesa ASC");

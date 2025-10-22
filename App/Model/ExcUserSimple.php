@@ -26,11 +26,11 @@ if (isset($_GET['Act']) && $_GET['Act'] == 'Edit' && isset($_POST['Edit'])) {
     
     if ($result1 && $result2) {
         // Success - redirect langsung tanpa halaman debug
-        header("Location: ../../View/v?pg=UserView&alert=Edit");
+        header("Location: ../../View/v?pg=UserView&success=edit");
         exit();
     } else {
         // Error - redirect back dengan pesan error
-        header("Location: ../../View/v?pg=UserEdit&Kode=$IdUser&alert=Error");
+        header("Location: ../../View/v?pg=UserEdit&Kode=$IdUser&error=1");
         exit();
     }
 }

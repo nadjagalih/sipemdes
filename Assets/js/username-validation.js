@@ -77,6 +77,61 @@
             function(response) {
                 // Success callback
                 targetElement.innerHTML = response;
+                
+                // Initialize dropdowns after dynamic content is loaded
+                setTimeout(function() {
+                    // Try to initialize dropdowns with or without Select2
+                    try {
+                        if (typeof $ !== 'undefined' && $.fn.select2) {
+                            // Safely destroy existing instances
+                            try { $('#Akses').select2('destroy'); } catch(e) {}
+                            try { $('#UnitKerja').select2('destroy'); } catch(e) {}
+                            try { $('#IdKecamatan').select2('destroy'); } catch(e) {}
+                            try { $('#Status').select2('destroy'); } catch(e) {}
+                            
+                            // Re-initialize with error handling
+                            setTimeout(function() {
+                                try {
+                                    if ($('#Akses').length) {
+                                        $('#Akses').select2({
+                                            placeholder: "Pilih Hak Akses",
+                                            allowClear: true,
+                                            width: '100%'
+                                        });
+                                    }
+                                    
+                                    if ($('#UnitKerja').length) {
+                                        $('#UnitKerja').select2({
+                                            placeholder: "Pilih Unit Kerja",
+                                            allowClear: true,
+                                            width: '100%'
+                                        });
+                                    }
+                                    
+                                    if ($('#IdKecamatan').length) {
+                                        $('#IdKecamatan').select2({
+                                            placeholder: "Pilih Kecamatan",
+                                            allowClear: true,
+                                            width: '100%'
+                                        });
+                                    }
+                                    
+                                    if ($('#Status').length) {
+                                        $('#Status').select2({
+                                            placeholder: "Pilih Status",
+                                            allowClear: true,
+                                            width: '100%'
+                                        });
+                                    }
+                                } catch(e) {
+                                    console.log('Select2 initialization error:', e);
+                                }
+                            }, 200);
+                        }
+                    } catch(e) {
+                        console.log('Dropdown initialization error:', e);
+                    }
+                }, 100);
             },
             function(error) {
                 // Error callback

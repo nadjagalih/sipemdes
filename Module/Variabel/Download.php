@@ -5,7 +5,22 @@ error_reporting(E_ALL);
 session_start();
 include "../Config/Env.php";
 
-$Direktori = "../../Vendor/Media/FileSK/"; // folder tempat penyimpanan file yang boleh didownload
+// Validasi session untuk keamanan
+if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
+    http_response_code(403);
+    echo "<h1>Access forbidden!</h1><p>Anda harus login terlebih dahulu.</p>";
+    exit();
+}
+
+// Validasi parameter File
+if (!isset($_GET['File']) || empty($_GET['File'])) {
+    http_response_code(400);
+    echo "<h1>Bad Request!</h1><p>Parameter file tidak ditemukan.</p>";
+    exit();
+}
+
+// Gunakan path absolut untuk menghindari masalah path relatif
+$Direktori = __DIR__ . "/../../Vendor/Media/FileSK/";
 $FileName = $_GET['File'];
 
 // Decode URL encoding untuk menangani spasi dan karakter khusus
@@ -60,7 +75,7 @@ if (file_exists($Direktori . $FileName)) {
 			// 	$ctype = "application/proses";
 	}
 
-	if ($file_extension == 'php' and $file_extension == 'py') {
+	if ($file_extension == 'php' or $file_extension == 'py') {
 		echo "<h1>Access forbidden!</h1>
 			<p>Maaf, file yang Anda download sudah tidak tersedia.</p>";
 		exit;

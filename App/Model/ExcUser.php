@@ -6,27 +6,18 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 include "../../Module/Config/Env.php";
-// Comment out security module for now to prevent white screen
-// try {
-//     require_once "../../Module/Security/Security.php";
-// } catch (Exception $e) {
-//     error_log("Security module error: " . $e->getMessage());
-//     // Continue without security for now to prevent white screen
-// }
 
 if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
+    exit();
 } else {
     if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
-            // Remove CSRF validation for now
-            // CSRFProtection::validateOrDie();
             $ViewTanggal   = date('YmdHis');
             $UserNama = sql_injeksi($_POST['UserNama']);
             $Pass  = password_hash(sql_injeksi($_POST['Pass']), PASSWORD_DEFAULT);
             $Akses = sql_injeksi($_POST['Akses']);
-            // $NIK = sql_injeksi($_POST['NIK']);
             $Nama = sql_injeksi($_POST['Nama']);
             $UnitKerja = sql_injeksi($_POST['UnitKerja']);
             $StatusLogin = sql_injeksi($_POST['Status']);
@@ -43,22 +34,12 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 
                 if ($Row <> 0) {
                     header("location:../../View/v?pg=UserView&alert=CekUser");
+                    exit();
                 } else {
                     $CekPassword = $_POST['Pass'];
                     if (strlen($CekPassword) >= 5) {
-
-                    // $QUser = mysqli_query($db, "SELECT * FROM main_user");
-                    // $Count = mysqli_num_rows($QUser);
-                    // if ($Count <> 0) {
-                    //     $TempId = $Count + 1;
-                    //     $IdUser = $ViewTanggal . "" . $TempId;
-                    // } else {
-                    //     $TempId = 1;
-                    //     $IdUser = $ViewTanggal . "" . $TempId;
-                    // }
-
-                        $tanggal        = date('Ymd');
-                        $waktuid        = date('His');
+                        $tanggal = date('Ymd');
+                        $waktuid = date('His');
                         $IdUser = $tanggal . "" . $waktuid . "" . substr($UserNama, -3);
 
                         // Insert user using prepared statement
@@ -78,10 +59,13 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                         }
 
                         if ($Save) {
-                            header("location:../../View/v?pg=UserView&alert=Save");
+                            header("location:../../View/v?pg=UserView&success=add");
+                            exit();
                         }
-                } elseif (strlen($CekPassword) < 5) {
-                    header("location:../../View/v?pg=UserView&alert=Karakter");
+                    } elseif (strlen($CekPassword) < 5) {
+                        header("location:../../View/v?pg=UserView&alert=Karakter");
+                        exit();
+                    }
                 }
             }
         }
@@ -118,17 +102,17 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 }
 
                 if ($Edit && $EditUnitKerja) {
-                    header("location:../../View/v?pg=UserView&alert=Edit");
+                    header("location:../../View/v?pg=UserView&success=edit");
                     exit();
                 } else {
-                    header("location:../../View/v?pg=UserEdit&Kode=$IdUser&alert=Error");
+                    header("location:../../View/v?pg=UserEdit&Kode=$IdUser&error=1");
                     exit();
                 }
                 
             } catch (Exception $e) {
                 error_log("Edit User Error: " . $e->getMessage());
                 $IdUser = isset($_POST['IdUser']) ? $_POST['IdUser'] : '';
-                header("location:../../View/v?pg=UserEdit&Kode=$IdUser&alert=Error");
+                header("location:../../View/v?pg=UserEdit&Kode=$IdUser&error=1");
                 exit();
             }
         }
@@ -153,27 +137,27 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($CountMutasi <> 0 or $CountAnak <> 0 or $CountOrtu <> 0 or $CountSuamiIstri <> 0 or $CountPendidikan <> 0) {
                 header("location:../../View/v?pg=UserView&alert=CekDelete");
+                exit();
             } else {
                 $Delete = mysqli_query($db, "DELETE FROM main_user WHERE IdUser = '$IdUser' ");
                 $Delete1 = mysqli_query($db, "DELETE FROM master_pegawai WHERE IdPegawaiFK = '$IdUser' ");
 
                 if ($Delete) {
-                    header("location:../../View/v?pg=UserView&alert=Delete");
+                    header("location:../../View/v?pg=UserView&success=delete");
+                    exit();
                 }
             }
         }
     } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Reset') {
         if (isset($_POST['Reset'])) {
-
             $IdUser = sql_injeksi($_POST['IdUser']);
             $Pass = sql_injeksi(password_hash($_POST['Pass'], PASSWORD_DEFAULT));
-            $EditReset = mysqli_query($db, "UPDATE main_user SET NamePassword = '$Pass'
-            WHERE IdUser = '$IdUser' ");
+            $EditReset = mysqli_query($db, "UPDATE main_user SET NamePassword = '$Pass' WHERE IdUser = '$IdUser'");
 
             if ($EditReset) {
                 header("location:../../View/v?pg=UserView&alert=Reset");
+                exit();
             }
         }
     }
-}
 }

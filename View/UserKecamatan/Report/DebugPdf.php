@@ -1,4 +1,7 @@
 <?php
+
+use Spipu\Html2Pdf\Html2Pdf;
+
 // Debug file untuk cek PDF generation
 echo "<h3>PDF Debug Information</h3>";
 
@@ -12,7 +15,6 @@ if (file_exists($html2pdfPath)) {
         require_once($html2pdfPath);
         echo "<p><strong>Html2Pdf Library:</strong> Loaded successfully</p>";
         
-        use Spipu\Html2Pdf\Html2Pdf;
         $testPdf = new Html2Pdf('P', 'A4', 'fr');
         echo "<p><strong>Html2Pdf Instance:</strong> Created successfully</p>";
         

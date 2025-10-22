@@ -1,4 +1,39 @@
 <?php
+// Check for success/error messages from URL parameters
+$alertData = null;
+if (isset($_GET['success'])) {
+    switch ($_GET['success']) {
+        case 'add':
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'User berhasil ditambahkan.',
+                'icon' => 'success'
+            ];
+            break;
+        case 'edit':
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'User berhasil diperbarui.',
+                'icon' => 'success'
+            ];
+            break;
+        case 'delete':
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'User berhasil dihapus.',
+                'icon' => 'warning'
+            ];
+            break;
+    }
+} elseif (isset($_GET['error'])) {
+    $alertData = [
+        'title' => 'Error!',
+        'message' => 'Terjadi kesalahan saat memproses data.',
+        'icon' => 'error'
+    ];
+}
+
+// Legacy alert handling for backward compatibility
 if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
     echo
         "<script type='text/javascript'>
@@ -83,6 +118,15 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
                     },10);
         </script>";
 }
+
+if ($alertData) {
+    // Set data untuk JavaScript menggunakan data attributes
+    echo '<div id="alert-data" 
+            data-title="' . htmlspecialchars($alertData['title'], ENT_QUOTES) . '" 
+            data-message="' . htmlspecialchars($alertData['message'], ENT_QUOTES) . '" 
+            data-icon="' . htmlspecialchars($alertData['icon'], ENT_QUOTES) . '" 
+            style="display: none;"></div>';
+}
 ?>
 
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -130,6 +174,39 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
                     </div>
                 </div>
                 <div class="ibox-content">
+                    <!-- Search Form -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <form method="GET" action="" class="form-inline">
+                                <input type="hidden" name="pg" value="UserView">
+                                <div class="form-group mr-3">
+                                    <label for="search" class="sr-only">Pencarian</label>
+                                    <div class="input-group">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="search" 
+                                               name="search" 
+                                               placeholder="Cari berdasarkan nama, username, atau unit kerja..." 
+                                               value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
+                                               style="width: 300px;">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fa fa-search"></i> Cari
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php if (isset($_GET['search']) && !empty($_GET['search'])): ?>
+                                <div class="form-group">
+                                    <a href="?pg=UserView" class="btn btn-secondary">
+                                        <i class="fa fa-times"></i> Reset
+                                    </a>
+                                </div>
+                                <?php endif; ?>
+                            </form>
+                        </div>
+                    </div>
+                    
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
                             <thead>
@@ -154,3 +231,5 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
         </div>
     </div>
 </div>
+
+<script src="../Assets/js/notification-handler.js"></script>

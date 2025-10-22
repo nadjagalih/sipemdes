@@ -46,7 +46,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     VALUE('$IdUser','$UserNama','$Pass','$Akses','$Setting','$Kecamatan','$StatusLogin','$Nama')");
 
                     if ($Save) {
-                        header("location:../../View/v?pg=UserViewKecamatan&alert=Save");
+                        header("location:../../View/v?pg=UserViewKecamatan&success=add");
                     }
                 } elseif (strlen($CekPassword) < 5) {
                     header("location:../../View/v?pg=UserViewKecamatan&alert=Karakter");
@@ -80,7 +80,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             // }
 
             if ($Edit) {
-                header("location:../../View/v?pg=UserViewKecamatan&alert=Edit");
+                header("location:../../View/v?pg=UserViewKecamatan&success=edit");
             }
         }
     } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
@@ -89,7 +89,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             $Delete = mysqli_query($db, "DELETE FROM main_user_kecamatan WHERE IdUser = '$IdUser' ");
 
             if ($Delete) {
-                header("location:../../View/v?pg=UserViewKecamatan&alert=Delete");
+                header("location:../../View/v?pg=UserViewKecamatan&success=delete");
             }
         }
     } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Reset') {

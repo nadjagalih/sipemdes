@@ -1,4 +1,39 @@
 <?php
+// Check for success/error messages from URL parameters
+$alertData = null;
+if (isset($_GET['success'])) {
+    switch ($_GET['success']) {
+        case 'add':
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'User kecamatan berhasil ditambahkan.',
+                'icon' => 'success'
+            ];
+            break;
+        case 'edit':
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'User kecamatan berhasil diperbarui.',
+                'icon' => 'success'
+            ];
+            break;
+        case 'delete':
+            $alertData = [
+                'title' => 'Berhasil!',
+                'message' => 'User kecamatan berhasil dihapus.',
+                'icon' => 'warning'
+            ];
+            break;
+    }
+} elseif (isset($_GET['error'])) {
+    $alertData = [
+        'title' => 'Error!',
+        'message' => 'Terjadi kesalahan saat memproses data.',
+        'icon' => 'error'
+    ];
+}
+
+// Legacy alert handling for backward compatibility
 if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
     echo
     "<script type='text/javascript'>
@@ -83,6 +118,15 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
                     },10);
         </script>";
 }
+
+if ($alertData) {
+    // Set data untuk JavaScript menggunakan data attributes
+    echo '<div id="alert-data" 
+            data-title="' . htmlspecialchars($alertData['title'], ENT_QUOTES) . '" 
+            data-message="' . htmlspecialchars($alertData['message'], ENT_QUOTES) . '" 
+            data-icon="' . htmlspecialchars($alertData['icon'], ENT_QUOTES) . '" 
+            style="display: none;"></div>';
+}
 ?>
 
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -154,3 +198,5 @@ if (isset($_GET['alert']) && $_GET['alert'] == 'Save') {
         </div>
     </div>
 </div>
+
+<script src="../Assets/js/notification-handler.js"></script>

@@ -58,7 +58,7 @@ $TipeMutasi = isset($_GET['TipeMutasi']) ? $_GET['TipeMutasi'] : '';
                 <?php } else { ?>
                     <div class="ibox-content">
                         <form action="../App/Model/ExcHistoryMutasi?Act=Save" method="POST" enctype="multipart/form-data"
-                            onsubmit="return validateFile()">
+                            id="formMutasi">
                             <div class="row">
                                 <div class="col-lg-6">
                                     <input type="hidden" name="IdPegawaiFK" id="IdPegawaiFK"
@@ -172,22 +172,67 @@ $TipeMutasi = isset($_GET['TipeMutasi']) ? $_GET['TipeMutasi'] : '';
                                 </div>
                             </div>
                         </form>
-                        <script>
-                            function validateFile() {
-                                const fileInput = document.querySelector('input[name="FUpload"]');
-                                const filePath = fileInput.value;
-                                const allowedExtensions = /(\.pdf)$/i;
-                                if (!allowedExtensions.exec(filePath)) {
-                                    alert('Hanya file PDF yang diizinkan.');
-                                    fileInput.value = '';
-                                    return false;
-                                }
-                                return true;
-                            }
-                        </script>
                     </div>
                 <?php } ?>
             </div>
         </div>
     </div>
 </div>
+
+<script <?php echo class_exists('CSPHandler') ? CSPHandler::scriptNonce() : ''; ?>>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update label dengan nama file yang dipilih
+    const fileInput = document.getElementById('File');
+    if (fileInput) {
+        const fileLabel = fileInput.nextElementSibling;
+        
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const fileName = e.target.files[0].name;
+                fileLabel.textContent = fileName;
+                fileLabel.style.color = '#1ab394';
+            } else {
+                fileLabel.textContent = 'Pilih File :pdf';
+                fileLabel.style.color = '';
+            }
+        });
+    }
+    
+    // Form validation
+    const formMutasi = document.getElementById('formMutasi');
+    if (formMutasi) {
+        formMutasi.addEventListener('submit', function(e) {
+            const fileInput = document.querySelector('input[name="FUpload"]');
+            if (fileInput && fileInput.value) {
+                const filePath = fileInput.value;
+                const allowedExtensions = /(\.pdf)$/i;
+                
+                if (!allowedExtensions.exec(filePath)) {
+                    e.preventDefault();
+                    
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Peringatan!',
+                            text: 'Hanya file PDF yang diizinkan.',
+                            icon: 'warning',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#f39c12'
+                        });
+                    } else {
+                        alert('Hanya file PDF yang diizinkan.');
+                    }
+                    
+                    fileInput.value = '';
+                    // Reset label
+                    const fileLabel = fileInput.nextElementSibling;
+                    if (fileLabel) {
+                        fileLabel.textContent = 'Pilih File :pdf';
+                        fileLabel.style.color = '';
+                    }
+                    return false;
+                }
+            }
+        });
+    }
+});
+</script>

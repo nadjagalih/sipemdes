@@ -13,6 +13,7 @@ if (isset($_GET['Act']) && $_GET['Act'] == 'Edit' && isset($_POST['Edit'])) {
     $IdUser = sql_injeksi($_POST['IdUser']);
     $UserNama = sql_injeksi($_POST['UserNama']);
     $Akses = sql_injeksi($_POST['Akses']);
+    $Nama = sql_injeksi($_POST['Nama']);
     $UnitKerja = sql_injeksi($_POST['UnitKerja']);
     $Status = sql_injeksi($_POST['Status']);
     
@@ -21,7 +22,7 @@ if (isset($_GET['Act']) && $_GET['Act'] == 'Edit' && isset($_POST['Edit'])) {
     $result1 = mysqli_query($db, $query1);
     
     // Update master_pegawai table
-    $query2 = "UPDATE master_pegawai SET IdDesaFK = '$UnitKerja' WHERE IdPegawaiFK = '$IdUser'";
+    $query2 = "UPDATE master_pegawai SET IdDesaFK = '$UnitKerja', Nama = '$Nama' WHERE IdPegawaiFK = '$IdUser'";
     $result2 = mysqli_query($db, $query2);
     
     if ($result1 && $result2) {

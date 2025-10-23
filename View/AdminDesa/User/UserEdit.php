@@ -229,7 +229,7 @@ if ($alert == 'EditSuccess' || $alert == 'Edit') {
                             </div>
                         </div> -->
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Nama</label>
-                            <div class="col-lg-8"><input type="text" name="Nama" id="Nama" value="<?php echo $EditNama; ?>" class="form-control" readonly>
+                            <div class="col-lg-8"><input type="text" name="Nama" id="Nama" value="<?php echo $EditNama; ?>" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Unit Kerja Desa/Kelurahan</label>
@@ -288,16 +288,6 @@ if ($alert == 'EditSuccess' || $alert == 'Edit') {
                         <div style="display: flex; align-items: flex-start;">
                             <span class="step-number">2</span>
                             <div class="step-text">
-                                <strong>Update Password</strong><br>
-                                <small>Ganti password atau biarkan tetap sama</small>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li>
-                        <div style="display: flex; align-items: flex-start;">
-                            <span class="step-number">3</span>
-                            <div class="step-text">
                                 <strong>Ubah Hak Akses</strong><br>
                                 <small>Sesuaikan level akses user</small>
                             </div>
@@ -306,7 +296,7 @@ if ($alert == 'EditSuccess' || $alert == 'Edit') {
 
                     <li>
                         <div style="display: flex; align-items: flex-start;">
-                            <span class="step-number">4</span>
+                            <span class="step-number">3</span>
                             <div class="step-text">
                                 <strong>Update Nama</strong><br>
                                 <small>Perbarui nama lengkap user</small>
@@ -316,17 +306,7 @@ if ($alert == 'EditSuccess' || $alert == 'Edit') {
 
                     <li>
                         <div style="display: flex; align-items: flex-start;">
-                            <span class="step-number">5</span>
-                            <div class="step-text">
-                                <strong>Ganti Unit Kerja</strong><br>
-                                <small>Pilih unit kerja yang sesuai</small>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li>
-                        <div style="display: flex; align-items: flex-start;">
-                            <span class="step-number">6</span>
+                            <span class="step-number">4</span>
                             <div class="step-text">
                                 <strong>Set Status Login</strong><br>
                                 <small>Aktif/nonaktif untuk mengatur akses login</small>

@@ -74,7 +74,9 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             StatusLogin = '$Status'
             WHERE IdUser = '$IdUser' ");
 
-            $EditUnitKerja = mysqli_query($db, "UPDATE master_pegawai SET IdDesaFK = '$UnitKerja'
+            $EditUnitKerja = mysqli_query($db, "UPDATE master_pegawai SET 
+            IdDesaFK = '$UnitKerja',
+            Nama = '$Nama'
             WHERE IdPegawaiFK = '$IdUser' ");
 
             // if ($Status == 0) {

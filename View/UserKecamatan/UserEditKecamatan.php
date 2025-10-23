@@ -17,88 +17,141 @@ include "../App/Control/FunctionUserEditKecamatan.php";
     }
 </script>
 <style>
-    .status-sukses {
+    /* Hanya untuk form user, tidak mempengaruhi top menu */
+    .wrapper-content .status-sukses {
         background: white;
         color: green;
     }
 
-    .status-no-sukses {
+    .wrapper-content .status-no-sukses {
         background: white;
         color: red;
     }
 
-    /* Notification Popup Styles */
-    .notification-popup {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        max-width: 400px;
-        border-radius: 10px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        opacity: 0;
-        transform: translateX(100%);
+    .wrapper-content .ibox {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border: 1px solid #e7eaec;
+    }
+
+    .wrapper-content .ibox-title {
+        border-radius: 15px 15px 0 0;
+        background: #ffffff;
+        color: #495057;
+        border-bottom: 1px solid #e7eaec;
+    }
+
+    .wrapper-content .ibox-title h5 {
+        color: #495057;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .wrapper-content .ibox-content {
+        border-radius: 0 0 15px 15px;
+        background: #ffffff;
+        padding: 30px;
+    }
+
+    .wrapper-content .form-control {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 12px 15px;
         transition: all 0.3s ease;
     }
 
-    .notification-popup.show {
-        opacity: 1;
-        transform: translateX(0);
+    .wrapper-content .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
     }
 
-    .notification-success {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        border: 1px solid #28a745;
+    .wrapper-content .btn {
+        border-radius: 25px;
+        padding: 10px 25px;
+        font-weight: 600;
     }
 
-    .notification-error {
-        background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
-        color: white;
-        border: 1px solid #dc3545;
+    .wrapper-content .guide-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 1px solid #dee2e6;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    .notification-content {
-        padding: 15px 20px;
+    .wrapper-content .guide-title {
+        color: #495057;
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #17a2b8;
         display: flex;
         align-items: center;
     }
 
-    .notification-icon {
-        font-size: 24px;
-        margin-right: 12px;
+    .wrapper-content .guide-title i {
+        margin-right: 8px;
+        color: #17a2b8;
+    }
+
+    .wrapper-content .guide-steps {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .wrapper-content .guide-steps li {
+        background: white;
+        margin-bottom: 10px;
+        padding: 12px 15px;
+        border-radius: 10px;
+        border-left: 4px solid #17a2b8;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .wrapper-content .guide-steps li:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .wrapper-content .step-number {
+        background: #17a2b8;
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        margin-right: 10px;
         flex-shrink: 0;
     }
 
-    .notification-text {
-        flex: 1;
-    }
-
-    .notification-title {
-        font-weight: bold;
-        font-size: 16px;
-        margin-bottom: 4px;
-    }
-
-    .notification-message {
+    .wrapper-content .step-text {
         font-size: 14px;
-        opacity: 0.9;
+        color: #495057;
+        line-height: 1.4;
     }
 
-    .notification-close {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 18px;
-        cursor: pointer;
-        padding: 0;
-        margin-left: 10px;
-        opacity: 0.8;
-        transition: opacity 0.2s ease;
+    .wrapper-content .guide-note {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 12px;
+        margin-top: 15px;
+        font-size: 13px;
+        color: #856404;
     }
 
-    .notification-close:hover {
-        opacity: 1;
+    .wrapper-content .guide-note i {
+        color: #f39c12;
+        margin-right: 8px;
     }
 </style>
 
@@ -204,6 +257,64 @@ include "../App/Control/FunctionUserEditKecamatan.php";
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-6">
+            <div class="guide-box">
+                <div class="guide-title">
+                    <i class="fa fa-edit"></i>
+                    Panduan Edit Data User
+                </div>
+                
+                <ol class="guide-steps">
+
+                    <li>
+                        <div style="display: flex; align-items: flex-start;">
+                            <span class="step-number">1</span>
+                            <div class="step-text">
+                                <strong>Ubah Hak Akses</strong><br>
+                                <small>Sesuaikan level akses user</small>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div style="display: flex; align-items: flex-start;">
+                            <span class="step-number">2</span>
+                            <div class="step-text">
+                                <strong>Update Nama</strong><br>
+                                <small>Perbarui nama lengkap user</small>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div style="display: flex; align-items: flex-start;">
+                            <span class="step-number">3</span>
+                            <div class="step-text">
+                                <strong>Ganti Unit Kerja</strong><br>
+                                <small>Pilih unit kerja yang sesuai</small>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div style="display: flex; align-items: flex-start;">
+                            <span class="step-number">4</span>
+                            <div class="step-text">
+                                <strong>Set Status Login</strong><br>
+                                <small>Aktif/nonaktif untuk mengatur akses login</small>
+                            </div>
+                        </div>
+                    </li>
+                </ol>
+
+                <div class="guide-note">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    <strong>Catatan:</strong> Perubahan akan langsung berlaku setelah disimpan. Pastikan data sudah benar.
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

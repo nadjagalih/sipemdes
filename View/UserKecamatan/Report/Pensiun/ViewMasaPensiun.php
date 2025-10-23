@@ -203,6 +203,7 @@ $Kecamatan = safeGet($DataQuery, 'Kecamatan', 'Unknown');
                                             master_jabatan.Jabatan,
                                             master_pegawai.StatusPensiunDesa,
                                             master_pegawai.StatusPensiunKecamatan,
+                                            master_pegawai.StatusPensiunKabupaten,
                                             master_pegawai.IdFilePengajuanPensiunFK
                                         FROM
                                             master_pegawai
@@ -325,8 +326,9 @@ $Kecamatan = safeGet($DataQuery, 'Kecamatan', 'Unknown');
                                 $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
                                 $Setting = safeGet($DataPegawai, 'Setting', '');
 
-                                $StatusPensiunDesa = safeGet($DataPegawai, 'StatusPensiunDesa', '');
-                                $StatusPensiunKecamatan = safeGet($DataPegawai, 'StatusPensiunKecamatan', '');
+                                $StatusPensiunDesa = $DataPegawai['StatusPensiunDesa'];
+                                $StatusPensiunKecamatan = $DataPegawai['StatusPensiunKecamatan'];
+                                $StatusPensiunKabupaten = $DataPegawai['StatusPensiunKabupaten'];
                                 $IdFilePengajuanPensiunFK = $DataPegawai['IdFilePengajuanPensiunFK'];
 
                                 $highlight = '';
@@ -384,36 +386,33 @@ $Kecamatan = safeGet($DataQuery, 'Kecamatan', 'Unknown');
                                     </td>
                                     <td>
                                         <?php
-                                        if ($TglSekarang1 >= $TanggalPensiun && $Setting == 1) {
-                                            ?>
-                                            <?php
-                                            if (!is_null($IdFilePengajuanPensiunFK) && $StatusPensiunDesa === '1') {
-                                                $qFile = mysqli_query($db, "SELECT * FROM file WHERE IdFile = '$IdFilePengajuanPensiunFK'");
-                                                $dataFile = mysqli_fetch_assoc($qFile);
+                                        // Hitung tanggal 3 bulan sebelum pensiun
+                                        $tanggal3BulanSebelumPensiun = date('Y-m-d', strtotime('-3 months', strtotime($TanggalPensiun)));
+                                        
+                                        // Tampilkan approval jika kurang dari 3 bulan sebelum pensiun
+                                        if ($TglSekarang1 >= $tanggal3BulanSebelumPensiun && $Setting == 1) {
+                                            // Tampilkan tombol Lihat File jika ada file dan tidak ditolak
+                                            if (!is_null($IdFilePengajuanPensiunFK) && $IdFilePengajuanPensiunFK != '' && 
+                                                $StatusPensiunDesa !== '0' && 
+                                                $StatusPensiunKecamatan !== '0' && 
+                                                $StatusPensiunKabupaten !== '0') {
                                                 ?>
                                                 <a href="../Module/File/ViewFilePengajuan.php?id=<?= $IdFilePengajuanPensiunFK ?>"
                                                     target="_blank" class="btn btn-xs btn-info" style="margin-bottom:5px;">
                                                     Lihat File Pengajuan
-                                                </a>
-                                                <?php
-                                            } else if (!is_null($IdFilePengajuanPensiunFK) && $StatusPensiunDesa === null) {
-                                                ?>
-                                                    <a href="#"><span class="label label-warning float-left">MENUNGGU PERSETUJUAN
-                                                            DESA</span></a>
-                                                <?php
-                                            } else if ($StatusPensiunDesa === '0') {
-                                                ?>
-                                                        <a href="#"><span class="label label-danger float-left">PENGAJUAN DITOLAK
-                                                                DESA</span></a>
-                                                <?php
-                                            } else {
-                                                ?>
-                                                        <a href="#"><span class="label label-danger float-left">PENSIUN BELUM
-                                                                MENGAJUKAN</span></a>
+                                                </a><br>
                                                 <?php
                                             }
-
-                                            if (is_null($StatusPensiunKecamatan) && !is_null($IdFilePengajuanPensiunFK) && $StatusPensiunDesa === '1') {
+                                            
+                                            // Prioritas tampilan: Kabupaten > Kecamatan > Desa
+                                            // Tampilkan status tertinggi/terakhir saja
+                                            if ($StatusPensiunKabupaten === '1') {
+                                                echo "<span class='label label-success'>Disetujui Kabupaten</span>";
+                                            } elseif ($StatusPensiunKabupaten === '0') {
+                                                echo "<span class='label label-danger'>Ditolak Kabupaten</span>";
+                                            }
+                                            // Jika belum ada status Kabupaten, cek Kecamatan
+                                            elseif (is_null($StatusPensiunKecamatan) && !is_null($IdFilePengajuanPensiunFK) && $StatusPensiunDesa === '1') {
                                                 ?>
                                                 <form method="POST"
                                                     action="UserKecamatan/Report/Pensiun/UpdateStatusPengajuanKec.php"
@@ -424,10 +423,24 @@ $Kecamatan = safeGet($DataQuery, 'Kecamatan', 'Unknown');
                                                     <button type="submit" name="tolak" class="btn btn-xs btn-danger">Tolak</button>
                                                 </form>
                                                 <?php
-                                            } else if ($StatusPensiunKecamatan === '1') {
+                                            } elseif ($StatusPensiunKecamatan === '1') {
                                                 echo "<span class='label label-success'>Disetujui Kecamatan</span>";
                                             } elseif ($StatusPensiunKecamatan === '0') {
                                                 echo "<span class='label label-danger'>Ditolak Kecamatan</span>";
+                                            }
+                                            // Jika belum ada status Kecamatan, tampilkan status Desa
+                                            elseif ($StatusPensiunDesa === '1') {
+                                                echo "<span class='label label-success'>Disetujui Desa</span>";
+                                            } elseif ($StatusPensiunDesa === '0') {
+                                                echo "<span class='label label-danger'>Ditolak Desa</span>";
+                                            }
+                                            // Jika ada file tapi belum disetujui Desa
+                                            elseif (!is_null($IdFilePengajuanPensiunFK) && is_null($StatusPensiunDesa)) {
+                                                echo "<span class='label label-warning'>Menunggu Persetujuan Desa</span>";
+                                            }
+                                            // Jika tidak ada file pengajuan sama sekali
+                                            else {
+                                                echo "<span class='label label-danger'>Belum Mengajukan Pensiun</span>";
                                             }
 
                                         } else {

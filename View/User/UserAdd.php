@@ -292,7 +292,7 @@
             <div class="guide-box">
                 <div class="guide-title">
                     <i class="fa fa-info-circle"></i>
-                    Panduan Menambah User Baru
+                    Panduan Menambah User Kecamatan
                 </div>
                 
                 <ol class="guide-steps">
@@ -300,7 +300,8 @@
                         <div class="step-container">
                             <span class="step-number">1</span>
                             <div class="step-text">
-                                <strong>Buat Username Unik</strong>
+                                <strong>Buat Username Unik</strong><br>
+                                <small>Username khusus untuk level kecamatan</small>
                             </div>
                         </div>
                     </li>
@@ -309,7 +310,8 @@
                         <div class="step-container">
                             <span class="step-number">2</span>
                             <div class="step-text">
-                                <strong>Tentukan Password</strong>
+                                <strong>Tentukan Password</strong><br>
+                                <small>Minimal 5 karakter untuk keamanan</small>
                             </div>
                         </div>
                     </li>
@@ -318,7 +320,8 @@
                         <div class="step-container">
                             <span class="step-number">3</span>
                             <div class="step-text">
-                                <strong>Atur Hak Akses</strong>
+                                <strong>Atur Hak Akses Kecamatan</strong><br>
+                                <small>Sesuai dengan level kewenangan</small>
                             </div>
                         </div>
                     </li>
@@ -327,7 +330,8 @@
                         <div class="step-container">
                             <span class="step-number">4</span>
                             <div class="step-text">
-                                <strong>Isi Nama Lengkap</strong>
+                                <strong>Isi Nama Lengkap</strong><br>
+                                <small>Nama petugas kecamatan</small>
                             </div>
                         </div>
                     </li>
@@ -336,7 +340,8 @@
                         <div class="step-container">
                             <span class="step-number">5</span>
                             <div class="step-text">
-                                <strong>Pilih Unit Kerja</strong>
+                                <strong>Pilih Kecamatan</strong><br>
+                                <small>Wilayah kerja kecamatan</small>
                             </div>
                         </div>
                     </li>
@@ -345,7 +350,8 @@
                         <div class="step-container">
                             <span class="step-number">6</span>
                             <div class="step-text">
-                                <strong>Set Status User</strong>
+                                <strong>Set Status User</strong><br>
+                                <small>Aktif atau Non Aktif</small>
                             </div>
                         </div>
                     </li>
@@ -353,7 +359,7 @@
 
                 <div class="guide-note">
                     <i class="fa fa-exclamation-triangle"></i>
-                    <strong>Catatan:</strong> Pastikan semua data sudah benar sebelum menyimpan.
+                    <strong>Catatan:</strong> User kecamatan memiliki akses khusus untuk mengelola data tingkat kecamatan.
                 </div>
             </div>
         </div>

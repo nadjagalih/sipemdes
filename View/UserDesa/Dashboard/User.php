@@ -44,13 +44,27 @@ if (empty($_GET['alert'])) {
 
 $idPegawai = $_SESSION['IdPegawai'];
 
-$q = mysqli_query($db, "SELECT TanggalPensiun, IdPegawaiFK, IdFilePengajuanPensiunFK, StatusPensiunDesa, StatusPensiunKecamatan, StatusPensiunKabupaten From master_pegawai p WHERE p.IdPegawaiFK = '$idPegawai'");
+// Query dengan JOIN ke history_mutasi untuk mendapatkan TanggalMutasi dan IdJabatanFK
+$q = mysqli_query($db, "SELECT 
+    p.TanggalPensiun, 
+    p.IdPegawaiFK, 
+    p.IdFilePengajuanPensiunFK, 
+    p.StatusPensiunDesa, 
+    p.StatusPensiunKecamatan, 
+    p.StatusPensiunKabupaten,
+    h.TanggalMutasi,
+    h.IdJabatanFK
+FROM master_pegawai p
+LEFT JOIN history_mutasi h ON p.IdPegawaiFK = h.IdPegawaiFK AND h.Setting = 1
+WHERE p.IdPegawaiFK = '$idPegawai'");
 $data = mysqli_fetch_assoc($q);
 
 $FilePengajuan = $data['IdFilePengajuanPensiunFK'];
 $StatusPensiunDesa = $data['StatusPensiunDesa'];
 $StatusPensiunKecamatan = $data['StatusPensiunKecamatan'];
 $StatusPensiunKabupaten = $data['StatusPensiunKabupaten'];
+$IdJabatanFK = $data['IdJabatanFK'];
+$TanggalMutasi = $data['TanggalMutasi'];
 
 $flagTampilkanUpload = false;
 
@@ -67,11 +81,22 @@ if ($StatusPensiunKabupaten === '0') {
     $flagTampilkanUpload = true;
 }
 
-$tanggalPensiun = $data['TanggalPensiun'];
+// Hitung tanggal pensiun berdasarkan jabatan
+// Jika Kepala Desa (IdJabatanFK = 1), pensiun = TanggalMutasi + 6 tahun
+// Jika bukan Kepala Desa, gunakan TanggalPensiun dari master_pegawai
+if ($IdJabatanFK == 1 && !is_null($TanggalMutasi)) {
+    $tanggalPensiun = date('Y-m-d', strtotime('+6 year', strtotime($TanggalMutasi)));
+} else {
+    $tanggalPensiun = $data['TanggalPensiun'];
+}
 
 $tanggalSekarang = date('Y-m-d');
 
-if ($tanggalPensiun <= $tanggalSekarang && $flagTampilkanUpload) {
+// Hitung tanggal 3 bulan sebelum pensiun
+$tanggal3BulanSebelumPensiun = date('Y-m-d', strtotime('-3 months', strtotime($tanggalPensiun)));
+
+// Tampilkan upload jika sudah kurang dari 3 bulan sebelum pensiun atau sudah lewat tanggal pensiun
+if ($tanggalSekarang >= $tanggal3BulanSebelumPensiun && $flagTampilkanUpload) {
     ?>
 
     <div class="col-lg-12">

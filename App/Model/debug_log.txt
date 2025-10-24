@@ -698,3 +698,51 @@ POST: Array
 )
 
 Data: NoTelepon=081234567890, AlamatDesa=Test alamat desa dawuhan trenggalek, Lat=-8.005125, Lng=111.746544, IdDesa=20201110200952155
+2025-10-24 10:47:40 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 0812343455666
+    [AlamatDesa] => Desa Suruh, Kecamatan Suruh
+    [Latitude] => -8.097130
+    [Longitude] => 111.632531
+    [Save] => 
+)
+
+Data: NoTelepon=0812343455666, AlamatDesa=Desa Suruh, Kecamatan Suruh, Lat=-8.097130, Lng=111.632531, IdDesa=20201110194236128
+2025-10-24 13:31:37 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 08224312345
+    [AlamatDesa] => Desa Suruh, Kecamatan Suruh
+    [Latitude] => -8.097130
+    [Longitude] => 111.632531
+    [Save] => 
+)
+
+Data: NoTelepon=08224312345, AlamatDesa=Desa Suruh, Kecamatan Suruh, Lat=-8.097130, Lng=111.632531, IdDesa=20201110194236128
+2025-10-24 13:42:46 - ExcSettingProfile accessed
+GET: Array
+(
+    [Act] => Save
+)
+
+POST: Array
+(
+    [NoTelepon] => 082213456789
+    [AlamatDesa] => Desa Suruh, Kecamatan Suruh
+    [Latitude] => -8.097130
+    [Longitude] => 111.632531
+    [Save] => 
+)
+
+Data: NoTelepon=082213456789, AlamatDesa=Desa Suruh, Kecamatan Suruh, Lat=-8.097130, Lng=111.632531, IdDesa=20201110194236128

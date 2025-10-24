@@ -3,7 +3,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-
+// Include CSP Handler
+require_once __DIR__ . "/../../Module/Security/CSPHandler.php";
 
 // Debug parameter
 // Debug code removed for production
@@ -243,8 +244,12 @@ if (!empty($IdKategoriAward)) {
                                                     $buttonIcon = !empty($Posisi) ? 'fa-edit' : 'fa-trophy';
                                                     $buttonText = !empty($Posisi) ? 'Edit Posisi' : 'Set Posisi';
                                                     ?>
-                                                    <button type="button" class="btn btn-xs <?php echo $buttonClass; ?>"
-                                                        onclick="updatePosisi('<?php echo $IdPesertaAward; ?>', '<?php echo addslashes($NamaPeserta); ?>', '<?php echo addslashes($NamaKarya); ?>', '<?php echo $Posisi; ?>', '<?php echo addslashes($LinkKarya); ?>')"
+                                                    <button type="button" class="btn btn-xs <?php echo $buttonClass; ?> btn-update-posisi"
+                                                        data-peserta-id="<?php echo $IdPesertaAward; ?>"
+                                                        data-nama-peserta="<?php echo htmlspecialchars($NamaPeserta); ?>"
+                                                        data-nama-karya="<?php echo htmlspecialchars($NamaKarya); ?>"
+                                                        data-posisi="<?php echo $Posisi; ?>"
+                                                        data-link-karya="<?php echo htmlspecialchars($LinkKarya); ?>"
                                                         title="<?php echo $buttonText; ?>">
                                                         <i class="fa <?php echo $buttonIcon; ?>"></i> <?php echo $buttonText; ?>
                                                     </button>
@@ -496,8 +501,7 @@ if (!empty($IdKategoriAward)) {
                         <div class="input-group">
                             <input type="text" id="updatePosisiLinkKarya" class="form-control" readonly>
                             <span class="input-group-btn">
-                                <button type="button" class="btn btn-success" onclick="window.open(document.getElementById('updatePosisiLinkKarya').value, '_blank')"
-                                    id="btnLihatKarya" style="display: none;">
+                                <button type="button" class="btn btn-success" id="btnLihatKarya" style="display: none;">
                                     <i class="fa fa-external-link"></i> Lihat
                                 </button>
                             </span>
@@ -552,11 +556,16 @@ if (!empty($IdKategoriAward)) {
     </div>
 </div>
 
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     function editKategori(id) {
         $.get('../App/Model/ExcKategoriAward.php?Act=GetKategoriData&Kode=' + id, function(data) {
             if (data.error) {
-                alert('Error: ' + data.error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: data.error,
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
 
@@ -648,35 +657,73 @@ if (!empty($IdKategoriAward)) {
 
     function submitUpdatePosisi() {
         var posisiValue = $('#updatePosisiDropdown').val();
-        var namaPeserta = $('#updatePosisiNamaPeserta').val();
 
-        // If no juara selected, just submit
-        if (!posisiValue || posisiValue === '') {
-            if (confirm('Apakah Anda yakin ingin menghapus posisi juara dari ' + namaPeserta + '?')) {
-                return true; // Let form submit normally
-            }
-            return false;
-        }
-
-        // Check if position is disabled (shouldn't happen with proper UI, but just in case)
+        // Check if position is disabled
         var selectedOption = $('#updatePosisiDropdown option:selected');
         if (selectedOption.is(':disabled')) {
-            alert('Posisi yang dipilih sudah terisi oleh peserta lain!');
+            Swal.fire({
+                icon: 'error',
+                title: 'Posisi Tidak Tersedia!',
+                text: 'Posisi yang dipilih sudah terisi oleh peserta lain!',
+                confirmButtonText: 'OK'
+            });
             return false;
         }
 
-        // Confirmation for juara selection
-        var juaraText = posisiValue == '1' ? 'Juara 1' : (posisiValue == '2' ? 'Juara 2' : 'Juara 3');
-        var icon = posisiValue == '1' ? '🥇' : (posisiValue == '2' ? '🥈' : '🥉');
-        
-        if (confirm(icon + ' Apakah Anda yakin ingin menetapkan posisi ' + juaraText + ' untuk ' + namaPeserta + '?\n\nCatatan: Posisi ini akan menggantikan posisi sebelumnya jika ada.')) {
-            return true; // Let form submit normally
-        }
-        return false;
+        // Langsung submit tanpa konfirmasi
+        return true;
     }
 
     // Override form submission to use our validation
     $(document).ready(function() {
+        // Check for alert parameter in URL
+        var urlParams = new URLSearchParams(window.location.search);
+        var alert = urlParams.get('alert');
+        
+        if (alert === 'UpdatePosisi') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Posisi juara berhasil diperbarui',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#28a745'
+            });
+        } else if (alert === 'ErrorPeserta') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: 'Terjadi kesalahan saat memperbarui posisi',
+                confirmButtonText: 'OK'
+            });
+        } else if (alert === 'ErrorMasaPenjurian') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tidak Dapat Diubah!',
+                text: 'Posisi hanya dapat diubah pada masa penjurian',
+                confirmButtonText: 'OK'
+            });
+        }
+        
+        // Event listener untuk tombol update posisi
+        $(document).on('click', '.btn-update-posisi', function() {
+            var id = $(this).data('peserta-id');
+            var namaPeserta = $(this).data('nama-peserta');
+            var namaKarya = $(this).data('nama-karya');
+            var posisi = $(this).data('posisi');
+            var linkKarya = $(this).data('link-karya');
+            
+            updatePosisi(id, namaPeserta, namaKarya, posisi, linkKarya);
+        });
+        
+        // Event listener untuk tombol lihat karya
+        $('#btnLihatKarya').on('click', function() {
+            var linkKarya = $('#updatePosisiLinkKarya').val();
+            if (linkKarya && linkKarya !== 'Tidak ada link') {
+                window.open(linkKarya, '_blank');
+            }
+        });
+        
+        // Form submission validation
         $('#modalUpdatePosisi form').on('submit', function(e) {
             e.preventDefault();
             if (submitUpdatePosisi()) {
@@ -686,8 +733,19 @@ if (!empty($IdKategoriAward)) {
     });
 
     function confirmDelete(url, message) {
-        if (confirm(message)) {
-            window.location.href = url;
-        }
+        Swal.fire({
+            title: 'Konfirmasi Hapus',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
     }
 </script>

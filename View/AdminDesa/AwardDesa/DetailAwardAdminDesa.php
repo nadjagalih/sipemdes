@@ -144,51 +144,6 @@ if (isset($_GET['alert'])) {
         </div>
     </div>
     
-    <div class="row">
-        <!-- Action Panel -->
-        <div class="col-lg-12">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <div class="text-center">
-                        <?php 
-                        // Cek apakah ada karya yang terdaftar untuk award ini
-                        if ($jumlahKaryaAward > 0): 
-                        ?>
-                            <div class="alert alert-info">
-                                <i class="fa fa-check-circle"></i>
-                                <strong>Sudah Terdaftar</strong><br>
-                                Desa sudah mendaftarkan <?php echo $jumlahKaryaAward; ?> karya ke award ini.
-                            </div>
-                            <?php if ($statusInfo['text'] == 'Pendaftaran'): ?>
-                            <small class="text-muted">
-                                <i class="fa fa-info-circle"></i> 
-                                Setiap desa hanya dapat mendaftar 1 kategori per award
-                            </small>
-                            <?php endif; ?>
-                        <?php else: ?>
-                            <?php if ($statusInfo['text'] == 'Pendaftaran'): ?>
-                                <div class="alert alert-success">
-                                    <i class="fa fa-clock-o"></i>
-                                    <strong>Bisa Mendaftar</strong><br>
-                                    Award ini sedang membuka pendaftaran.
-                                </div>
-                                <a href="?pg=AwardViewAdminDesa" class="btn btn-success btn-block">
-                                    <i class="fa fa-plus"></i> Daftar Karya
-                                </a>
-                            <?php else: ?>
-                                <div class="alert alert-warning">
-                                    <i class="fa fa-exclamation-triangle"></i>
-                                    <strong>Tidak Bisa Mendaftar</strong><br>
-                                    Award sedang tidak membuka pendaftaran.
-                                </div>
-                            <?php endif; ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Karya Desa yang Terdaftar -->
     <div class="row">
         <div class="col-lg-12">
@@ -278,7 +233,8 @@ if (isset($_GET['alert'])) {
                         <div class="alert alert-info text-center">
                             <i class="fa fa-info-circle"></i>
                             <strong>Belum Ada Karya Terdaftar</strong><br>
-                            Desa belum mendaftarkan karya untuk award ini.
+                            Desa belum mendaftarkan karya untuk award ini. <br>
+                            Setiap desa hanya dapat mendaftar 1 kategori per award.
                             <?php if ($statusInfo['text'] == 'Pendaftaran'): ?>
                                 <br><br>
                                 <a href="?pg=AwardViewAdminDesa" class="btn btn-primary">

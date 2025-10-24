@@ -908,13 +908,21 @@ include __DIR__ . "/../../../App/Control/FunctionAwardListAdminDesa.php";
         font-weight: 600;
         font-size: 16px;
         transition: all 0.3s ease;
-        box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
     }
     
     .btn-success-ok:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
         color: white;
+    }
+    
+    /* SweetAlert2 z-index fix untuk muncul di atas modal */
+    .swal2-container {
+        z-index: 10000 !important;
+    }
+    
+    .swal2-popup {
+        z-index: 10001 !important;
     }
 </style>
 
@@ -1451,15 +1459,53 @@ document.getElementById('formDaftarKarya').addEventListener('submit', function(e
     .then(data => {
         console.log('Submit response data:', data);
         if (data.success) {
-            showSuccessModal('Karya berhasil didaftarkan!\n\nID Karya: ' + data.data.id);
             $('#modalDaftarKarya').modal('hide');
+            setTimeout(() => {
+                showSuccessModal('Karya berhasil didaftarkan!\n\nID Karya: ' + data.data.id);
+            }, 300);
         } else {
-            alert('Error: ' + data.message);
+            // Tutup modal terlebih dahulu untuk menghindari konflik z-index
+            $('#modalDaftarKarya').modal('hide');
+            setTimeout(() => {
+                console.log('Showing error SweetAlert:', data.message);
+                console.log('Swal available:', typeof Swal !== 'undefined');
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: data.message,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#d33',
+                        allowOutsideClick: false
+                    });
+                } else {
+                    console.error('SweetAlert2 not loaded!');
+                    alert('Error: ' + data.message);
+                }
+            }, 300);
         }
     })
     .catch(error => {
         console.error('Error submitting form:', error);
-        alert('Terjadi kesalahan saat mendaftar karya.\nSilakan cek console untuk detail error.');
+        // Tutup modal terlebih dahulu
+        $('#modalDaftarKarya').modal('hide');
+        setTimeout(() => {
+            console.log('Showing catch error SweetAlert');
+            console.log('Swal available:', typeof Swal !== 'undefined');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan!',
+                    text: 'Terjadi kesalahan saat mendaftar karya. Silakan coba lagi.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#d33',
+                    allowOutsideClick: false
+                });
+            } else {
+                console.error('SweetAlert2 not loaded!');
+                alert('Terjadi kesalahan saat mendaftar karya. Silakan coba lagi.');
+            }
+        }, 300);
     })
     .finally(() => {
         // Reset button

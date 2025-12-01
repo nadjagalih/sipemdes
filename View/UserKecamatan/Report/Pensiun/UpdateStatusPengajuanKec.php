@@ -40,16 +40,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdPegawaiFK'])) {
 
     if ($update) {
         if($status === 1) {
-            // Cek apakah pegawai ini adalah Kades (IdJabatanFK = 1)
-            $queryJabatan = mysqli_query($db, "SELECT IdJabatanFK FROM master_pegawai WHERE IdPegawaiFK = '$IdPegawai'");
-            $dataJabatan = mysqli_fetch_assoc($queryJabatan);
-            $jabatan = $dataJabatan['IdJabatanFK'];
+            // Cek apakah pegawai ini adalah Kades berdasarkan history_mutasi yang aktif
+            $queryJabatan = mysqli_query($db, "SELECT IdJabatanFK FROM history_mutasi 
+                                               WHERE IdPegawaiFK = '$IdPegawai' AND Setting = 1 
+                                               ORDER BY TanggalMutasi DESC LIMIT 1");
             
-            if($jabatan == 1) {
-                // Jika Kades, redirect ke halaman Kades
-                header("Location: ../../../v?pg=ViewMasaPensiunKadesKec&alert=Sukses");
+            if ($queryJabatan && mysqli_num_rows($queryJabatan) > 0) {
+                $dataJabatan = mysqli_fetch_assoc($queryJabatan);
+                $jabatan = $dataJabatan['IdJabatanFK'];
+                
+                if($jabatan == 1) {
+                    // Jika Kades (IdJabatanFK = 1), redirect ke halaman Kades
+                    header("Location: ../../../v?pg=ViewMasaPensiunKadesKec&alert=Sukses");
+                } else {
+                    // Jika bukan Kades, redirect ke halaman biasa
+                    header("Location: ../../../v?pg=ViewMasaPensiunKec&alert=Sukses");
+                }
             } else {
-                // Jika bukan Kades, redirect ke halaman biasa
+                // Jika tidak ada history mutasi, redirect ke halaman biasa
                 header("Location: ../../../v?pg=ViewMasaPensiunKec&alert=Sukses");
             }
         } else {

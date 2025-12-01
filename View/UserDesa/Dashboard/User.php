@@ -6,7 +6,7 @@ if (empty($_GET['alert'])) {
             setTimeout(function () {
                 swal({
                     title: 'Upload Berhasil',
-                    text: 'File telah berhasil diupload.',
+                    text: 'File pengajuan pensiun telah berhasil diupload dan sedang menunggu persetujuan dari Desa.',
                     type: 'success'
                 });
             }, 1000);
@@ -95,42 +95,97 @@ $tanggalSekarang = date('Y-m-d');
 // Hitung tanggal 3 bulan sebelum pensiun
 $tanggal3BulanSebelumPensiun = date('Y-m-d', strtotime('-3 months', strtotime($tanggalPensiun)));
 
-// Tampilkan upload jika sudah kurang dari 3 bulan sebelum pensiun atau sudah lewat tanggal pensiun
-if ($tanggalSekarang >= $tanggal3BulanSebelumPensiun && $flagTampilkanUpload) {
+// Tampilkan box ajukan pensiun jika sudah kurang dari 3 bulan sebelum pensiun atau sudah lewat tanggal pensiun
+if ($tanggalSekarang >= $tanggal3BulanSebelumPensiun) {
     ?>
-
     <div class="col-lg-12">
         <div class="ibox ">
             <div class="ibox-title">
-                <h5>Ajukan Pensiun</h5>
+                <h5>Ajukan Pensiun</h5>&nbsp;
                 <?php
-                if ($StatusPensiunDesa === '0') {
-                    echo "<span class='label label-danger'>*) Pengajuan Pensiun Ditolak Desa</span>";
-                } 
-                if ($StatusPensiunKecamatan === '0') {
-                    echo "<span class='label label-danger'>*) Pengajuan Pensiun Ditolak Kecamatan</span>";
+                // Jika file sudah diupload dan menunggu persetujuan desa
+                if (!is_null($FilePengajuan) && is_null($StatusPensiunDesa) && is_null($StatusPensiunKecamatan) && is_null($StatusPensiunKabupaten)) {
+                    ?>
+                    <button type="button" class="btn btn-warning" disabled>*) Menunggu Persetujuan Desa</button>
+                    <?php
                 }
-                if ($StatusPensiunKabupaten === '0') {
-                    echo "<span class='label label-danger'>*) Pengajuan Pensiun Ditolak Kabupaten</span>";
+                // Jika file sudah diupload dan disetujui desa, menunggu persetujuan kecamatan
+                elseif (!is_null($FilePengajuan) && $StatusPensiunDesa === '1' && is_null($StatusPensiunKecamatan)) {
+                    ?>
+                    <button type="button" class="btn btn-info" disabled>*) Menunggu Persetujuan Kecamatan</button>
+                    <?php
                 }
-                
+                // Jika file sudah diupload dan disetujui kecamatan, menunggu persetujuan kabupaten
+                elseif (!is_null($FilePengajuan) && $StatusPensiunDesa === '1' && $StatusPensiunKecamatan === '1' && is_null($StatusPensiunKabupaten)) {
+                    ?>
+                    <button type="button" class="btn btn-info" disabled>*) Menunggu Persetujuan Kabupaten</button>
+                    <?php
+                }
+                // Jika semua sudah disetujui
+                elseif (!is_null($FilePengajuan) && $StatusPensiunDesa === '1' && $StatusPensiunKecamatan === '1' && $StatusPensiunKabupaten === '1') {
+                    ?>
+                    <button type="button" class="btn btn-success" disabled>*) Pengajuan Pensiun Disetujui</button>
+                    <?php
+                }
+                // Jika ada penolakan
+                else {
+                    if ($StatusPensiunDesa === '0') {
+                        echo "<span class='label label-danger'>*) Pengajuan Pensiun Ditolak Desa</span> ";
+                    } 
+                    if ($StatusPensiunKecamatan === '0') {
+                        echo "<span class='label label-danger'>*) Pengajuan Pensiun Ditolak Kecamatan</span> ";
+                    }
+                    if ($StatusPensiunKabupaten === '0') {
+                        echo "<span class='label label-danger'>*) Pengajuan Pensiun Ditolak Kabupaten</span>";
+                    }
+                }
                 ?>
             </div>
 
             <div class="ibox-content">
                 <div class="text-left">
-                    <a href="?pg=FileUploadPengajuan">
-                        <button type="button" class="btn btn-white" style="width:150px; text-align:center">
-                            Upload File
-                        </button>
-                    </a>
+                    <?php
+                    // Tampilkan pesan sesuai status
+                    if (!is_null($FilePengajuan) && is_null($StatusPensiunDesa) && is_null($StatusPensiunKecamatan) && is_null($StatusPensiunKabupaten)) {
+                        echo "<p class='text-muted'>File pengajuan pensiun Anda telah diupload dan sedang menunggu persetujuan dari Desa.</p>";
+                    }
+                    elseif (!is_null($FilePengajuan) && $StatusPensiunDesa === '1' && is_null($StatusPensiunKecamatan)) {
+                        echo "<p class='text-muted'>File pengajuan pensiun Anda telah disetujui Desa dan sedang menunggu persetujuan dari Kecamatan.</p>";
+                    }
+                    elseif (!is_null($FilePengajuan) && $StatusPensiunDesa === '1' && $StatusPensiunKecamatan === '1' && is_null($StatusPensiunKabupaten)) {
+                        echo "<p class='text-muted'>File pengajuan pensiun Anda telah disetujui Desa dan Kecamatan, sedang menunggu persetujuan dari Kabupaten.</p>";
+                    }
+                    elseif (!is_null($FilePengajuan) && $StatusPensiunDesa === '1' && $StatusPensiunKecamatan === '1' && $StatusPensiunKabupaten === '1') {
+                        echo "<p class='text-success'><strong>Pengajuan pensiun Anda telah disetujui oleh Desa, Kecamatan, dan Kabupaten.</strong></p>";
+                    }
+                    
+                    // Tombol Lihat File jika sudah upload
+                    if (!is_null($FilePengajuan) && $FilePengajuan != '') {
+                        ?>
+                        <a href="../Module/File/ViewFilePengajuan.php?id=<?php echo $FilePengajuan; ?>" target="_blank">
+                            <button type="button" class="btn btn-primary" style="width:150px; text-align:center">
+                                <i class="fa fa-file-pdf-o"></i> Lihat File
+                            </button>
+                        </a>
+                        <?php
+                    }
+                    
+                    // Tombol Upload jika belum upload atau ditolak
+                    if ($flagTampilkanUpload) {
+                        ?>
+                        <a href="?pg=FileUploadPengajuan">
+                            <button type="button" class="btn btn-white" style="width:150px; text-align:center">
+                                Upload File
+                            </button>
+                        </a>
+                        <?php
+                    }
+                    ?>
                 </div>
             </div>
         </div>
     </div>
     <?php
-} else {
-    echo " ";
 }
 ?>
 

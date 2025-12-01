@@ -61,17 +61,17 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($FileSize <= $FileMaxUpload) {
                 if (in_array($FileExtention, $AllowExtention) == true) {
-                    // OLD File Upload
-                    // FileSK($FileUpload);
-
-                    // NEW BLOB - Improved file content handling
+                    // Baca konten file dulu sebelum dipindah
                     $FileContent = file_get_contents($LokasiFile);
                     if ($FileContent === false) {
                         error_log("Failed to read uploaded file: " . $LokasiFile);
                         header("location:../../View/v?pg=ViewMutasi&alert=FileError");
                         exit();
                     }
-                    $FileContent = mysqli_real_escape_string($db, $FileContent);
+                    $FileContentEscaped = mysqli_real_escape_string($db, $FileContent);
+                    
+                    // Simpan file fisik ke folder (ini akan memindahkan file dari tmp)
+                    FileSK($FileUpload);
 
                     //CARI ID PEGAWAI DENGAN SETTING 1
                     $Cek = mysqli_query($db, "SELECT IdPegawaiFK, Setting FROM history_mutasi WHERE IdPegawaiFK = '$IdPegawaiFK' AND Setting = 1 ");
@@ -81,16 +81,9 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     $Koreksi = mysqli_query($db, "UPDATE history_mutasi SET Setting = 0
                     WHERE IdPegawaiFK = '$IdPegawaiFKCek' ");
 
-                    // OLD File Upload
-                    // $Save = mysqli_query($db, "INSERT INTO history_mutasi(IdMutasi,IdPegawaiFK,JenisMutasi,NomorSK,TanggalMutasi,FileSKMutasi,IdJabatanFK,KeteranganJabatan,Setting)
-                    // VALUE('$IdMutasi','$IdPegawaiFK','$JenisMutasi','$NomerSK','$TanggalMutasi','$FileUpload','$Jabatan','$Keterangan','$Setting')");
-
-                    // NEW BLOB - Debug info
-                    error_log("Saving mutasi with file: " . $FileUpload);
-                    error_log("File content length: " . strlen($FileContent));
-                    
+                    // Simpan ke database dengan file fisik dan BLOB
                     $Save = mysqli_query($db, "INSERT INTO history_mutasi (IdMutasi, IdPegawaiFK, JenisMutasi, NomorSK, TanggalMutasi, FileSKMutasi, FileSKMutasiBlob, IdJabatanFK, KeteranganJabatan, Setting)
-                    VALUES ('$IdMutasi', '$IdPegawaiFK', '$JenisMutasi', '$NomerSK', '$TanggalMutasi', '$FileUpload', '$FileContent', '$Jabatan', '$Keterangan', '$Setting')");
+                    VALUES ('$IdMutasi', '$IdPegawaiFK', '$JenisMutasi', '$NomerSK', '$TanggalMutasi', '$FileUpload', '$FileContentEscaped', '$Jabatan', '$Keterangan', '$Setting')");
                     
                     if (!$Save) {
                         error_log("MySQL Error: " . mysqli_error($db));
@@ -291,13 +284,19 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($FileSize <= $FileMaxUpload) {
                 if (in_array($FileExtention, $AllowExtention) == true) {
-                    // FileSK($FileUpload);
-                    // $Edit = mysqli_query($db, "UPDATE history_mutasi SET FileSKMutasi = '$FileUpload'
-                    //     WHERE IdMutasi ='$IdMutasi' ");
-
-                    // NEW BLOB FILE
+                    // Baca konten file dulu sebelum dipindah
                     $FileContent = file_get_contents($_FILES['FUpload']['tmp_name']);
+                    if ($FileContent === false) {
+                        error_log("Failed to read uploaded file");
+                        header("location:../../View/v?pg=ViewMutasi&alert=FileError");
+                        exit();
+                    }
                     $FileContentEscaped = mysqli_real_escape_string($db, $FileContent);
+                    
+                    // Simpan file fisik ke folder (ini akan memindahkan file dari tmp)
+                    FileSK($FileUpload);
+                    
+                    // Update database dengan file fisik dan BLOB
                     $Edit = mysqli_query($db, "UPDATE history_mutasi SET FileSKMutasi = '$FileUpload',
                         FileSKMutasiBlob = '$FileContentEscaped'
                         WHERE IdMutasi ='$IdMutasi' ");

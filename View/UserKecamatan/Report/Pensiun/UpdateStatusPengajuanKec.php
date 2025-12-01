@@ -39,10 +39,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdPegawaiFK'])) {
     }
 
     if ($update) {
-        header("Location: ../../../v?pg=$redirectPage&alert=Sukses");
+        if($status === 1) {
+            // Cek apakah pegawai ini adalah Kades (IdJabatanFK = 1)
+            $queryJabatan = mysqli_query($db, "SELECT IdJabatanFK FROM master_pegawai WHERE IdPegawaiFK = '$IdPegawai'");
+            $dataJabatan = mysqli_fetch_assoc($queryJabatan);
+            $jabatan = $dataJabatan['IdJabatanFK'];
+            
+            if($jabatan == 1) {
+                // Jika Kades, redirect ke halaman Kades
+                header("Location: ../../../v?pg=ViewMasaPensiunKadesKec&alert=Sukses");
+            } else {
+                // Jika bukan Kades, redirect ke halaman biasa
+                header("Location: ../../../v?pg=ViewMasaPensiunKec&alert=Sukses");
+            }
+        } else {
+            header("Location: ../../../v?pg=ViewMasaPensiunKec&alert=Ditolak");
+        }
         exit();
     } else {
-        header("Location: ../../../v?pg=$redirectPage&alert=Gagal");
+        header("Location: ../../../v?pg=ViewMasaPensiunKec&alert=Gagal");
         exit();
     }
 } else {

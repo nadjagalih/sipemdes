@@ -1,4 +1,5 @@
 <?php
+// DataTables will handle pagination, so we load all data
 $Nomor = 1;
 $QueryPegawai = mysqli_query($db, "SELECT
 master_pegawai.IdPegawaiFK,
@@ -35,8 +36,19 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $NIK = $DataPegawai['NIK'];
     $Nama = $DataPegawai['Nama'];
     $TanggalLahir = $DataPegawai['TanggalLahir'];
-    $exp = explode('-', $TanggalLahir);
-    $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+    
+    // Cek dan format tanggal lahir
+    if (!empty($TanggalLahir) && $TanggalLahir != '0000-00-00') {
+        $exp = explode('-', $TanggalLahir);
+        if (count($exp) >= 3) {
+            $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+        } else {
+            $ViewTglLahir = $TanggalLahir; // Gunakan format asli jika tidak bisa di-parse
+        }
+    } else {
+        $ViewTglLahir = "Tidak Diset";
+    }
+    
     $JenKel = $DataPegawai['JenKel'];
     $NamaDesa = $DataPegawai['NamaDesa'];
     $Kecamatan = $DataPegawai['Kecamatan'];
@@ -69,13 +81,13 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
             <?php
             $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
             $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-            $JenisKelamin = $DataJenKel['Keterangan'];
+            $JenisKelamin = ($DataJenKel && isset($DataJenKel['Keterangan'])) ? $DataJenKel['Keterangan'] : 'Tidak Diset';
             echo $JenisKelamin;
             ?>
         </td>
         <td>
             <?php
-            $Id = 1;
+            // Hanya tampilkan jenis mutasi yang aktif (Setting = 1)
             $QMutasi = mysqli_query($db, "SELECT
                         history_mutasi.JenisMutasi,
                         master_mutasi.IdMutasi,
@@ -86,26 +98,26 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
                         FROM
                         history_mutasi
                         INNER JOIN master_mutasi ON history_mutasi.JenisMutasi = master_mutasi.IdMutasi
-                        WHERE IdPegawaiFK = '$IdPegawaiFK'
+                        WHERE IdPegawaiFK = '$IdPegawaiFK' AND history_mutasi.Setting = 1
                         ORDER BY history_mutasi.IdMutasi DESC,
                         history_mutasi.TanggalMutasi DESC");
-            while ($DataMutasi = mysqli_fetch_assoc($QMutasi)) {
-                $JenjangMutasi = $DataMutasi['Mutasi'];
-                $SettingMutasi = $DataMutasi['Setting'];
-            ?>
-                <br>
-                <?php if ($SettingMutasi == 0) { ?>
-                    <?php echo $JenjangMutasi; ?>
-                <?php } elseif ($SettingMutasi == 1) { ?>
+            
+            if (mysqli_num_rows($QMutasi) > 0) {
+                while ($DataMutasi = mysqli_fetch_assoc($QMutasi)) {
+                    $JenjangMutasi = $DataMutasi['Mutasi'];
+                ?>
                     <span class="label label-success float-left"><?php echo $JenjangMutasi; ?></span>
-                <?php } ?>
-            <?php $Id++;
-            } ?>
+                <?php 
+                }
+            } else {
+                echo "<span class='text-muted'>Tidak ada mutasi aktif</span>";
+            }
+            ?>
         </td>
         <td>
 
             <?php
-            $Id = 1;
+            // Hanya tampilkan jabatan yang aktif (Setting = 1)
             $QJabatan = mysqli_query($db, "SELECT
                     history_mutasi.IdJabatanFK,
                     master_jabatan.IdJabatan,
@@ -116,21 +128,21 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
                     history_mutasi.Setting
                     FROM history_mutasi
                     INNER JOIN master_jabatan ON history_mutasi.IdJabatanFK = master_jabatan.IdJabatan
-                    WHERE IdPegawaiFK = '$IdPegawaiFK'
+                    WHERE IdPegawaiFK = '$IdPegawaiFK' AND history_mutasi.Setting = 1
                     ORDER BY history_mutasi.IdMutasi DESC,
                     history_mutasi.TanggalMutasi DESC");
-            while ($DataJabatan = mysqli_fetch_assoc($QJabatan)) {
-                $JenjangJabatan = $DataJabatan['Jabatan'];
-                $SettingJabatan = $DataJabatan['Setting'];
+            
+            if (mysqli_num_rows($QJabatan) > 0) {
+                while ($DataJabatan = mysqli_fetch_assoc($QJabatan)) {
+                    $JenjangJabatan = $DataJabatan['Jabatan'];
+                ?>
+                    <span class="label label-success float-left"><?php echo $JenjangJabatan; ?></span>
+                <?php 
+                }
+            } else {
+                echo "<span class='text-muted'>Tidak ada jabatan aktif</span>";
+            }
             ?>
-                <br>
-                <?php if ($SettingJabatan == 0) { ?>
-                    <?php echo $Id; ?>. <?php echo $JenjangJabatan; ?>
-                <?php } elseif ($SettingJabatan == 1) { ?>
-                    <span class="label label-success float-left"><?php echo $Id; ?>. <?php echo $JenjangJabatan; ?></span>
-                <?php } ?>
-            <?php $Id++;
-            } ?>
         </td>
         <td>
             <?php echo $NamaDesa; ?><br>

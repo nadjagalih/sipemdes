@@ -13,7 +13,7 @@ if (!isset($_GET['Act'])) {
     exit("Access Denied");
 }
 
-$Act = $_GET['Act'];
+$Act = isset($_GET['Act']) ? sql_injeksi($_GET['Act']) : '';
 
 // Fungsi untuk generate ID
 function generatePesertaAwardId($db) {

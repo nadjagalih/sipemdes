@@ -1,31 +1,43 @@
 <?php
+// Include security configuration
+require_once "../Module/Security/Security.php";
+
 // Main view page untuk list award dalam format card
 
-// Handle alert notifications
+// Handle alert notifications with XSS protection
 if (isset($_GET['alert'])) {
-    $alertType = $_GET['alert'];
+    $alertType = isset($_GET['alert']) ? XSSProtection::sanitizeInput($_GET['alert']) : '';
     if ($alertType == 'SaveSuccess') {
-        echo "<script>
+        echo "<script nonce='" . CSPHandler::getNonce() . "'>
             document.addEventListener('DOMContentLoaded', function() {
                 showSuccessModal('Award berhasil ditambahkan!');
             });
         </script>";
     } elseif ($alertType == 'EditSuccess') {
-        echo "<script>
+        echo "<script nonce='" . CSPHandler::getNonce() . "'>
             document.addEventListener('DOMContentLoaded', function() {
                 showSuccessModal('Award berhasil diupdate!');
             });
         </script>";
     } elseif ($alertType == 'DeleteSuccess') {
-        echo "<script>
+        echo "<script nonce='" . CSPHandler::getNonce() . "'>
             document.addEventListener('DOMContentLoaded', function() {
                 showSuccessModal('Award berhasil dihapus!');
             });
         </script>";
     } elseif ($alertType == 'DeleteError') {
-        echo "<script>
+        echo "<script nonce='" . CSPHandler::getNonce() . "'>
             document.addEventListener('DOMContentLoaded', function() {
-                alert('Gagal menghapus award. Silakan coba lagi.');
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Gagal menghapus award. Silakan coba lagi.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    alert('Gagal menghapus award. Silakan coba lagi.');
+                }
             });
         </script>";
     }
@@ -54,100 +66,6 @@ if (isset($_GET['alert'])) {
 </div>
 
 <div class="wrapper wrapper-content animated fadeInRight">
-    <!-- Filter Section -->
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <form method="GET" action="">
-                        <input type="hidden" name="pg" value="AwardView">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <label>Status</label>
-                                    <select name="status" class="form-control">
-                                        <option value="">Semua Status</option>
-                                        <option value="Aktif" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Aktif') ? 'selected' : ''; ?>>Aktif</option>
-                                        <option value="Nonaktif" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Nonaktif') ? 'selected' : ''; ?>>Nonaktif</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <label>Tahun</label>
-                                    <select name="tahun" class="form-control">
-                                        <option value="">Semua Tahun</option>
-                                        <?php for($i = date('Y'); $i >= 2015; $i--): ?>
-                                            <option value="<?php echo $i; ?>" <?php echo (isset($_GET['tahun']) && $_GET['tahun'] == $i) ? 'selected' : ''; ?>><?php echo $i; ?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label>Cari Penghargaan</label>
-                                    <input type="text" name="search" class="form-control" placeholder="Nama penghargaan..." value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
-                                </div>
-                            </div>
-                            <div class="col-sm-2">
-                                <div class="form-group">
-                                    <label>&nbsp;</label>
-                                    <div>
-                                        <button type="submit" class="btn btn-info btn-block">
-                                            <i class="fa fa-search"></i> Filter
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <!--
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <h5>Total Penghargaan</h5>
-                    <h1 class="no-margins"><?php include "../App/Control/StatistikAward.php"; echo $TotalAward; ?></h1>
-                    <small>Semua penghargaan</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <h5>Status Aktif</h5>
-                    <h1 class="no-margins text-success"><?php echo $AwardAktif; ?></h1>
-                    <small>Penghargaan aktif</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <h5>Status Nonaktif</h5>
-                    <h1 class="no-margins text-warning"><?php echo $AwardNonaktif; ?></h1>
-                    <small>Penghargaan nonaktif</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <h5>Penghargaan <?php echo date('Y'); ?></h5>
-                    <h1 class="no-margins text-info"><?php echo $AwardTahunIni; ?></h1>
-                    <small>Tahun ini</small>
-                </div>
-            </div>
-        </div>
-    </div>
-    -->
-
     <!-- Award List Table -->
     <div class="row">
         <div class="col-lg-12">
@@ -175,7 +93,7 @@ if (isset($_GET['alert'])) {
                 <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 25px;" id="successMessage">
                     Data berhasil disimpan
                 </p>
-                <button type="button" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-weight: 600; font-size: 16px;" onclick="closeSuccessModal()">
+                <button type="button" class="btn btn-success-ok" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-weight: 600; font-size: 16px;">
                     OK
                 </button>
             </div>
@@ -196,7 +114,7 @@ if (isset($_GET['alert'])) {
                     Penghargaan yang sudah dihapus tidak dapat dikembalikan.
                 </p>
                 <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button type="button" class="btn" style="background: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;" onclick="closeDeleteModal()">
+                    <button type="button" class="btn btn-cancel-delete" style="background: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;">
                         Batal
                     </button>
                     <button type="button" class="btn" style="background: linear-gradient(135deg, #f44336, #d32f2f); color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;" id="confirmDeleteBtn">
@@ -579,8 +497,51 @@ if (isset($_GET['alert'])) {
 }
 </style>
 
-<script>
+<script nonce="<?php echo CSPHandler::getNonce(); ?>">
 $(document).ready(function() {
+    // Debug: Check if jQuery and modal are working
+    console.log('AwardView.php loaded, jQuery version:', $.fn.jquery);
+    console.log('Modal element exists:', $('#modalConfirmDelete').length > 0);
+    
+    // Event listener untuk delete award button (CSP-compliant)
+    $(document).on('click', '.delete-award-btn', function(e) {
+        e.preventDefault();
+        
+        var awardId = $(this).data('award-id');
+        var awardName = $(this).data('award-name');
+        
+        console.log('Delete clicked for:', awardId, awardName);
+        
+        // Call confirm delete function
+        confirmDeleteAward(awardId, awardName);
+        
+        return false;
+    });
+    
+    // Event listener untuk tombol Batal di modal delete (CSP-compliant)
+    $(document).on('click', '.btn-cancel-delete', function(e) {
+        e.preventDefault();
+        $('#modalConfirmDelete').modal('hide');
+        return false;
+    });
+    
+    // Event listener untuk tombol OK di modal success (CSP-compliant)
+    $(document).on('click', '.btn-success-ok', function(e) {
+        e.preventDefault();
+        $('#modalSuccess').modal('hide');
+        return false;
+    });
+    
+    // Test modal functionality
+    window.testModal = function() {
+        $('#modalConfirmDelete').modal('show');
+    };
+    
+    // Test confirmDeleteAward function
+    window.testDeleteFunction = function() {
+        confirmDeleteAward('test123', 'Test Award');
+    };
+    
     // Hapus teks "Sudah Berakhir" dari semua elemen
     setTimeout(function() {
         // Hapus teks dalam semua elemen text
@@ -664,27 +625,39 @@ function showSuccessModal(message) {
     });
 }
 
-// Function untuk close success modal
-function closeSuccessModal() {
-    $('#modalSuccess').modal('hide');
-}
-
 // Function untuk konfirmasi hapus award
 function confirmDeleteAward(id, nama) {
-    document.getElementById('deleteMessage').innerHTML = 'Penghargaan "<strong>' + nama + '</strong>" akan dihapus permanen.<br><br>Semua kategori dan peserta dalam penghargaan ini juga akan ikut terhapus.';
+    // Debug: Log parameters
+    console.log('confirmDeleteAward called with:', {id: id, nama: nama});
+    
+    // Escape nama untuk mencegah XSS
+    var namaEscaped = nama.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+    
+    document.getElementById('deleteMessage').innerHTML = 'Penghargaan "<strong>' + namaEscaped + '</strong>" akan dihapus permanen.<br><br>Semua kategori dan peserta dalam penghargaan ini juga akan ikut terhapus.';
     
     document.getElementById('confirmDeleteBtn').onclick = function() {
-        window.location.href = '../App/Model/ExcAward.php?Act=Delete&Kode=' + id;
+        // Debug: Log the URL that will be called
+        var deleteUrl = '../App/Model/ExcAward.php?Act=Delete&Kode=' + encodeURIComponent(id);
+        console.log('Delete URL:', deleteUrl);
+        
+        // Close modal first
+        $('#modalConfirmDelete').modal('hide');
+        
+        // Add loading overlay
+        document.body.innerHTML += '<div id="loadingOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">Menghapus penghargaan...</div>';
+        
+        // Log before redirect
+        console.log('Redirecting to:', deleteUrl);
+        
+        // Redirect to delete URL
+        window.location.href = deleteUrl;
     };
     
+    // Show modal
+    console.log('Showing modal...');
     $('#modalConfirmDelete').modal({
         backdrop: 'static',
         keyboard: false
     });
-}
-
-// Function untuk close delete modal
-function closeDeleteModal() {
-    $('#modalConfirmDelete').modal('hide');
 }
 </script>

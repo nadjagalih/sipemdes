@@ -1,8 +1,10 @@
 # Vendor folders
 vendor/Media
-Vendor/Charts
-Vendor/Assets/js
 Vendor/Assets/html5pdf
+
+# Large files (prevent files > 100MB)
+*.zip
+Vendor/Charts/api.zip
 
 # Database files
 *.sql
@@ -41,3 +43,7 @@ Thumbs.db
 # Cache directories
 cache/
 tmp/
+
+# markdown files
+*.md
+*.markdown

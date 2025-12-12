@@ -1,58 +1,47 @@
 <?php
-// Setting Profile Admin Desa - View dan Process
+// Setting Profile Admin Kecamatan - View dan Process
 ob_start(); // Start output buffering
-session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 // Include files
 include_once "../App/Control/FunctionSettingProfileAdminKecamatan.php";
+require_once "../Module/Security/CSPHandler.php";
 
-// Alert Handler seperti di PegawaiViewAll.php
+// Enhanced Alert Handler dengan SweetAlert2 dan CSP-compliant
+$alertType = '';
+$alertTitle = '';
+$alertMessage = '';
+$alertIcon = '';
+
 if (isset($_GET['alert'])) {
-    if ($_GET['alert'] == 'Edit') {
-        echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Berhasil!',
-                    text: 'Data Profile Kecamatan Berhasil Diperbarui',
-                    type: 'success',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
-    } elseif ($_GET['alert'] == 'Gagal') {
-        echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Gagal!',
-                    text: 'Gagal Memperbarui Data Profile Kecamatan',
-                    type: 'error',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
-    } elseif ($_GET['alert'] == 'ErrorTelepon') {
-        echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Nomor Telepon Harus Diisi',
-                    type: 'warning',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
-    } elseif ($_GET['alert'] == 'ErrorKoordinat') {
-        echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Silakan Klik pada Peta untuk Menentukan Koordinat',
-                    type: 'warning',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
+    switch ($_GET['alert']) {
+        case 'Edit':
+            $alertType = 'EditProfile';
+            $alertTitle = 'Berhasil!';
+            $alertMessage = 'Data Profile Kecamatan Berhasil Diperbarui';
+            $alertIcon = 'success';
+            break;
+        case 'Gagal':
+            $alertType = 'ErrorProfile';
+            $alertTitle = 'Gagal!';
+            $alertMessage = 'Gagal Memperbarui Data Profile Kecamatan';
+            $alertIcon = 'error';
+            break;
+        case 'ErrorTelepon':
+            $alertType = 'ErrorTelepon';
+            $alertTitle = 'Peringatan!';
+            $alertMessage = 'Nomor Telepon Harus Diisi';
+            $alertIcon = 'warning';
+            break;
+        case 'ErrorKoordinat':
+            $alertType = 'ErrorKoordinat';
+            $alertTitle = 'Peringatan!';
+            $alertMessage = 'Silakan Klik pada Peta untuk Menentukan Koordinat';
+            $alertIcon = 'warning';
+            break;
     }
 }
 
@@ -69,17 +58,15 @@ if (isset($_GET['alert'])) {
 
 <!-- Bootstrap CSS -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="../Assets/css/local-fonts.css" rel="stylesheet">
 <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- SweetAlert -->
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-<style>
+<!-- SweetAlert2 (Modern version with CSP support) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><style>
     /* Menggunakan struktur CSS yang sama dengan UserAdd.php */
     .wrapper-content .ibox {
         border-radius: 15px;
@@ -495,6 +482,7 @@ if (isset($_GET['alert'])) {
                                         id="AlamatKantor"
                                         rows="3"
                                         placeholder="Masukkan alamat lengkap kantor..."
+                                        required
                                         autocomplete="off"><?php echo htmlspecialchars($AlamatKecamatan); ?></textarea>
                                 </div>
                             </div>
@@ -559,7 +547,7 @@ if (isset($_GET['alert'])) {
                         
                         <div class="ibox-content" style="padding: 0;">
                             <div class="map-container">
-                                <div id="koordinatMap"></div>
+                                <div id="koordinatMap" style="height: 400px; width: 100%; min-height: 400px;"></div>
                             </div>
                         </div>
                     </div>
@@ -571,7 +559,7 @@ if (isset($_GET['alert'])) {
 </div>
 
 <!-- Map Script -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         // Koordinat default (Indonesia/Jawa)
         var defaultLat = <?php echo !empty($currentLatitude) ? $currentLatitude : '-8.055'; ?>;
@@ -747,12 +735,12 @@ if (isset($_GET['alert'])) {
         toggleClearButton();
 
         // Jika sudah ada koordinat, tampilkan marker
-        <?php if (!empty($currentLatitude) && !empty($currentLongitude)): ?>
+        <?php if (!empty($currentLatitude) && !empty($currentLongitude) && is_numeric($currentLatitude) && is_numeric($currentLongitude)): ?>
             marker = L.marker([defaultLat, defaultLng], {
                 draggable: true
             }).addTo(map);
 
-            marker.bindPopup('<b><?php echo $namaDesa; ?></b><br>Lokasi saat ini').openPopup();
+            marker.bindPopup('<b><?php echo addslashes(htmlspecialchars($namaKecamatan ?? 'Kecamatan', ENT_QUOTES, 'UTF-8')); ?></b><br>Lokasi saat ini').openPopup();
 
             // Event ketika marker di-drag
             marker.on('dragend', function(e) {
@@ -776,7 +764,7 @@ if (isset($_GET['alert'])) {
                 draggable: true
             }).addTo(map);
 
-            marker.bindPopup('<b><?php echo $namaDesa; ?></b><br>Lokasi baru').openPopup();
+            marker.bindPopup('<b><?php echo addslashes(htmlspecialchars($namaKecamatan ?? 'Kecamatan', ENT_QUOTES, 'UTF-8')); ?></b><br>Lokasi baru').openPopup();
 
             // Update koordinat
             updateCoordinates(lat, lng);
@@ -799,8 +787,16 @@ if (isset($_GET['alert'])) {
             document.getElementById('Longitude').value = lng.toFixed(6);
         }
 
-        // Form validation seperti di UserAdd.php
+        // Form validation dengan SweetAlert - Enhanced untuk CSP & Anti-Loop
+        var formSubmitted = false; // Prevent multiple submissions
+        
         document.getElementById('koordinatForm').addEventListener('submit', function(e) {
+            // Prevent multiple submissions
+            if (formSubmitted) {
+                e.preventDefault();
+                return false;
+            }
+            
             var noTelepon = document.getElementById('NoTelepon').value.trim();
             var latitude = document.getElementById('Latitude').value;
             var longitude = document.getElementById('Longitude').value;
@@ -812,56 +808,60 @@ if (isset($_GET['alert'])) {
 
             if (!noTelepon) {
                 e.preventDefault();
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Nomor telepon harus diisi.',
-                    type: 'warning',
-                    confirmButtonColor: '#007bff'
-                });
+                alert('Peringatan! Nomor telepon harus diisi.');
                 return false;
             }
 
             if (!latitude || !longitude) {
                 e.preventDefault();
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Silakan klik pada peta untuk menentukan lokasi koordinat.',
-                    type: 'warning',
-                    confirmButtonColor: '#007bff'
-                });
+                alert('Peringatan! Silakan klik pada peta untuk menentukan koordinat.');
                 return false;
             }
 
-            // SEMENTARA BYPASS KONFIRMASI UNTUK TESTING
-            console.log('Form validation passed, submitting...');
-            // Form akan submit secara normal tanpa konfirmasi
+            // TEMPORARY: Simple form submission for debugging
+            console.log('Validation passed, allowing form submission...');
+            
+            // Just submit the form directly for debugging
             return true;
-
-            // Konfirmasi sebelum simpan (commented sementara)
-            /*
-            e.preventDefault();
-            swal({
-                title: 'Konfirmasi',
-                text: 'Apakah Anda yakin ingin menyimpan pengaturan ini?',
-                type: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#007bff',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Simpan!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.value || result === true) {
-                    // Debug: log form data
-                    console.log('Form akan di-submit');
-                    console.log('NoTelepon:', document.getElementById('NoTelepon').value);
-                    console.log('Latitude:', document.getElementById('Latitude').value);
-                    console.log('Longitude:', document.getElementById('Longitude').value);
-                    
-                    // Submit form secara normal seperti UserAdd.php
-                    document.getElementById('koordinatForm').submit();
-                }
-            });
-            */
         });
+    });
+</script>
+
+<!-- Script untuk notification seperti AdminDesa -->
+<script <?php echo CSPHandler::scriptNonce(); ?>>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // CSP-compliant notification system for SettingProfile
+        const showNotification = () => {
+            <?php if (isset($alertType) && isset($alertTitle) && isset($alertMessage) && isset($alertIcon)): ?>
+                // Additional check to ensure values are not empty
+                if ('<?php echo $alertType; ?>' && '<?php echo $alertMessage; ?>') {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: '<?php echo addslashes($alertTitle); ?>',
+                            text: '<?php echo addslashes($alertMessage); ?>',
+                            icon: '<?php echo $alertIcon; ?>',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#007bff',
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutUp'
+                            }
+                        });
+                    } else {
+                        // Fallback for legacy browsers
+                        alert('<?php echo addslashes($alertMessage); ?>');
+                        console.warn('SweetAlert2 not loaded, using browser alert');
+                    }
+                }
+            <?php endif; ?>
+        };
+        
+        // Call notification function if alert parameter exists
+        <?php if (isset($_GET['alert'])): ?>
+            showNotification();
+        <?php endif; ?>
     });
 </script>

@@ -3,17 +3,19 @@ session_start();
 error_reporting(E_ALL ^ E_NOTICE);
 
 include "../../Module/Config/Env.php";
+require_once "../../Module/Security/Security.php";
 
 if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
+    exit();
 } else {
 
 if (!isset($_GET['Act'])) {
     exit("Access Denied");
 }
 
-$Act = $_GET['Act'];
+$Act = isset($_GET['Act']) ? sql_injeksi($_GET['Act']) : '';
 
 // Fungsi untuk generate ID
 function generateKategoriAwardId($db) {
@@ -26,6 +28,9 @@ function generateKategoriAwardId($db) {
 switch ($Act) {
     case 'Add':
         if (isset($_POST['IdAward']) && isset($_POST['NamaKategori'])) {
+            // Validate CSRF token
+            CSRFProtection::validateOrDie();
+            
             $IdKategoriAward = generateKategoriAwardId($db);
             $IdAwardFK = sql_injeksi($_POST['IdAward']);
             $NamaKategori = sql_injeksi($_POST['NamaKategori']);
@@ -38,14 +43,19 @@ switch ($Act) {
             
             if (mysqli_query($db, $query)) {
                 header("location:../../View/v?pg=AwardDetail&Kode=$IdAwardFK&alert=SaveKategori");
+                exit();
             } else {
                 header("location:../../View/v?pg=AwardDetail&Kode=$IdAwardFK&alert=ErrorKategori");
+                exit();
             }
         }
         break;
         
     case 'Edit':
         if (isset($_POST['IdKategoriAward']) && isset($_POST['NamaKategori'])) {
+            // Validate CSRF token
+            CSRFProtection::validateOrDie();
+            
             $IdKategoriAward = sql_injeksi($_POST['IdKategoriAward']);
             $NamaKategori = sql_injeksi($_POST['NamaKategori']);
             $DeskripsiKategori = sql_injeksi($_POST['DeskripsiKategori']);
@@ -68,6 +78,7 @@ switch ($Act) {
                 } else {
                     header("location:../../View/v?pg=AwardDetail&Kode=$IdAwardFK&alert=EditKategori");
                 }
+                exit();
             } else {
                 // Check if coming from kategori detail page for error redirect too
                 $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
@@ -76,31 +87,43 @@ switch ($Act) {
                 } else {
                     header("location:../../View/v?pg=AwardDetail&Kode=$IdAwardFK&alert=ErrorKategori");
                 }
+                exit();
             }
         }
         break;
         
     case 'Delete':
-        if (isset($_GET['Kode'])) {
+        // Prefer POST (CSRF-protected) delete. For backward compatibility, support GET but log a notice.
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdKategoriAward'])) {
+            CSRFProtection::validateOrDie();
+            $IdKategoriAward = sql_injeksi($_POST['IdKategoriAward']);
+        } elseif (isset($_GET['Kode'])) {
+            // Legacy support - using GET (not recommended). Still sanitize.
+            error_log("Warning: Deleting kategori via GET. Consider using POST with CSRF token.");
             $IdKategoriAward = sql_url($_GET['Kode']);
-            
-            // Get IdAwardFK for redirect
-            $getAwardId = mysqli_query($db, "SELECT IdAwardFK FROM master_kategori_award WHERE IdKategoriAward = '$IdKategoriAward'");
-            $awardData = mysqli_fetch_assoc($getAwardId);
-            $IdAwardFK = $awardData['IdAwardFK'];
-            
-            // Delete related peserta first
-            mysqli_query($db, "DELETE FROM desa_award WHERE IdKategoriAwardFK = '$IdKategoriAward'");
-            // Delete kategori
-            $query = "DELETE FROM master_kategori_award WHERE IdKategoriAward = '$IdKategoriAward'";
-            
-            if (mysqli_query($db, $query)) {
-                header("location:../../View/v?pg=AwardDetail&Kode=$IdAwardFK&alert=DeleteKategori");
-            } else {
-                header("location:../../View/v?pg=AwardDetail&Kode=$IdAwardFK&alert=ErrorKategori");
-            }
+        } else {
+            // No id provided
+            header("location:../../View/v?pg=AwardView&alert=ErrorAct");
+            exit();
         }
-        break;
+
+        // Get IdAwardFK for redirect
+        $getAwardId = mysqli_query($db, "SELECT IdAwardFK FROM master_kategori_award WHERE IdKategoriAward = '$IdKategoriAward'");
+        $awardData = mysqli_fetch_assoc($getAwardId);
+        $IdAwardFK = $awardData['IdAwardFK'];
+
+        // Delete related peserta first
+        mysqli_query($db, "DELETE FROM desa_award WHERE IdKategoriAwardFK = '$IdKategoriAward'");
+        // Delete kategori
+        $query = "DELETE FROM master_kategori_award WHERE IdKategoriAward = '$IdKategoriAward'";
+
+        if (mysqli_query($db, $query)) {
+            header("location:../../View/v?pg=AwardDetail&Kode=$IdAwardFK&alert=DeleteKategori");
+            exit();
+        } else {
+            header("location:../../View/v?pg=AwardDetail&Kode=$IdAwardFK&alert=ErrorKategori");
+            exit();
+        }
         
     case 'GetKategoriData':
         if (isset($_GET['Kode'])) {

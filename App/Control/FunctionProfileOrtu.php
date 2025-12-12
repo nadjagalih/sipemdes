@@ -103,8 +103,8 @@
                                     <div class="col-lg-8"><input type="text" name="Pekerjaan" id="Pekerjaan" placeholder="Masukkan Pekerjaan" class="form-control" autocomplete="off">
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
-                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-4" class="btn btn-success ">Batal</a>
+                                <button class="btn btn-primary" type="submit" name="Save" id="SaveOrtu">Save</button>
+                                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-4" class="btn btn-success">Batal</a>
                             </div>
                         </div>
                     </form>
@@ -213,8 +213,13 @@
                                    class="btn btn-warning btn-sm" title="Edit Data">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
-                                <a href="#" onclick="confirmDeleteOrtu('<?php echo $IdOrtu; ?>', '<?php echo htmlspecialchars($Nama); ?>', '<?php echo htmlspecialchars($Hubungan); ?>', '<?php echo $IdTemp; ?>')" 
-                                   class="btn btn-danger btn-sm" title="Hapus Data">
+                                <a href="#" 
+                                   class="btn btn-danger btn-sm btn-delete-ortu" 
+                                   title="Hapus Data"
+                                   data-id="<?php echo htmlspecialchars($IdOrtu); ?>"
+                                   data-nama="<?php echo htmlspecialchars($Nama); ?>"
+                                   data-hubungan="<?php echo htmlspecialchars($Hubungan); ?>"
+                                   data-pegawai="<?php echo htmlspecialchars($IdTemp); ?>">
                                     <i class="fa fa-trash"></i> Hapus
                                 </a>
                             </div>
@@ -235,22 +240,205 @@
     </table>
 </div>
 
-<script>
-function confirmDeleteOrtu(idOrtu, namaOrtu, statusHubungan, idPegawai) {
-    swal({
-        title: 'Konfirmasi Hapus',
-        text: 'Apakah Anda yakin ingin menghapus data orang tua "' + namaOrtu + ' (' + statusHubungan + ')"?',
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Hapus!',
-        cancelButtonText: 'Batal'
-    }, function(isConfirm) {
-        if (isConfirm) {
-            // Redirect to delete action with pegawai ID and tab parameter for proper redirect
-            window.location.href = '../App/Model/ExcPegawaiOrtuAdminDesa?Act=Delete&Kode=' + idOrtu + '&IdPegawai=' + idPegawai + '&tab=tab-4';
+<?php
+// Generate CSP nonce for inline script with enhanced security
+$nonce = '';
+$nonceAttr = '';
+
+// Enhanced CSP nonce generation with fallback
+if (class_exists('CSPHandler')) {
+    try {
+        $nonce = CSPHandler::scriptNonce();
+        $nonceAttr = $nonce;
+    } catch (Exception $e) {
+        error_log("CSPHandler error: " . $e->getMessage());
+        $nonceAttr = ''; // Fallback tanpa nonce
+    }
+} else {
+    // Manual nonce generation sebagai fallback
+    if (function_exists('random_bytes')) {
+        $manualNonce = base64_encode(random_bytes(16));
+        $nonceAttr = 'nonce="' . $manualNonce . '"';
+        error_log("Manual nonce generated: " . $manualNonce);
+    } else {
+        error_log("CSPHandler not available and random_bytes not supported");
+        $nonceAttr = ''; // Fallback tanpa nonce
+    }
+}
+
+// Log untuk debugging
+error_log("CSP nonce for FunctionProfileOrtu: " . $nonceAttr);
+?>
+
+<script <?php echo $nonceAttr; ?>>
+// Enhanced CSP-compliant script for Ortu delete
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('FunctionProfileOrtu script loaded with CSP nonce');
+    console.log('SweetAlert2 available:', typeof Swal !== 'undefined');
+    console.log('jQuery available:', typeof $ !== 'undefined');
+    
+    // Delay untuk memastikan semua library sudah load
+    setTimeout(function() {
+        console.log('Setting up CSP-compliant delete event handlers for Ortu...');
+        
+        // Native JavaScript Event Delegation (CSP-compliant)
+        document.addEventListener('click', function(e) {
+            var deleteBtn = e.target.closest('.btn-delete-ortu');
+            if (deleteBtn) {
+                console.log('Ortu delete button found:', deleteBtn);
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var idOrtu = deleteBtn.getAttribute('data-id');
+                var namaOrtu = deleteBtn.getAttribute('data-nama');
+                var statusHubungan = deleteBtn.getAttribute('data-hubungan');
+                var idPegawai = deleteBtn.getAttribute('data-pegawai');
+                
+                console.log('=== CSP-COMPLIANT ORTU DELETE BUTTON CLICKED ===');
+                console.log('Data attributes:', {
+                    id: idOrtu,
+                    nama: namaOrtu,
+                    hubungan: statusHubungan,
+                    pegawai: idPegawai
+                });
+                
+                confirmDeleteOrtu(idOrtu, namaOrtu, statusHubungan, idPegawai);
+                return false;
+            }
+        });
+        
+        // jQuery event delegation sebagai backup
+        if (typeof $ !== 'undefined') {
+            $(document).off('click.deleteOrtu').on('click.deleteOrtu', '.btn-delete-ortu', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('jQuery Ortu delete event triggered');
+                
+                var idOrtu = $(this).data('id');
+                var namaOrtu = $(this).data('nama');
+                var statusHubungan = $(this).data('hubungan');
+                var idPegawai = $(this).data('pegawai');
+                
+                console.log('jQuery Ortu data:', {
+                    id: idOrtu,
+                    nama: namaOrtu,
+                    hubungan: statusHubungan,
+                    pegawai: idPegawai
+                });
+                
+                confirmDeleteOrtu(idOrtu, namaOrtu, statusHubungan, idPegawai);
+                return false;
+            });
         }
+        
+    }, 1000); // Delay 1 detik untuk memastikan DataTables sudah selesai
+});
+
+// CSP-compliant confirmation function for Ortu
+function confirmDeleteOrtu(idOrtu, namaOrtu, statusHubungan, idPegawai) {
+    console.log('=== CSP-COMPLIANT ORTU DELETE CONFIRMATION TRIGGERED ===');
+    console.log('Parameters:', {
+        idOrtu: idOrtu,
+        namaOrtu: namaOrtu,
+        statusHubungan: statusHubungan,
+        idPegawai: idPegawai
     });
+    console.log('SweetAlert2 check:', typeof Swal !== 'undefined');
+    
+    if (typeof Swal !== 'undefined') {
+        console.log('Showing CSP-compliant SweetAlert2 confirmation for Ortu...');
+        
+        // CSP-compliant SweetAlert2 configuration
+        Swal.fire({
+            title: 'Konfirmasi Hapus',
+            html: 'Apakah Anda yakin ingin menghapus data orang tua:<br><strong>' + 
+                  escapeHtml(namaOrtu) + ' (' + escapeHtml(statusHubungan) + ')</strong>?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            customClass: {
+                container: 'my-swal'
+            },
+            zIndex: 10000
+        }).then((result) => {
+            console.log('SweetAlert2 Ortu result:', result);
+            
+            if (result.isConfirmed) {
+                console.log('Ortu delete confirmed by user');
+                
+                // Show loading dengan CSP-compliant configuration
+                Swal.fire({
+                    title: 'Menghapus...',
+                    text: 'Mohon tunggu sebentar',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Build delete URL dengan proper encoding
+                var deleteUrl = '../App/Model/ExcPegawaiOrtuAdminDesa?Act=Delete&Kode=' + 
+                               encodeURIComponent(idOrtu) + 
+                               '&IdPegawai=' + encodeURIComponent(idPegawai) + 
+                               '&tab=tab-4';
+                
+                console.log('Redirecting to:', deleteUrl);
+                
+                // Redirect after short delay
+                setTimeout(function() {
+                    window.location.href = deleteUrl;
+                }, 500);
+                
+            } else if (result.isDismissed) {
+                console.log('Ortu delete cancelled by user');
+            }
+        }).catch((error) => {
+            console.error('SweetAlert2 error (possible CSP issue):', error);
+            // CSP-safe fallback confirmation
+            if (confirm('SweetAlert2 error (CSP?). Apakah Anda yakin ingin menghapus data orang tua "' + 
+                       namaOrtu + ' (' + statusHubungan + ')"?')) {
+                var deleteUrl = '../App/Model/ExcPegawaiOrtuAdminDesa?Act=Delete&Kode=' + 
+                               encodeURIComponent(idOrtu) + 
+                               '&IdPegawai=' + encodeURIComponent(idPegawai) + 
+                               '&tab=tab-4';
+                window.location.href = deleteUrl;
+            }
+        });
+        
+    } else {
+        console.log('SweetAlert2 not available (possible CSP block), using native confirm');
+        // CSP-safe fallback untuk browser yang tidak support SweetAlert2
+        if (confirm('Apakah Anda yakin ingin menghapus data orang tua "' + namaOrtu + ' (' + statusHubungan + ')"?')) {
+            console.log('Ortu delete confirmed via native confirm');
+            var deleteUrl = '../App/Model/ExcPegawaiOrtuAdminDesa?Act=Delete&Kode=' + 
+                           encodeURIComponent(idOrtu) + 
+                           '&IdPegawai=' + encodeURIComponent(idPegawai) + 
+                           '&tab=tab-4';
+            console.log('Redirecting to:', deleteUrl);
+            window.location.href = deleteUrl;
+        } else {
+            console.log('Ortu delete cancelled via native confirm');
+        }
+    }
+}
+
+// CSP-compliant HTML escaping function
+function escapeHtml(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 </script>

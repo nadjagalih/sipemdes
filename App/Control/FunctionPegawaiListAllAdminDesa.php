@@ -1,5 +1,6 @@
 <?php
 $IdDesa = $_SESSION['IdDesa'];
+$IdUserLogin = $_SESSION['IdUser']; // ID user yang sedang login (admin desa)
 $Nomor = 1;
 $QueryPegawai = mysqli_query($db, "SELECT
 master_pegawai.*,
@@ -18,14 +19,12 @@ FROM master_pegawai
 LEFT JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
 LEFT JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
 LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile
-INNER JOIN main_user ON main_user.IdPegawai = master_pegawai.IdPegawaiFK
-INNER JOIN history_mutasi ON master_pegawai.IdPegawaiFK = history_mutasi.IdPegawaiFK
-INNER JOIN master_jabatan ON history_mutasi.IdJabatanFK = master_jabatan.IdJabatan
+LEFT JOIN history_mutasi ON master_pegawai.IdPegawaiFK = history_mutasi.IdPegawaiFK AND history_mutasi.Setting = 1
+LEFT JOIN master_jabatan ON history_mutasi.IdJabatanFK = master_jabatan.IdJabatan
 WHERE
 master_pegawai.Setting = 1 AND
-main_user.IdLevelUserFK NOT IN (1, 2) AND
-history_mutasi.Setting = 1 AND
-master_pegawai.IdDesaFK = '$IdDesa'
+master_pegawai.IdDesaFK = '$IdDesa' AND
+master_pegawai.IdPegawaiFK != '$IdUserLogin'
 ORDER BY
 CASE WHEN history_mutasi.IdJabatanFK = 1 THEN 0 ELSE 1 END,
 master_pegawai.Nama ASC");
@@ -36,6 +35,7 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $NIK = $DataPegawai['NIK'];
     $Nama = $DataPegawai['Nama'];
     $TanggalLahir = $DataPegawai['TanggalLahir'];
+    
     // Ambil pendidikan terakhir dari history_pendidikan (Setting=1)
     $QueryPendidikan = mysqli_query($db, "SELECT master_pendidikan.JenisPendidikan FROM history_pendidikan INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND history_pendidikan.Setting = 1 ORDER BY master_pendidikan.IdPendidikan DESC, history_pendidikan.TahunLulus DESC LIMIT 1");
     if ($QueryPendidikan && mysqli_num_rows($QueryPendidikan) > 0) {
@@ -44,8 +44,18 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     } else {
         $Pendidikan = '-';
     }
-    $exp = explode('-', $TanggalLahir);
-    $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+    
+    // Validasi dan format tanggal lahir
+    if (!empty($TanggalLahir) && $TanggalLahir != '0000-00-00') {
+        $exp = explode('-', $TanggalLahir);
+        if (count($exp) == 3) {
+            $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+        } else {
+            $ViewTglLahir = '-';
+        }
+    } else {
+        $ViewTglLahir = '-';
+    }
     $JenKel = $DataPegawai['JenKel'];
     $NamaDesa = $DataPegawai['NamaDesa'];
     $Kecamatan = $DataPegawai['Kecamatan'];
@@ -55,18 +65,18 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $RW = $DataPegawai['RW'];
     
     // Ambil jabatan langsung dari query utama (seperti di ViewMasaPensiunKades.php)
-    $Jabatan = $DataPegawai['Jabatan'];
-    $IdJabatanFK = $DataPegawai['IdJabatanFK'];
+    $Jabatan = isset($DataPegawai['Jabatan']) && !empty($DataPegawai['Jabatan']) ? $DataPegawai['Jabatan'] : 'Belum Ada Jabatan';
+    $IdJabatanFK = isset($DataPegawai['IdJabatanFK']) ? $DataPegawai['IdJabatanFK'] : 0;
 
     $Lingkungan = $DataPegawai['Lingkungan'];
     $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
     $LingkunganPeg = mysqli_fetch_assoc($AmbilDesa);
-    $Komunitas = $LingkunganPeg['NamaDesa'];
+    $Komunitas = ($LingkunganPeg && isset($LingkunganPeg['NamaDesa'])) ? $LingkunganPeg['NamaDesa'] : 'Unknown';
 
     $KecamatanPeg = $DataPegawai['Kecamatan'];
     $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanPeg' ");
     $KecamatanPegData = mysqli_fetch_assoc($AmbilKecamatan);
-    $KomunitasKec = $KecamatanPegData['Kecamatan'];
+    $KomunitasKec = ($KecamatanPegData && isset($KecamatanPegData['Kecamatan'])) ? $KecamatanPegData['Kecamatan'] : 'Unknown';
 
     $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec
 ?>
@@ -99,7 +109,7 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
             <?php
             $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
             $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-            $JenisKelamin = $DataJenKel['Keterangan'];
+            $JenisKelamin = ($DataJenKel && isset($DataJenKel['Keterangan'])) ? $DataJenKel['Keterangan'] : 'Unknown';
             echo $JenisKelamin;
             ?>
         </td>
@@ -124,25 +134,17 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
             ?>
         </td>
         <td>
-            <?php if ($IdPegawaiFK == $_SESSION['IdUser']) { ?>
-                <div class="btn-group">
-                    <a href="?pg=PegawaiEditAdminAplikasi&Kode=<?php echo $IdPegawaiFK; ?>">
-                        <button class="btn btn-outline btn-success btn-xs" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></button>
-                    </a>
-                </div>
-            <?php } else { ?>
-                <div class="btn-group" role="group">
-                    <a href="?pg=PegawaiEditAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>">
-                        <button class="btn btn-outline btn-success btn-xs" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></button>
-                    </a>
-                    <a href="../App/Model/ExcPegawaiAdminDesa?Act=Delete&Kode=<?php echo $IdPegawaiFK; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $Nama; ?> ?');">
-                        <button class="btn btn-outline btn-danger btn-xs" data-toggle="tooltip" title="Hapus Data"><i class="fa fa-eraser"></i></button>
-                    </a>
-                    <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>">
-                        <button class="btn btn-outline btn-success btn-xs" data-toggle="tooltip"><i class="fa fa-folder-open-o"></i></button>
-                    </a>
-                </div>
-            <?php } ?>
+            <div class="btn-group" role="group">
+                <a href="?pg=PegawaiEditAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>">
+                    <button class="btn btn-outline btn-success btn-xs" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></button>
+                </a>
+                <button class="btn btn-outline btn-danger btn-xs delete-btn" data-toggle="tooltip" title="Hapus Data" data-id="<?php echo $IdPegawaiFK; ?>" data-nama="<?php echo htmlspecialchars($Nama, ENT_QUOTES); ?>">
+                    <i class="fa fa-eraser"></i>
+                </button>
+                <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>">
+                    <button class="btn btn-outline btn-success btn-xs" data-toggle="tooltip" title="Detail Data"><i class="fa fa-folder-open-o"></i></button>
+                </a>
+            </div>
         </td>
     </tr>
 <?php $Nomor++;

@@ -1,76 +1,71 @@
 <?php
-if ($_GET['alert'] == 'Cek') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-              title: '',
-              text:  'Extention Yang Dimasukkan Tidak Sesuai',
-              type: 'warning',
-              showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'Edit') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Dikoreksi',
-                type: 'success',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'Save') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Disimpan',
-                type: 'success',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'Delete') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Dihapus',
-                type: 'warning',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'Kosong') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Tidak Ada File Yang Diupload',
-                type: 'warning',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'FileMax') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Tidak Dapat Disimpan, Ukuran File Melebihi 2 MB',
-                type: 'warning',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
+// Notifikasi SweetAlert - CSPHandler sudah di-include di v.php
+if (isset($_GET['alert'])) {
+    $alertType = $_GET['alert'];
+    $alertConfig = [];
+    
+    switch($alertType) {
+        case 'AddPegawai':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Data Pegawai BPD Berhasil Ditambahkan', 'type' => 'success'];
+            break;
+        case 'EditPegawai':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Data Pegawai BPD Berhasil Diperbarui', 'type' => 'success'];
+            break;
+        case 'DeletePegawai':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Data Pegawai BPD Berhasil Dihapus', 'type' => 'success'];
+            break;
+        case 'Cek':
+            $alertConfig = ['title' => 'Peringatan!', 'text' => 'Extention Yang Dimasukkan Tidak Sesuai', 'type' => 'warning'];
+            break;
+        case 'Edit':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Data Pegawai BPD Berhasil Diperbarui', 'type' => 'success'];
+            break;
+        case 'Save':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Data Pegawai BPD Berhasil Ditambahkan', 'type' => 'success'];
+            break;
+        case 'Delete':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Data Pegawai BPD Berhasil Dihapus', 'type' => 'success'];
+            break;
+        case 'Kosong':
+            $alertConfig = ['title' => 'Peringatan!', 'text' => 'Tidak Ada File Yang Diupload', 'type' => 'warning'];
+            break;
+        case 'FileMax':
+            $alertConfig = ['title' => 'Peringatan!', 'text' => 'Data Tidak Dapat Disimpan, Ukuran File Melebihi 2 MB', 'type' => 'warning'];
+            break;
+        case 'Error':
+            $alertConfig = ['title' => 'Error!', 'text' => 'Terjadi kesalahan saat memproses data', 'type' => 'error'];
+            break;
+        case 'NotFound':
+            $alertConfig = ['title' => 'Peringatan!', 'text' => 'Data yang dicari tidak ditemukan', 'type' => 'warning'];
+            break;
+    }
+    
+    if (!empty($alertConfig)) {
+        echo "<script " . CSPHandler::scriptNonce() . ">
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '" . addslashes($alertConfig['title']) . "',
+                        text: '" . addslashes($alertConfig['text']) . "',
+                        icon: '" . $alertConfig['type'] . "',
+                        confirmButtonText: 'OK'
+                    });
+                } else if (typeof swal !== 'undefined') {
+                    swal({
+                        title: '" . addslashes($alertConfig['title']) . "',
+                        text: '" . addslashes($alertConfig['text']) . "',
+                        type: '" . $alertConfig['type'] . "',
+                        showConfirmButton: true,
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    alert('" . addslashes($alertConfig['title']) . "\\n" . addslashes($alertConfig['text']) . "');
+                }
+            }, 500);
+        });
+        </script>";
+    }
 }
 ?>
 

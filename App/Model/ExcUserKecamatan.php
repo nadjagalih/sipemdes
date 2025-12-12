@@ -8,7 +8,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
 } else {
-    if ($_GET['Act'] == 'Save') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
             $ViewTanggal   = date('YmdHis');
             $UserNama = sql_injeksi($_POST['UserNama']);
@@ -46,14 +46,14 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     VALUE('$IdUser','$UserNama','$Pass','$Akses','$Setting','$Kecamatan','$StatusLogin','$Nama')");
 
                     if ($Save) {
-                        header("location:../../View/v?pg=UserViewKecamatan&alert=Save");
+                        header("location:../../View/v?pg=UserViewKecamatan&success=add");
                     }
                 } elseif (strlen($CekPassword) < 5) {
                     header("location:../../View/v?pg=UserViewKecamatan&alert=Karakter");
                 }
             }
         }
-    } elseif ($_GET['Act'] == 'Edit') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
             $IdUser = sql_injeksi($_POST['IdUser']);
             $UserNama = sql_injeksi($_POST['UserNama']);
@@ -80,19 +80,19 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
             // }
 
             if ($Edit) {
-                header("location:../../View/v?pg=UserViewKecamatan&alert=Edit");
+                header("location:../../View/v?pg=UserViewKecamatan&success=edit");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdUser = sql_injeksi(($_GET['Kode']));
             $Delete = mysqli_query($db, "DELETE FROM main_user_kecamatan WHERE IdUser = '$IdUser' ");
 
             if ($Delete) {
-                header("location:../../View/v?pg=UserViewKecamatan&alert=Delete");
+                header("location:../../View/v?pg=UserViewKecamatan&success=delete");
             }
         }
-    } elseif ($_GET['Act'] == 'Reset') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Reset') {
         if (isset($_POST['Reset'])) {
 
             $IdUser = sql_injeksi($_POST['IdUser']);

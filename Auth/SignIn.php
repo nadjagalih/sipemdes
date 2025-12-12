@@ -1,3 +1,21 @@
+<?php
+// Security headers for login page
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Redirect to main.php - this page is deprecated
+// Only allow access if coming from a specific auth process
+if (!isset($_GET['alert']) || empty($_GET['alert'])) {
+    header("Location: ../main.php");
+    exit;
+}
+
+// Destroy any existing session
+session_start();
+session_unset();
+session_destroy();
+?>
 <!DOCTYPE html>
 <html>
 

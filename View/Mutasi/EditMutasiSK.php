@@ -26,14 +26,32 @@ if (isset($_GET['Kode'])) {
                 WHERE history_mutasi.IdMutasi = '$IdTemp' ");
 
     $DataMutasi = mysqli_fetch_assoc($QueryMutasi);
-    $NIK = $DataMutasi['NIK'];
-    $Nama = $DataMutasi['Nama'];
+    
+    // Cek apakah data ditemukan
+    if (!$DataMutasi) {
+        echo "<script>
+            alert('Data mutasi tidak ditemukan!');
+            window.location.href = '?pg=ViewMutasi';
+        </script>";
+        exit;
+    }
+    
+    $NIK = isset($DataMutasi['NIK']) ? $DataMutasi['NIK'] : '';
+    $Nama = isset($DataMutasi['Nama']) ? $DataMutasi['Nama'] : '';
 
-    $IdMutasi = $DataMutasi['IdMutasi'];
+    $IdMutasi = isset($DataMutasi['IdMutasi']) ? $DataMutasi['IdMutasi'] : '';
 
     $TglSKMutasi = $DataMutasi['TanggalMutasi'];
-    $exp = explode('-', $TglSKMutasi);
-    $TanggalSKMutasi = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+    if (!empty($TglSKMutasi) && $TglSKMutasi != '0000-00-00') {
+        $exp = explode('-', $TglSKMutasi);
+        if (count($exp) >= 3) {
+            $TanggalSKMutasi = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+        } else {
+            $TanggalSKMutasi = $TglSKMutasi;
+        }
+    } else {
+        $TanggalSKMutasi = "";
+    }
 
     $NomerSK = $DataMutasi['NomorSK'];
     $JenisMutasi = $DataMutasi['JenisMutasi'];
@@ -42,8 +60,16 @@ if (isset($_GET['Kode'])) {
     $Jabatan = $DataMutasi['Jabatan'];
 
     $TglTMT = $DataMutasi['TanggalTMT'];
-    $exp1 = explode("-", $TglTMT);
-    $TanggalTMT = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+    if (!empty($TglTMT) && $TglTMT != '0000-00-00') {
+        $exp1 = explode("-", $TglTMT);
+        if (count($exp1) >= 3) {
+            $TanggalTMT = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+        } else {
+            $TanggalTMT = $TglTMT;
+        }
+    } else {
+        $TanggalTMT = "";
+    }
 
     $FileSK = $DataMutasi['FileSKMutasi'];
     $Keterangan = $DataMutasi['KeteranganJabatan'];

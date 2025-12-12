@@ -1,78 +1,80 @@
 <?php
-if ($_GET['alert'] == 'Cek') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-              title: '',
-              text:  'Extention Yang Dimasukkan Tidak Sesuai',
-              type: 'warning',
-              showConfirmButton: true
+// Sistem Notifikasi Universal untuk Pegawai - mengikuti pola PegawaiDetail.php
+if (isset($_GET['alert'])) {
+    $alert = isset($_GET['alert']) ? sql_injeksi($_GET['alert']) : '';
+    
+    // Konfigurasi pesan berdasarkan jenis alert
+    $notifications = [
+        'Cek' => ['title' => 'Peringatan!', 'message' => 'Extention Yang Dimasukkan Tidak Sesuai', 'icon' => 'warning'],
+        'Edit' => ['title' => 'Berhasil!', 'message' => 'Data berhasil disimpan', 'icon' => 'success'],
+        'Delete' => ['title' => 'Berhasil!', 'message' => 'Data beserta semua history berhasil dihapus', 'icon' => 'success'],
+        'Error' => ['title' => 'Gagal!', 'message' => 'Terjadi kesalahan saat menghapus data', 'icon' => 'error'],
+        'Kosong' => ['title' => 'Peringatan!', 'message' => 'Tidak Ada File Yang Diupload', 'icon' => 'warning'],
+        'FileMax' => ['title' => 'Peringatan!', 'message' => 'Data Tidak Dapat Disimpan, Ukuran File Melebihi 2 MB', 'icon' => 'warning'],
+        'CekDelete' => ['title' => 'Tidak Dapat Dihapus!', 'message' => 'Data Tidak Bisa Dihapus, Karena Sudah Mempunyai History', 'icon' => 'warning'],
+    ];
+    
+    // Cek apakah alert ada dalam konfigurasi
+    if (array_key_exists($alert, $notifications)) {
+        $notification = $notifications[$alert];
+        $swalType = ($notification['icon'] == 'success') ? 'success' : (($notification['icon'] == 'error') ? 'error' : 'warning');
+        
+        // Enhanced CSP nonce generation with fallback - sama seperti PegawaiDetail.php
+        $nonce = '';
+        $nonceAttr = '';
+        
+        if (class_exists('CSPHandler')) {
+            try {
+                $nonce = CSPHandler::scriptNonce();
+                $nonceAttr = $nonce;
+            } catch (Exception $e) {
+                error_log("CSPHandler error in notification: " . $e->getMessage());
+                $nonceAttr = ''; // Fallback tanpa nonce
+            }
+        } else {
+            // Manual nonce generation sebagai fallback
+            if (function_exists('random_bytes')) {
+                $manualNonce = base64_encode(random_bytes(16));
+                $nonceAttr = 'nonce="' . $manualNonce . '"';
+                error_log("Manual nonce generated for notification: " . $manualNonce);
+            } else {
+                error_log("No CSP nonce available for notification script");
+                $nonceAttr = ''; // Fallback tanpa nonce
+            }
+        }
+        
+        echo '<script ' . $nonceAttr . '>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Debug untuk memastikan script dipanggil dengan CSP compliance
+                console.log("CSP-compliant notification script loaded with alert: ' . $alert . '");
+                
+                // Pastikan SweetAlert2 sudah ter-load
+                if (typeof Swal !== "undefined") {
+                    console.log("SweetAlert2 detected, showing CSP-compliant notification");
+                    Swal.fire({
+                        title: "' . addslashes($notification['title']) . '",
+                        text: "' . addslashes($notification['message']) . '",
+                        icon: "' . $swalType . '",
+                        showConfirmButton: true,
+                        confirmButtonText: "OK",
+                        confirmButtonColor: "#3085d6",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        customClass: {
+                            container: "notification-swal"
+                        },
+                        zIndex: 10000
+                    });
+                } else {
+                    console.error("SweetAlert2 not available, using fallback");
+                    alert("' . addslashes($notification['title']) . ': ' . addslashes($notification['message']) . '");
+                }
             });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'Edit') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Dikoreksi',
-                type: 'success',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'Delete') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Dihapus',
-                type: 'warning',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'Kosong') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Tidak Ada File Yang Diupload',
-                type: 'warning',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'FileMax') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Tidak Dapat Disimpan, Ukuran File Melebihi 2 MB',
-                type: 'warning',
-                showConfirmButton: true
-            });
-        },10);
-    </script>";
-} elseif ($_GET['alert'] == 'CekDelete') {
-    echo
-        "<script type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: '',
-                      text:  'Data Tidak Bisa Dihapus, Karena Sudah Mempunyai History',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
+        </script>';
+    }
 }
 ?>
+
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
@@ -157,7 +159,7 @@ if ($_GET['alert'] == 'Cek') {
 </div>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
+<script <?php echo class_exists('CSPHandler') ? CSPHandler::scriptNonce() : ''; ?>>
     // Force pace loading to complete after page is fully loaded
     window.addEventListener('load', function() {
         // Wait a bit for all scripts to finish
@@ -207,6 +209,41 @@ if ($_GET['alert'] == 'Cek') {
             const notifBar = document.querySelector('.notification-bar');
             if (notifBar) {
                 notifBar.style.display = 'none';
+            }
+        }
+    });
+    
+    // Event delegation untuk tombol delete - CSP compliant
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-btn')) {
+            e.preventDefault();
+            const button = e.target.closest('.delete-btn');
+            const idPegawai = button.getAttribute('data-id');
+            const namaPegawai = button.getAttribute('data-nama');
+            
+            if (typeof Swal !== 'undefined' && typeof Swal.fire === 'function') {
+                Swal.fire({
+                    title: 'Konfirmasi Hapus',
+                    text: 'Anda yakin ingin menghapus data: ' + namaPegawai + '?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect ke URL delete
+                        window.location.href = '../App/Model/ExcPegawaiAdminDesa?Act=Delete&Kode=' + idPegawai;
+                    }
+                });
+            } else {
+                // Fallback ke confirm biasa jika SweetAlert tidak tersedia
+                if (confirm('Anda yakin ingin menghapus data: ' + namaPegawai + '?')) {
+                    window.location.href = '../App/Model/ExcPegawaiAdminDesa?Act=Delete&Kode=' + idPegawai;
+                }
             }
         }
     });

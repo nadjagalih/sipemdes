@@ -1,10 +1,13 @@
 <?php
+// Start output buffering untuk mencegah header already sent
+ob_start();
+
 include "../App/Control/FunctionSession.php";
 include "../App/Control/FunctionProfilePegawaiUser.php";
 
 $pg = isset($_GET['pg']) ? $_GET['pg'] : '';
-
-echo '<style>
+?>
+<style>
     /* Override semua warna hijau dengan prioritas tinggi */
     .nav > li.active,
     .nav > li.active > a,
@@ -364,9 +367,8 @@ echo '<style>
         box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08) !important;
         border: none !important;
     }
-</style>';
-
-
+</style>
+<?php
 
 // Set session when visiting the page
 if (isset($_GET['pg']) && ($_GET['pg'] == 'ViewMasaPensiun' || $_GET['pg'] == 'ViewMasaPensiunKades')) {
@@ -567,9 +569,6 @@ $showNotif = ($notifPensiun > 0 && empty($_SESSION['visited_pensiun_sadmin']));
         <li class="<?= isActive('Pass') ?>">
             <a href="?pg=Pass"><i class="fa fa-terminal"></i> <span class="nav-label">Ganti Password</span></a>
         </li>
-        <li class="special_link">
-            <a href="../Auth/SignOut"><i class="fa fa-power-off"></i> <span class="nav-label">Keluar</span></a>
-        </li>
 
         <li class="<?= isActive('ViewPegawaiReportExcel') ?>">
             <a href="?pg=ViewPegawaiReportExcel"><i class="fa fa-print"></i> <span class="nav-label">Laporan
@@ -577,6 +576,10 @@ $showNotif = ($notifPensiun > 0 && empty($_SESSION['visited_pensiun_sadmin']));
             <!-- <ul class="nav nav-second-level collapse">
                 <li><a href="">Semua Data</a></li>
             </ul> -->
+        </li>
+
+        <li class="special_link">
+            <a href="../Auth/SignOut.php" onclick="return confirmLogout();"><i class="fa fa-power-off"></i> <span class="nav-label">Keluar</span></a>
         </li>
 
     </ul>
@@ -593,4 +596,36 @@ $(document).ready(function() {
     $('.nav > li.active > a').attr('aria-expanded', 'true');
     $('.nav > li.active > .nav-second-level').show();
 });
+
+// Logout confirmation function
+function confirmLogout() {
+    var result = confirm('Apakah Anda yakin ingin keluar dari sistem?');
+    if (result) {
+        // Mark that logout is being performed
+        if (typeof(Storage) !== "undefined") {
+            sessionStorage.setItem('logout_performed', 'true');
+        }
+    }
+    return result;
+}
+
+// Additional security: Clear storage on logout click
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutLink = document.querySelector('.special_link a');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', function() {
+            if (typeof(Storage) !== "undefined") {
+                sessionStorage.setItem('logout_performed', 'true');
+                sessionStorage.clear();
+                localStorage.clear();
+            }
+        });
+    }
+});
 </script>
+<?php
+// Flush output buffer
+if (ob_get_level()) {
+    ob_end_flush();
+}
+?>

@@ -9,7 +9,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     header("location: $logout_redirect_url");
 } else {
 
-    if ($_GET['Act'] == 'Save') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
             $ViewTanggal = date('YmdHis');
             $QAward = mysqli_query($db, "SELECT * FROM master_award_desa");
@@ -74,7 +74,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=AwardAdd&alert=SaveError");
             }
         }
-    } elseif ($_GET['Act'] == 'Edit') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
             $IdAward = sql_injeksi($_POST['IdAward']);
             $JenisPenghargaan = sql_injeksi($_POST['JenisPenghargaan']);
@@ -142,23 +142,47 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=AwardEdit&Kode=$IdAward&alert=EditError");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdAward = sql_url($_GET['Kode']);
             
+            // Debug logging
+            error_log("Delete Award Request - IdAward: " . $IdAward);
+            
+            // Check if award exists
+            $checkAward = mysqli_query($db, "SELECT * FROM master_award_desa WHERE IdAward = '$IdAward'");
+            if (!$checkAward || mysqli_num_rows($checkAward) == 0) {
+                error_log("Award not found: " . $IdAward);
+                header("location:../../View/v?pg=AwardView&alert=DeleteError");
+                exit();
+            }
+            
             // Delete related data first (foreign key constraints)
             // Delete peserta award
-            mysqli_query($db, "DELETE FROM desa_award WHERE IdKategoriAwardFK IN (SELECT IdKategoriAward FROM master_kategori_award WHERE IdAwardFK = '$IdAward')");
+            $deletePeserta = mysqli_query($db, "DELETE FROM desa_award WHERE IdKategoriAwardFK IN (SELECT IdKategoriAward FROM master_kategori_award WHERE IdAwardFK = '$IdAward')");
+            if (!$deletePeserta) {
+                error_log("Failed to delete peserta: " . mysqli_error($db));
+            }
+            
             // Delete kategori award
-            mysqli_query($db, "DELETE FROM master_kategori_award WHERE IdAwardFK = '$IdAward'");
+            $deleteKategori = mysqli_query($db, "DELETE FROM master_kategori_award WHERE IdAwardFK = '$IdAward'");
+            if (!$deleteKategori) {
+                error_log("Failed to delete kategori: " . mysqli_error($db));
+            }
+            
             // Delete master award
             $Delete = mysqli_query($db, "DELETE FROM master_award_desa WHERE IdAward = '$IdAward'");
             
             if ($Delete) {
+                error_log("Award deleted successfully: " . $IdAward);
                 header("location:../../View/v?pg=AwardView&alert=DeleteSuccess");
             } else {
+                error_log("Failed to delete award: " . mysqli_error($db));
                 header("location:../../View/v?pg=AwardView&alert=DeleteError");
             }
+        } else {
+            error_log("Delete Award - No Kode parameter");
+            header("location:../../View/v?pg=AwardView&alert=DeleteError");
         }
     }
 }

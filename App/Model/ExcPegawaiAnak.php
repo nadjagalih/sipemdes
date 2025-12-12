@@ -8,7 +8,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
 } else {
-    if ($_GET['Act'] == 'Save') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
 
             $ViewTanggal   = date('YmdHis');
@@ -45,7 +45,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=PegawaiViewAnak&alert=Save");
             }
         }
-    } elseif ($_GET['Act'] == 'Edit') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
             $IdAnak = sql_injeksi($_POST['IdAnak']);
             $NIKAnak = sql_injeksi($_POST['NIKAnak']);
@@ -77,7 +77,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=PegawaiViewAnak&alert=Edit");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdTemp = sql_injeksi(($_GET['Kode']));
 

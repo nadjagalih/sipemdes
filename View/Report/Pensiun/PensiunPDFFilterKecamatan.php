@@ -1,16 +1,6 @@
-<script type="text/javascript">
-    $(document).ready(function() {
-        $.ajax({
-            type: 'POST',
-            url: "Report/Pensiun/GetKecamatan.php",
-            cache: false,
-            success: function(msg) {
-                $("#Kecamatan").html(msg);
-            }
-        });
-    });
-</script>
-
+<?php
+require_once "../Module/Security/CSPHandler.php";
+?>
 <form action="Report/pdf/PdfPensiunFilterKecamatan" method="GET" enctype="multipart/form-data" target="_BLANK">
     <div class="row">
         <div class="col-lg-12">
@@ -43,6 +33,14 @@
                                 <div class="col-lg-6">
                                     <select name="Kecamatan" id="Kecamatan" style="width: 100%;" class="select2_kecamatan form-control" required>
                                         <option value="">Filter Kecamatan</option>
+                                        <?php
+                                        $QueryKecamatanList = mysqli_query($db, "SELECT * FROM master_kecamatan ORDER BY Kecamatan ASC");
+                                        while ($RowKecamatanList = mysqli_fetch_assoc($QueryKecamatanList)) {
+                                            $IdKecamatanList = isset($RowKecamatanList['IdKecamatan']) ? $RowKecamatanList['IdKecamatan'] : '';
+                                            $NamaKecamatanList = isset($RowKecamatanList['Kecamatan']) ? $RowKecamatanList['Kecamatan'] : '';
+                                        ?>
+                                            <option value="<?php echo htmlspecialchars($IdKecamatanList); ?>"><?php echo htmlspecialchars($NamaKecamatanList); ?></option>
+                                        <?php } ?>
                                     </select>
                                 </div>
                             </div>
@@ -59,12 +57,12 @@
 
     <!-- FILTERING -->
     <?php
-    if (isset($_POST['Proses'])) {
-        $Kecamatan = sql_injeksi($_POST['Kecamatan']);
+    if (isset($_GET['Proses'])) {
+        $Kecamatan = sql_injeksi($_GET['Kecamatan']);
 
         $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan ='$Kecamatan' ");
         $DataKecamatan = mysqli_fetch_assoc($QueryKecamatan);
-        $NamaKecamatan = $DataKecamatan['Kecamatan'];
+        $NamaKecamatan = isset($DataKecamatan['Kecamatan']) ? $DataKecamatan['Kecamatan'] : '';
 
     ?>
     <?php } ?>

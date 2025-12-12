@@ -1,4 +1,7 @@
 <?php
+// Include CSP Handler untuk nonce support
+require_once __DIR__ . '/../../../../Module/Security/CSPHandler.php';
+
 $IdKec = $_SESSION['IdKecamatan'];
 $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$IdKec' ");
 $DataQuery = mysqli_fetch_assoc($QueryKecamatan);
@@ -55,33 +58,55 @@ $Kecamatan = $DataQuery['Kecamatan'];
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
             color: white !important;
         }
+        
+        /* Custom styling for DataTables buttons */
+        .dt-buttons .btn {
+            border: 2px solid !important;
+            margin-right: 5px !important;
+            padding: 6px 12px !important;
+            border-radius: 4px !important;
+        }
+        
+        .dt-buttons .btn-outline-default {
+            border-color: #6c757d !important;
+            color: #6c757d !important;
+        }
+        
+        .dt-buttons .btn-outline-success {
+            border-color: #28a745 !important;
+            color: #28a745 !important;
+        }
+        
+        .dt-buttons .btn-outline-danger {
+            border-color: #dc3545 !important;
+            color: #dc3545 !important;
+        }
+        
+        .dt-buttons .btn-outline-primary {
+            border-color: #007bff !important;
+            color: #007bff !important;
+        }
+        
+        .dt-buttons .btn-outline-default:hover {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+        
+        .dt-buttons .btn-outline-success:hover {
+            background-color: #28a745 !important;
+            color: white !important;
+        }
+        
+        .dt-buttons .btn-outline-danger:hover {
+            background-color: #dc3545 !important;
+            color: white !important;
+        }
+        
+        .dt-buttons .btn-outline-primary:hover {
+            background-color: #007bff !important;
+            color: white !important;
+        }
     </style>
-
-    <div class="col-lg-12">
-        <div class="ibox ">
-            <div class="ibox-title">
-                <h5>Filter Data Pensiun</h5>
-            </div>
-
-            <div class="ibox-content">
-
-                <div class="text-left">
-                    <a href="?pg=PensiunFilterDesaKec">
-                        <button type="button" class="btn btn-white" style="width:150px; text-align:center">
-                            Filter Desa
-                        </button>
-                    </a>
-
-                    <a href="?pg=PensiunPDFFilterDesaKec">
-                        <button type="button" class="btn btn-white" style="width:150px; text-align:center">
-                            PDF Desa
-                        </button>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
     <div class="col-lg-12">
         <div class="ibox ">
@@ -90,8 +115,25 @@ $Kecamatan = $DataQuery['Kecamatan'];
             </div>
 
             <div class="ibox-content">
+                <!-- Hidden elements for custom filters -->
+                <div style="display: none;">
+                    <select id="desaFilter">
+                        <option value="">Filter Desa</option>
+                        <?php
+                        $QueryDesaFilter = mysqli_query($db, "SELECT DISTINCT master_desa.IdDesa, master_desa.NamaDesa 
+                            FROM master_desa 
+                            INNER JOIN master_pegawai ON master_desa.IdDesa = master_pegawai.IdDesaFK 
+                            WHERE master_desa.IdKecamatanFK = '$IdKec' 
+                            ORDER BY master_desa.NamaDesa ASC");
+                        while ($RowDesaFilter = mysqli_fetch_assoc($QueryDesaFilter)) {
+                            echo "<option value='" . htmlspecialchars($RowDesaFilter['NamaDesa']) . "'>" . htmlspecialchars($RowDesaFilter['NamaDesa']) . "</option>";
+                        }
+                        ?>
+                    </select>
+                    <input type="search" id="customSearch" placeholder="Search:">
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
+                    <table class="table table-striped table-bordered table-hover pensiun-report-table" id="pensiunTable">
                         <thead style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
                             <tr style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
                                 <th style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white !important; font-weight: bold !important; text-align: center !important;">No</th>
@@ -142,7 +184,8 @@ $Kecamatan = $DataQuery['Kecamatan'];
                                             history_mutasi.IdJabatanFK,
                                             master_jabatan.IdJabatan,
                                             master_jabatan.Jabatan,
-                                            history_mutasi.Setting
+                                            history_mutasi.Setting,
+                                            master_pegawai.IdFilePengajuanPensiunFK
                                         FROM
                                             master_pegawai
                                             LEFT JOIN
@@ -240,6 +283,7 @@ $Kecamatan = $DataQuery['Kecamatan'];
 
                                 $NomorSK = $DataPegawai['NomorSK'];
                                 $SKMutasi = $DataPegawai['FileSKMutasi'];
+                                $IdFilePengajuanPensiun = $DataPegawai['IdFilePengajuanPensiunFK'];
                             ?>
 
                                 <tr class="gradeX">
@@ -284,6 +328,9 @@ $Kecamatan = $DataQuery['Kecamatan'];
                                     </td>
                                     <td>
                                         <?php echo $NomorSK; ?><br>
+                                        <?php if (!is_null($IdFilePengajuanPensiun) && $IdFilePengajuanPensiun != '') { ?>
+                                            <a target='_BLANK' href='../Module/File/ViewFilePengajuan.php?id=<?php echo $IdFilePengajuanPensiun; ?>'>Lihat File Pengajuan Pensiun</a><br>
+                                        <?php } ?>
                                         <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
                                     </td>
 
@@ -303,3 +350,126 @@ $Kecamatan = $DataQuery['Kecamatan'];
         </div>
     </div>
 </div>
+
+<!-- JavaScript untuk filter dropdown -->
+<script <?php echo CSPHandler::scriptNonce(); ?>>
+$(document).ready(function() {
+    console.log('Initializing Pensiun DataTable with custom filters...');
+    
+    // Check if DataTable already exists and destroy it
+    if ($.fn.DataTable.isDataTable('#pensiunTable')) {
+        console.log('DataTable already exists, destroying...');
+        $('#pensiunTable').DataTable().destroy();
+    }
+    
+    // Initialize DataTable dengan konfigurasi yang tepat
+    var table = $('#pensiunTable').DataTable({
+        "dom": '<"row"<"col-sm-6"B><"col-sm-6"<"custom-filters">>>rt<"bottom"ip><"clear">',
+        "pageLength": 10,
+        "searching": true,
+        "paging": true,
+        "info": true,
+        "lengthChange": true,
+        "destroy": true, // Allow reinitialisation
+        "buttons": [
+            {
+                extend: 'copy',
+                text: '<i class="fa fa-copy"></i> Copy',
+                className: 'btn btn-outline btn-default'
+            },
+            {
+                extend: 'csv',
+                text: '<i class="fa fa-file-text-o"></i> CSV',
+                className: 'btn btn-outline btn-success'
+            },
+            {
+                extend: 'excel',
+                text: '<i class="fa fa-file-excel-o"></i> Excel',
+                className: 'btn btn-outline btn-success'
+            },
+            {
+                text: '<i class="fa fa-file-pdf-o"></i> PDF',
+                className: 'btn btn-outline btn-danger',
+                action: function (e, dt, node, config) {
+                    // Get current filter value from moved element
+                    var currentFilter = $('#desaFilterMoved').val() || $('#desaFilter').val();
+                    var pdfUrl = 'UserKecamatan/Report/Pensiun/PdfPensiunReportAll.php';
+                    
+                    // Add filter parameter if exists
+                    if (currentFilter && currentFilter !== '') {
+                        pdfUrl += '?desa=' + encodeURIComponent(currentFilter);
+                    }
+                    
+                    // Open PDF in new window
+                    window.open(pdfUrl, '_blank');
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fa fa-print"></i> Print',
+                className: 'btn btn-outline btn-primary'
+            }
+        ],
+        "language": {
+            "search": "",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "infoEmpty": "Showing 0 to 0 of 0 entries",
+            "infoFiltered": "(filtered from _MAX_ total entries)",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        }
+    });
+
+    console.log('Pensiun DataTable initialized successfully');
+
+    // Move custom filters to the right container
+    setTimeout(function() {
+        // Create the filter HTML
+        var filterHtml = '<div style="text-align: right; padding-top: 5px;">' +
+            '<select class="form-control input-sm" style="display: inline-block; width: 150px; margin-right: 10px;" id="desaFilterMoved">' +
+            $('#desaFilter').html() +
+            '</select>' +
+            '<input type="search" class="form-control input-sm" placeholder="Search:" style="display: inline-block; width: 200px;" id="customSearchMoved">' +
+            '</div>';
+        
+        // Insert into custom-filters container
+        $('.custom-filters').html(filterHtml);
+        
+        // Copy current values
+        $('#desaFilterMoved').val($('#desaFilter').val());
+        $('#customSearchMoved').val($('#customSearch').val());
+        
+        console.log('Pensiun filters moved to custom container');
+    }, 100);
+
+    // Custom search input (use event delegation for moved elements)
+    $(document).on('keyup', '#customSearchMoved', function() {
+        console.log('Pensiun search input:', this.value);
+        table.search(this.value).draw();
+    });
+
+    // Desa filter functionality (use event delegation for moved elements)
+    $(document).on('change', '#desaFilterMoved', function() {
+        var selectedDesa = $(this).val();
+        console.log('Pensiun desa filter changed to:', selectedDesa);
+        
+        if (selectedDesa === '') {
+            table.column(8).search('').draw(); // Column 8 is Unit Kerja column (contains desa name)
+        } else {
+            table.column(8).search(selectedDesa).draw();
+        }
+    });
+
+    // Debug: Check if elements exist
+    setTimeout(function() {
+        console.log('Pensiun moved dropdown exists:', $('#desaFilterMoved').length > 0);
+        console.log('Pensiun moved search input exists:', $('#customSearchMoved').length > 0);
+        console.log('Pensiun custom filters container exists:', $('.custom-filters').length > 0);
+    }, 200);
+});
+</script>

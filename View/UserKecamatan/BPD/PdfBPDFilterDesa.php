@@ -1,6 +1,6 @@
 <?php
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 include '../../../Module/Config/Env.php';
 
@@ -98,26 +98,48 @@ if (isset($_GET['Proses'])) {
         $content .=
             '<tr>
                 <td align="center">' . $Nomor . '</td>';
-        if (empty($Foto)) {
-            $content .=
-                '<td align="center">
-                    <img src="../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
+        
+        // Pengecekan foto dengan validasi file existence
+        if (!empty($Foto)) {
+            // Tentukan path absolut untuk pengecekan file
+            $fotoPath = __DIR__ . '/../../../Vendor/Media/Pegawai/' . $Foto;
+            
+            // Cek apakah file benar-benar ada
+            if (file_exists($fotoPath)) {
+                $content .= '<td align="center">
+                    <img src="../../../Vendor/Media/Pegawai/' . htmlspecialchars($Foto) . '" width="65" height="auto" align="center">
                 </td>';
+            } else {
+                // File tidak ditemukan, tampilkan placeholder text
+                $content .= '<td align="center" style="vertical-align:middle;">-</td>';
+            }
         } else {
-            $content .=
-                '<td align="center">
-                    <img src="../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
-                </td>';
+            // Foto kosong/null, tampilkan placeholder text
+            $content .= '<td align="center" style="vertical-align:middle;">-</td>';
         }
-        $content .= '<td>' . $NIK . '</td>
-                    <td><strong>' . $Nama . '</strong><br><br>' . $Address . '</td>
-                    <td>' . $ViewTglLahir . '<br>';
-        $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
-        $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-        $JenisKelamin = $DataJenKel['Keterangan'];
-        $content .= $JenisKelamin;
+        
+        $content .= '<td>' . htmlspecialchars($NIK) . '</td>
+                    <td><strong>' . htmlspecialchars($Nama) . '</strong><br><br>' . htmlspecialchars($Address) . '</td>
+                    <td>' . htmlspecialchars($ViewTglLahir) . '<br>';
+        
+        // Validasi Jenis Kelamin
+        if (!empty($JenKel)) {
+            $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
+            if ($QueryJenKel && mysqli_num_rows($QueryJenKel) > 0) {
+                $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
+                $JenisKelamin = $DataJenKel['Keterangan'];
+                $content .= htmlspecialchars($JenisKelamin);
+            } else {
+                $content .= '-';
+            }
+        } else {
+            $content .= '-';
+        }
+        
         $content .= '</td>
-                    <td>' . $NamaDesa . '<br>' . $Kecamatan . '<br>' . $Kabupaten . '</td>
+                    <td>' . (!empty($NamaDesa) ? htmlspecialchars($NamaDesa) : '-') . '<br>' . 
+                           (!empty($Kecamatan) ? htmlspecialchars($Kecamatan) : '-') . '<br>' . 
+                           (!empty($Kabupaten) ? htmlspecialchars($Kabupaten) : '-') . '</td>
                 </tr>';
         $Nomor++;
     }
@@ -131,14 +153,12 @@ require_once('../../../Vendor/html2pdf/vendor/autoload.php');
 
 use Spipu\Html2Pdf\Html2Pdf;
 
-$content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(15, 15, 15, 15), false);
-$content2pdf->writeHTML($content);
-// $content2pdf->output();
-$content2pdf->Output('Data BPD Desa ' . $NamaDesa . ' Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I');
+try {
+    $content2pdf = new Html2Pdf('L', 'F4', 'fr');
+    $content2pdf->writeHTML($content);
+    // $content2pdf->output();
+    $content2pdf->Output('Data BPD Desa ' . $NamaDesa . ' Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I');
+} catch (Exception $e) {
+    echo 'Error generating PDF: ' . $e->getMessage();
+}
 ?>
-
-<!--  KETERANGAN OUTPUT
- “I” mengirim file untuk ditampilkan di browser.
- “D” mengirim file ke browser dan memaksa download file.
- “F” simpan ke file server lokal.
- “S” mengembalikan dokumen sebagai string. -->

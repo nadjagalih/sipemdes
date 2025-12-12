@@ -1,5 +1,6 @@
 <?php
 include '../../../Module/Config/Env.php';
+require_once '../Module/Security/CSPHandler.php';
 
 if (isset($_GET['id'])) {
     $IdKecamatan = sql_injeksi($_GET['id']);
@@ -167,7 +168,7 @@ if (isset($_GET['id'])) {
         </div>
     <?php } ?>
 
-    <script type="text/javascript">
+    <script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
         Highcharts.chart('GrafikDesaV', {
             chart: {
                 type: 'column'
@@ -261,7 +262,7 @@ if (isset($_GET['id'])) {
         });
     </script>
 
-    <script type="text/javascript">
+    <script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
         Highcharts.chart('GrafikDesaVBPD', {
             chart: {
                 type: 'column'

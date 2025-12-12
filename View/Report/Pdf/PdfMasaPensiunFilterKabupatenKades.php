@@ -1,8 +1,14 @@
 <?php
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
+// Start output buffering to prevent premature output
+ob_start();
 
 include '../../../Module/Config/Env.php';
+require_once('../../../Vendor/html2pdf/vendor/autoload.php');
+
+use Spipu\Html2Pdf\Html2Pdf;
 
 $Tanggal_Cetak = date('d-m-Y');
 $Waktu_Cetak = date('H:i:s');
@@ -98,28 +104,35 @@ $QueryPegawai = mysqli_query($db, "SELECT
                                             history_mutasi.Setting = 1
                                     ORDER BY master_pegawai.TanggalPensiun ASC");
 while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
-    $IdPegawaiFK = $DataPegawai['IdPegawaiFK'];
-    $Foto = $DataPegawai['Foto'];
-    $NIK = $DataPegawai['NIK'];
-    $Nama = $DataPegawai['Nama'];
-    $Jabatan = $DataPegawai['Jabatan'];
+    $IdPegawaiFK = isset($DataPegawai['IdPegawaiFK']) ? $DataPegawai['IdPegawaiFK'] : '';
+    $Foto = isset($DataPegawai['Foto']) ? $DataPegawai['Foto'] : '';
+    $NIK = isset($DataPegawai['NIK']) ? $DataPegawai['NIK'] : '';
+    $Nama = isset($DataPegawai['Nama']) ? $DataPegawai['Nama'] : '';
+    $Jabatan = isset($DataPegawai['Jabatan']) ? $DataPegawai['Jabatan'] : '';
 
-    $TanggalLahir = $DataPegawai['TanggalLahir'];
-    $exp = explode('-', $TanggalLahir);
-    $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+    $TanggalLahir = isset($DataPegawai['TanggalLahir']) ? $DataPegawai['TanggalLahir'] : '';
+    if (!empty($TanggalLahir)) {
+        $exp = explode('-', $TanggalLahir);
+        $ViewTglLahir = (isset($exp[2]) && isset($exp[1]) && isset($exp[0])) ? $exp[2] . "-" . $exp[1] . "-" . $exp[0] : $TanggalLahir;
+    } else {
+        $ViewTglLahir = '-';
+    }
 
-    $TanggalMutasi = $DataPegawai['TanggalMutasi'];
-    $exp1 = explode('-', $TanggalMutasi);
-    $ViewTglMutasi = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
-    // $AddTahun = $exp1[0] + 6;
-
-    $TanggalPensiun = date('Y-m-d', strtotime('+6 year', strtotime($TanggalMutasi)));
+    $TanggalMutasi = isset($DataPegawai['TanggalMutasi']) ? $DataPegawai['TanggalMutasi'] : '';
+    if (!empty($TanggalMutasi)) {
+        $exp1 = explode('-', $TanggalMutasi);
+        $ViewTglMutasi = (isset($exp1[2]) && isset($exp1[1]) && isset($exp1[0])) ? $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0] : $TanggalMutasi;
+        $TanggalPensiun = date('Y-m-d', strtotime('+6 year', strtotime($TanggalMutasi)));
+    } else {
+        $ViewTglMutasi = '-';
+        $TanggalPensiun = date('Y-m-d', strtotime('+6 year'));
+    }
+    
     $ViewTglPensiun = date('d-m-Y', strtotime($TanggalPensiun));
 
     $TglPensiun = date_create($TanggalPensiun);
     $TglSekarang = date_create();
     $Temp = date_diff($TglSekarang, $TglPensiun);
-
 
     $TglSekarang1 = date('Y-m-d');
 
@@ -134,26 +147,26 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     }
     //SELESAI
 
-    $JenKel = $DataPegawai['JenKel'];
-    $NamaDesa = $DataPegawai['NamaDesa'];
-    $Kecamatan = $DataPegawai['Kecamatan'];
-    $Kabupaten = $DataPegawai['Kabupaten'];
-    $Alamat = $DataPegawai['Alamat'];
-    $RT = $DataPegawai['RT'];
-    $RW = $DataPegawai['RW'];
+    $JenKel = isset($DataPegawai['JenKel']) ? $DataPegawai['JenKel'] : '';
+    $NamaDesa = isset($DataPegawai['NamaDesa']) ? $DataPegawai['NamaDesa'] : '';
+    $Kecamatan = isset($DataPegawai['Kecamatan']) ? $DataPegawai['Kecamatan'] : '';
+    $Kabupaten = isset($DataPegawai['Kabupaten']) ? $DataPegawai['Kabupaten'] : '';
+    $Alamat = isset($DataPegawai['Alamat']) ? $DataPegawai['Alamat'] : '';
+    $RT = isset($DataPegawai['RT']) ? $DataPegawai['RT'] : '';
+    $RW = isset($DataPegawai['RW']) ? $DataPegawai['RW'] : '';
 
-    $Lingkungan = $DataPegawai['Lingkungan'];
+    $Lingkungan = isset($DataPegawai['Lingkungan']) ? $DataPegawai['Lingkungan'] : '';
     $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
     $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-    $Komunitas = $LingkunganBPD['NamaDesa'];
+    $Komunitas = isset($LingkunganBPD['NamaDesa']) ? $LingkunganBPD['NamaDesa'] : '';
 
-    $KecamatanBPD = $DataPegawai['Kec'];
+    $KecamatanBPD = isset($DataPegawai['Kec']) ? $DataPegawai['Kec'] : '';
     $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
     $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-    $KomunitasKec = $KecamatanBPD['Kecamatan'];
+    $KomunitasKec = isset($KecamatanBPD['Kecamatan']) ? $KecamatanBPD['Kecamatan'] : '';
 
     $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
-    $Setting = $DataPegawai['Setting'];
+    $Setting = isset($DataPegawai['Setting']) ? $DataPegawai['Setting'] : '';
 
     $content .=
         '<tr>
@@ -174,7 +187,7 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
                     <td width="80">' . $ViewTglLahir;
     $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
     $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-    $JenisKelamin = $DataJenKel['Keterangan'];
+    $JenisKelamin = isset($DataJenKel['Keterangan']) ? $DataJenKel['Keterangan'] : '-';
 
     $content .=
         '<br>' . $JenisKelamin . '</td>
@@ -199,14 +212,21 @@ $content .= '</tbody>
                 </body>
                 </html>';
 
-require_once('../../../Vendor/html2pdf/vendor/autoload.php');
+// Clear any previous output
+ob_clean();
 
-use Spipu\Html2Pdf\Html2Pdf;
+try {
+    $content2pdf = new Html2Pdf('L', 'F4', 'en');
+    $content2pdf->writeHTML($content);
+    $content2pdf->Output('Data Masa Pensiun Perangkat Desa Kabupaten ' . " " . $Kabupaten . '_' . $DateCetak . '.pdf', 'I');
+} catch (Exception $e) {
+    // Clear buffer and show error
+    ob_clean();
+    echo 'Error saat membuat PDF: ' . $e->getMessage();
+}
 
-$content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(15, 15, 15, 15), false);
-$content2pdf->writeHTML($content);
-// $html2pdf->output();
-$content2pdf->Output('Data Masa Pensiun Perangkat Desa Kecamatan ' . " " . $NamaKecamatan . '_' . $DateCetak . '.pdf', 'I'); //NAMA FILE, I/D/F/S
+// End output buffering
+ob_end_flush();
 ?>
 
 <!--  KETERANGAN OUTPUT

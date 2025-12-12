@@ -1,18 +1,37 @@
 <?php
+// Include safe helpers and CSP handler
+require_once __DIR__ . '/../../helpers/safe_helpers.php';
+require_once __DIR__ . '/../../Module/Security/CSPHandler.php';
+
+// Set CSP headers
+CSPHandler::setCSPHeaders();
+
 include "../App/Control/FunctionDesaEdit.php";
 ?>
 
 <!-- Bootstrap CSS -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="../Assets/css/local-fonts.css" rel="stylesheet">
 <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- jQuery -->
+<script <?php echo CSPHandler::scriptNonce(); ?> src="../../Vendor/Assets/js/jquery-3.7.1.min.js"></script>
 
-<!-- SweetAlert -->
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin=""
+      onerror="console.error('Failed to load Leaflet CSS')"/>
+<script <?php echo CSPHandler::scriptNonce(); ?> 
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+        onload="console.log('Leaflet JS loaded successfully')"
+        onerror="console.error('Failed to load Leaflet JS')"></script>
+
+<!-- SweetAlert2 -->
+<link href="../Assets/sweetalert/sweetalert2.min.css" rel="stylesheet">
+<script <?php echo CSPHandler::scriptNonce(); ?> src="../Assets/sweetalert/sweetalert2.min.js"></script>
 
 <style>
     /* Map Container Styles */
@@ -297,7 +316,7 @@ include "../App/Control/FunctionDesaEdit.php";
                                         <i class="fas fa-save"></i> Update Data
                                     </button>
                                     <a href="?pg=DesaView" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left"></i> Batal
+                                        <i class="fas fa-arrow-left"></i> Kembali
                                     </a>
                                 </div>
                             </div>
@@ -335,7 +354,11 @@ include "../App/Control/FunctionDesaEdit.php";
                         
                         <div class="ibox-content" style="padding: 0;">
                             <div class="map-container">
-                                <div id="koordinatMap"></div>
+                                <div id="koordinatMap" style="height: 400px; width: 100%; min-height: 400px; background: #f0f0f0; border: 2px solid #ddd;">
+                                    <div id="mapStatus" style="padding: 20px; text-align: center; color: #666;">
+                                        📍 Memuat peta...
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -346,154 +369,263 @@ include "../App/Control/FunctionDesaEdit.php";
 </div>
 
 <!-- Map Script -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Koordinat default
-        var defaultLat = <?php echo !empty($EditLatitude) ? $EditLatitude : '-8.055'; ?>;
-        var defaultLng = <?php echo !empty($EditLongitude) ? $EditLongitude : '111.715'; ?>;
+<script <?php echo CSPHandler::scriptNonce(); ?>>
+    // Global variables
+    var map = null;
+    var marker = null;
+    var isMapInitialized = false;
 
-        // Initialize map
-        var map = L.map('koordinatMap').setView([defaultLat, defaultLng], 13);
-
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        // Marker untuk menunjukkan lokasi yang dipilih
-        var marker = null;
-        
-        // Search functionality
-        var searchInput = document.getElementById('searchInput');
-        var searchButton = document.getElementById('searchButton');
-        var searchClear = document.getElementById('searchClear');
-        var searchResults = document.getElementById('searchResults');
-        var searchTimeout = null;
-
-        // Show/hide clear button
-        function toggleClearButton() {
-            searchClear.style.display = searchInput.value.length > 0 ? 'block' : 'none';
+    // Update coordinates function
+    function updateCoordinates(lat, lng) {
+        try {
+            document.getElementById('currentLat').textContent = lat.toFixed(6);
+            document.getElementById('currentLng').textContent = lng.toFixed(6);
+            document.getElementById('Latitude').value = lat.toFixed(6);
+            document.getElementById('Longitude').value = lng.toFixed(6);
+            console.log('📍 Coordinates updated:', lat.toFixed(6), lng.toFixed(6));
+        } catch (error) {
+            console.error('❌ Error updating coordinates:', error);
         }
+    }
 
-        // Search function
-        function searchLocation(query) {
-            if (query.length < 3) {
-                hideSearchResults();
+    // Simple map initialization
+    function initMap() {
+        try {
+            console.log('🗺️ Starting map initialization...');
+            
+            if (typeof L === 'undefined') {
+                console.error('❌ Leaflet not loaded');
                 return;
             }
-
-            showSearchResults();
-            searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Mencari lokasi...</div>';
-
-            var nominatimUrl = 'https://nominatim.openstreetmap.org/search?' +
-                'format=json' +
-                '&q=' + encodeURIComponent(query) +
-                '&countrycodes=id' +
-                '&limit=8' +
-                '&addressdetails=1';
-
-            fetch(nominatimUrl)
-                .then(response => response.json())
-                .then(data => {
-                    displaySearchResults(data);
-                })
-                .catch(error => {
-                    console.error('Search error:', error);
-                    searchResults.innerHTML = '<div class="search-no-results">Terjadi kesalahan saat mencari lokasi</div>';
-                });
-        }
-
-        // Display search results
-        function displaySearchResults(results) {
-            searchResults.innerHTML = '';
             
-            if (results.length === 0) {
-                searchResults.innerHTML = '<div class="search-no-results">Lokasi tidak ditemukan</div>';
-                return;
-            }
-
-            results.forEach(function(result) {
-                var resultItem = document.createElement('div');
-                resultItem.className = 'search-result-item';
-                
-                var title = result.display_name.split(',')[0];
-                var description = result.display_name.split(',').slice(1, 3).join(',');
-                
-                resultItem.innerHTML = 
-                    '<div class="search-result-title">' + title + '</div>' +
-                    '<div class="search-result-description">' + description + '</div>';
-                
-                resultItem.addEventListener('click', function() {
-                    selectSearchResult(result, title);
-                });
-                
-                searchResults.appendChild(resultItem);
-            });
-        }
-
-        // Select search result
-        function selectSearchResult(result, title) {
-            var lat = parseFloat(result.lat);
-            var lng = parseFloat(result.lon);
+            var lat = <?php echo !empty($EditLatitude) && is_numeric($EditLatitude) ? $EditLatitude : '-8.055'; ?>;
+            var lng = <?php echo !empty($EditLongitude) && is_numeric($EditLongitude) ? $EditLongitude : '111.715'; ?>;
             
-            searchInput.value = title;
-            toggleClearButton();
-            hideSearchResults();
+            console.log('📍 Using coordinates:', lat, lng);
             
-            if (marker) {
-                map.removeLayer(marker);
-            }
+            map = L.map('koordinatMap').setView([lat, lng], 13);
             
-            marker = L.marker([lat, lng], {
-                draggable: true
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
             }).addTo(map);
             
-            marker.bindPopup('<b>' + title + '</b><br>Lokasi dari pencarian').openPopup();
-            
-            updateCoordinates(lat, lng);
-            map.setView([lat, lng], 15);
-            
+            // Add existing marker if coordinates exist
+            <?php if (!empty($EditLatitude) && !empty($EditLongitude)): ?>
+            marker = L.marker([lat, lng], {draggable: true}).addTo(map);
+            marker.bindPopup('<b><?php echo addslashes($EditNamaDesa ?? 'Desa'); ?></b><br>Lokasi saat ini').openPopup();
             marker.on('dragend', function(e) {
-                var position = marker.getLatLng();
-                updateCoordinates(position.lat, position.lng);
+                updateCoordinates(marker.getLatLng().lat, marker.getLatLng().lng);
+            });
+            <?php endif; ?>
+            
+            // Map click event
+            map.on('click', function(e) {
+                if (marker) map.removeLayer(marker);
+                marker = L.marker([e.latlng.lat, e.latlng.lng], {draggable: true}).addTo(map);
+                marker.bindPopup('<b><?php echo addslashes($EditNamaDesa ?? 'Desa'); ?></b><br>Lokasi baru').openPopup();
+                marker.on('dragend', function(e) {
+                    updateCoordinates(marker.getLatLng().lat, marker.getLatLng().lng);
+                });
+                updateCoordinates(e.latlng.lat, e.latlng.lng);
+            });
+            
+            isMapInitialized = true;
+            console.log('✅ Map initialized successfully');
+            
+        } catch (error) {
+            console.error('❌ Map initialization error:', error);
+        }
+    }
+
+    // Search functionality
+    var searchInput = document.getElementById('searchInput');
+    var searchButton = document.getElementById('searchButton');
+    var searchClear = document.getElementById('searchClear');
+    var searchResults = document.getElementById('searchResults');
+    var searchTimeout = null;
+
+    // Show/hide clear button
+    function toggleClearButton() {
+        if (searchClear && searchInput) {
+            searchClear.style.display = searchInput.value.length > 0 ? 'block' : 'none';
+        }
+    }
+
+    // Search function
+    function searchLocation(query) {
+        if (query.length < 3) {
+            hideSearchResults();
+            return;
+        }
+
+        showSearchResults();
+        searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Mencari lokasi...</div>';
+
+        var nominatimUrl = 'https://nominatim.openstreetmap.org/search?' +
+            'format=json' +
+            '&q=' + encodeURIComponent(query) +
+            '&countrycodes=id' +
+            '&limit=8' +
+            '&addressdetails=1';
+
+        fetch(nominatimUrl)
+            .then(response => response.json())
+            .then(data => {
+                displaySearchResults(data);
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                searchResults.innerHTML = '<div class="search-no-results">Terjadi kesalahan saat mencari lokasi</div>';
+            });
+    }
+
+    // Display search results
+    function displaySearchResults(results) {
+        searchResults.innerHTML = '';
+        
+        if (results.length === 0) {
+            searchResults.innerHTML = '<div class="search-no-results">Lokasi tidak ditemukan</div>';
+            return;
+        }
+
+        results.forEach(function(result) {
+            var resultItem = document.createElement('div');
+            resultItem.className = 'search-result-item';
+            
+            var title = result.display_name.split(',')[0];
+            var description = result.display_name.split(',').slice(1, 3).join(',');
+            
+            resultItem.innerHTML = 
+                '<div class="search-result-title">' + title + '</div>' +
+                '<div class="search-result-description">' + description + '</div>';
+            
+            resultItem.addEventListener('click', function() {
+                selectSearchResult(result, title);
+            });
+            
+            searchResults.appendChild(resultItem);
+        });
+    }
+
+    // Select search result
+    function selectSearchResult(result, title) {
+        var lat = parseFloat(result.lat);
+        var lng = parseFloat(result.lon);
+        
+        searchInput.value = title;
+        toggleClearButton();
+        hideSearchResults();
+        
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        
+        marker = L.marker([lat, lng], {
+            draggable: true
+        }).addTo(map);
+        
+        marker.bindPopup('<b>' + title + '</b><br>Lokasi dari pencarian').openPopup();
+        
+        updateCoordinates(lat, lng);
+        map.setView([lat, lng], 15);
+        
+        marker.on('dragend', function(e) {
+            var position = marker.getLatLng();
+            updateCoordinates(position.lat, position.lng);
+        });
+    }
+
+    // Show/hide search results
+    function showSearchResults() {
+        if (searchResults) {
+            searchResults.style.display = 'block';
+        }
+    }
+
+    function hideSearchResults() {
+        if (searchResults) {
+            searchResults.style.display = 'none';
+        }
+    }
+
+    // Initialize on document ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM loaded, preparing map...');
+        
+        // Check for success/error alerts
+        const urlParams = new URLSearchParams(window.location.search);
+        const alert = urlParams.get('alert');
+        
+        if (alert === 'Edit') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data desa berhasil diperbarui.',
+                confirmButtonColor: '#1c84c6',
+                confirmButtonText: 'OK'
+            });
+        } else if (alert === 'Save') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data desa berhasil disimpan.',
+                confirmButtonColor: '#1c84c6',
+                confirmButtonText: 'OK'
+            });
+        } else if (alert === 'Error') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: 'Terjadi kesalahan saat menyimpan data.',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        }
+        
+        // Wait for Leaflet to load
+        var checkLeaflet = function() {
+            if (typeof L !== 'undefined') {
+                console.log('✅ Leaflet detected, initializing map...');
+                setTimeout(initMap, 500);
+            } else {
+                console.log('⏳ Waiting for Leaflet...');
+                setTimeout(checkLeaflet, 100);
+            }
+        };
+        
+        checkLeaflet();
+
+        // Setup search events if elements exist
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                toggleClearButton();
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    searchLocation(searchInput.value);
+                }, 500);
+            });
+
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchLocation(searchInput.value);
+                }
             });
         }
 
-        // Show/hide search results
-        function showSearchResults() {
-            searchResults.style.display = 'block';
+        if (searchButton) {
+            searchButton.addEventListener('click', function() {
+                searchLocation(searchInput.value);
+            });
         }
 
-        function hideSearchResults() {
-            searchResults.style.display = 'none';
+        if (searchClear) {
+            searchClear.addEventListener('click', function() {
+                searchInput.value = '';
+                toggleClearButton();
+                hideSearchResults();
+            });
         }
-
-        // Search events
-        searchInput.addEventListener('input', function() {
-            toggleClearButton();
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(function() {
-                searchLocation(searchInput.value);
-            }, 500);
-        });
-
-        searchButton.addEventListener('click', function() {
-            searchLocation(searchInput.value);
-        });
-
-        searchClear.addEventListener('click', function() {
-            searchInput.value = '';
-            toggleClearButton();
-            hideSearchResults();
-        });
-
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                searchLocation(searchInput.value);
-            }
-        });
 
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.search-box-external')) {
@@ -503,67 +635,27 @@ include "../App/Control/FunctionDesaEdit.php";
 
         toggleClearButton();
 
-        // Jika sudah ada koordinat, tampilkan marker
-        <?php if (!empty($EditLatitude) && !empty($EditLongitude)): ?>
-            marker = L.marker([defaultLat, defaultLng], {
-                draggable: true
-            }).addTo(map);
+        // Setup form validation
+        setTimeout(function() {
+            var form = document.getElementById('desaEditForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    var namaDesa = document.getElementById('Desa').value.trim();
+                    var kodeDesa = document.getElementById('KodeDesa').value.trim();
 
-            marker.bindPopup('<b><?php echo $EditNamaDesa; ?></b><br>Lokasi saat ini').openPopup();
-
-            marker.on('dragend', function(e) {
-                var position = marker.getLatLng();
-                updateCoordinates(position.lat, position.lng);
-            });
-        <?php endif; ?>
-
-        // Event ketika peta diklik
-        map.on('click', function(e) {
-            var lat = e.latlng.lat;
-            var lng = e.latlng.lng;
-
-            if (marker) {
-                map.removeLayer(marker);
-            }
-
-            marker = L.marker([lat, lng], {
-                draggable: true
-            }).addTo(map);
-
-            marker.bindPopup('<b><?php echo $EditNamaDesa; ?></b><br>Lokasi baru').openPopup();
-            updateCoordinates(lat, lng);
-
-            marker.on('dragend', function(e) {
-                var position = marker.getLatLng();
-                updateCoordinates(position.lat, position.lng);
-            });
-        });
-
-        // Update koordinat
-        function updateCoordinates(lat, lng) {
-            document.getElementById('currentLat').textContent = lat.toFixed(6);
-            document.getElementById('currentLng').textContent = lng.toFixed(6);
-            document.getElementById('Latitude').value = lat.toFixed(6);
-            document.getElementById('Longitude').value = lng.toFixed(6);
-        }
-
-        // Form validation
-        document.getElementById('desaEditForm').addEventListener('submit', function(e) {
-            var namaDesa = document.getElementById('Desa').value.trim();
-            var kodeDesa = document.getElementById('KodeDesa').value.trim();
-
-            if (!namaDesa || !kodeDesa) {
-                e.preventDefault();
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Nama Desa dan Kode Desa harus diisi.',
-                    type: 'warning',
-                    confirmButtonColor: '#007bff'
+                    if (!namaDesa || !kodeDesa) {
+                        e.preventDefault();
+                        swal({
+                            title: 'Peringatan!',
+                            text: 'Nama Desa dan Kode Desa harus diisi.',
+                            type: 'warning',
+                            confirmButtonColor: '#007bff'
+                        });
+                        return false;
+                    }
+                    return true;
                 });
-                return false;
             }
-
-            return true;
-        });
+        }, 1000);
     });
 </script>

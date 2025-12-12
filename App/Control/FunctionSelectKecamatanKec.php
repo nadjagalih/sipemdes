@@ -1,7 +1,7 @@
 <?php
 if ($EditIdKecamatanFK == '') {
 ?>
-    <select name="IdKecamatan" id="IdKecamatan" style="width: 100%;" class="select2_kecamatan form-control" required>
+    <select name="IdKecamatan" id="IdKecamatan" style="width: 100%;" class="select2_akses form-control" required>
         <option value="">Pilih Kecamatan</option>
         <?php
         $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan ORDER BY Kecamatan ASC");
@@ -15,7 +15,7 @@ if ($EditIdKecamatanFK == '') {
     </select>
 <?php } elseif ($EditIdKecamatanFK <> '') {
 ?>
-    <select name="IdKecamatan" id="IdKecamatan" style="width: 100%;" class="select2_kecamatan form-control" required>
+    <select name="IdKecamatan" id="IdKecamatan" style="width: 100%;" class="select2_akses form-control" required>
         <option value="<?php echo $EditIdKecamatanFK; ?>"><?php echo $EditNamaKecamatan; ?></option>
         <?php
         $QueryKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan <> '$EditIdKecamatanFK' ORDER BY Kecamatan ASC");

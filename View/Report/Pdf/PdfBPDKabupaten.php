@@ -1,6 +1,6 @@
 <?php
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 include '../../../Module/Config/Env.php';
 $Tanggal_Cetak = date('d-m-Y');
@@ -121,10 +121,14 @@ require_once('../../../Vendor/html2pdf/vendor/autoload.php');
 
 use Spipu\Html2Pdf\Html2Pdf;
 
-$content2pdf = new Html2Pdf('L', 'F4', 'fr', true, 'UTF-8', array(15, 15, 15, 15), false);
-$content2pdf->writeHTML($content);
-// $html2pdf->output();
-$content2pdf->Output('Data BPD Desa Kabupaten ' . " " . $Kabupaten . '_' . $DateCetak . '.pdf', 'I');
+try {
+    $content2pdf = new Html2Pdf('L', 'F4', 'fr');
+    $content2pdf->writeHTML($content);
+    // $html2pdf->output();
+    $content2pdf->Output('Data BPD Desa Kabupaten ' . " " . $Kabupaten . '_' . $DateCetak . '.pdf', 'I');
+} catch (Exception $e) {
+    echo 'Error generating PDF: ' . $e->getMessage();
+}
 ?>
 <!--  KETERANGAN OUTPUT
  “I” mengirim file untuk ditampilkan di browser.

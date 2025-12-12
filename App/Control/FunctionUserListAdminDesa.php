@@ -90,9 +90,12 @@ while ($DataUser = mysqli_fetch_assoc($QueryUser)) {
                 <a href="?pg=UserEditAdminDesa&Kode=<?php echo $IdUser; ?>">
                     <button class="btn btn-outline btn-success btn-xs" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></button>
                 </a>
-                <a href="../App/Model/ExcUserAdminDesa?Act=Delete&Kode=<?php echo $IdUser; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $NameAkses; ?> ?');">
-                    <button class="btn btn-outline btn-danger  btn-xs " data-toggle="tooltip" title="Delete"><i class="fa fa-eraser"></i></button>
-                </a>
+                <button class="btn btn-outline btn-danger btn-xs" data-toggle="tooltip" title="Delete" 
+                        onclick="confirmDelete('<?php echo $IdUser; ?>', '<?php echo htmlspecialchars($NameAkses, ENT_QUOTES); ?>')"
+                        data-user-id="<?php echo $IdUser; ?>" 
+                        data-user-name="<?php echo htmlspecialchars($NameAkses, ENT_QUOTES); ?>">
+                    <i class="fa fa-eraser"></i>
+                </button>
             <?php } ?>
         </td>
     </tr>

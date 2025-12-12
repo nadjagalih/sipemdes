@@ -48,9 +48,17 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
             color: white !important;
         }
-    </style>
-
-    <div class="col-lg-12">
+        
+        /* Perkecil kolom jabatan */
+        .dataTables-kecamatan th:nth-child(9),
+        .dataTables-kecamatan td:nth-child(9) {
+            width: 120px !important;
+            max-width: 120px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        </style>    <div class="col-lg-12">
         <div class="ibox ">
             <div class="ibox-title">
                 <h5>Filter Pemerintah Desa</h5>
@@ -75,23 +83,6 @@
         <div class="ibox ">
             <div class="ibox-title">
                 <h5>List Semua Data Pemerintah Desa</h5>
-                <div class="ibox-tools">
-                    <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
-                    </a>
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-wrench"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#" class="dropdown-item">Config option 1</a>
-                        </li>
-                        <li><a href="#" class="dropdown-item">Config option 2</a>
-                        </li>
-                    </ul>
-                    <a class="close-link">
-                        <i class="fa fa-times"></i>
-                    </a>
-                </div>
             </div>
 
             <div class="ibox-content">
@@ -184,28 +175,48 @@
 
                                 $TanggalLahir = $DataPegawai['TanggalLahir'];
                                 $exp = explode('-', $TanggalLahir);
-                                $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+                                if (count($exp) >= 3) {
+                                    $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+                                } else {
+                                    $ViewTglLahir = $TanggalLahir;
+                                }
 
-                                $TanggalPensiun = $DataPegawai['TanggalPensiun'];
-                                $exp1 = explode('-', $TanggalPensiun);
-                                $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+                                // Check if TanggalPensiun exists and is not empty
+                                if (isset($DataPegawai['TanggalPensiun']) && !empty($DataPegawai['TanggalPensiun'])) {
+                                    $TanggalPensiun = $DataPegawai['TanggalPensiun'];
+                                    $exp1 = explode('-', $TanggalPensiun);
+                                    if (count($exp1) >= 3) {
+                                        $ViewTglPensiun = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+                                    } else {
+                                        $ViewTglPensiun = $TanggalPensiun;
+                                    }
+                                } else {
+                                    $TanggalPensiun = '';
+                                    $ViewTglPensiun = '-';
+                                }
 
                                 //HITUNG DETAIL TANGGAL PENSIUN
-                                $TglPensiun = date_create($TanggalPensiun);
-                                $TglSekarang = date_create();
-                                $Temp = date_diff($TglSekarang, $TglPensiun);
+                                if (!empty($TanggalPensiun)) {
+                                    $TglPensiun = date_create($TanggalPensiun);
+                                    $TglSekarang = date_create();
+                                    $Temp = date_diff($TglSekarang, $TglPensiun);
 
-                                //CEK TANGGAL ASLI SAAT INI
-                                $TglSekarang1 = Date('Y-m-d');
+                                    //CEK TANGGAL ASLI SAAT INI
+                                    $TglSekarang1 = Date('Y-m-d');
 
-                                if ($TglSekarang1 >= $TanggalPensiun) {
-                                    $HasilTahun = 0 . ' Tahun ';
-                                    $HasilBulan = 0 . ' Bulan ';
-                                    $HasilHari = 0 . ' Hari ';
-                                } elseif ($TglSekarang1 < $TanggalPensiun) {
-                                    $HasilTahun = $Temp->y . ' Tahun ';
-                                    $HasilBulan = $Temp->m . ' Bulan ';
-                                    $HasilHari = $Temp->d + 1 . ' Hari ';
+                                    if ($TglSekarang1 >= $TanggalPensiun) {
+                                        $HasilTahun = 0 . ' Tahun ';
+                                        $HasilBulan = 0 . ' Bulan ';
+                                        $HasilHari = 0 . ' Hari ';
+                                    } elseif ($TglSekarang1 < $TanggalPensiun) {
+                                        $HasilTahun = $Temp->y . ' Tahun ';
+                                        $HasilBulan = $Temp->m . ' Bulan ';
+                                        $HasilHari = $Temp->d + 1 . ' Hari ';
+                                    }
+                                } else {
+                                    $HasilTahun = '-';
+                                    $HasilBulan = '';
+                                    $HasilHari = '';
                                 }
                                 //SELESAI
 
@@ -221,23 +232,31 @@
                                 $Lingkungan = $DataPegawai['Lingkungan'];
                                 $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
                                 $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-                                $Komunitas = $LingkunganBPD['NamaDesa'];
+                                $Komunitas = ($LingkunganBPD && isset($LingkunganBPD['NamaDesa'])) ? $LingkunganBPD['NamaDesa'] : 'Unknown';
 
                                 $KecamatanBPD = $DataPegawai['Kec'];
                                 $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
-                                $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-                                $KomunitasKec = $KecamatanBPD['Kecamatan'];
+                                $KecamatanBPDData = mysqli_fetch_assoc($AmbilKecamatan);
+                                $KomunitasKec = ($KecamatanBPDData && isset($KecamatanBPDData['Kecamatan'])) ? $KecamatanBPDData['Kecamatan'] : 'Unknown';
 
                                 $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
                                 $Setting = $DataPegawai['Setting'];
-                                $JenisMutasi = $DataPegawai['JenisMutasi'];
+                                $JenisMutasi = isset($DataPegawai['JenisMutasi']) ? $DataPegawai['JenisMutasi'] : '-';
 
-                                $TglSKMutasi = $DataPegawai['TanggalMutasi'];
-                                $exp2 = explode('-', $TglSKMutasi);
-                                $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
+                                if (isset($DataPegawai['TanggalMutasi']) && !empty($DataPegawai['TanggalMutasi'])) {
+                                    $TglSKMutasi = $DataPegawai['TanggalMutasi'];
+                                    $exp2 = explode('-', $TglSKMutasi);
+                                    if (count($exp2) >= 3) {
+                                        $TanggalMutasi = $exp2[2] . "-" . $exp2[1] . "-" . $exp2[0];
+                                    } else {
+                                        $TanggalMutasi = $TglSKMutasi;
+                                    }
+                                } else {
+                                    $TanggalMutasi = '-';
+                                }
 
-                                $NomorSK = $DataPegawai['NomorSK'];
-                                $SKMutasi = $DataPegawai['FileSKMutasi'];
+                                $NomorSK = isset($DataPegawai['NomorSK']) ? $DataPegawai['NomorSK'] : '-';
+                                $SKMutasi = isset($DataPegawai['FileSKMutasi']) ? $DataPegawai['FileSKMutasi'] : '';
                                 $Jabatan = $DataPegawai['Jabatan'];
                                 $KetJabatan = $DataPegawai['KeteranganJabatan'];
                                 $Siltap =  number_format($DataPegawai['Siltap'], 0, ",", ".");

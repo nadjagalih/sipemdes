@@ -1,18 +1,18 @@
 <?php
 if (empty($_GET['alert'])) {
     echo "";
-} elseif ($_GET['alert'] == 'UploadSukses') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadSukses') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
                     title: 'Upload Berhasil',
-                    text: 'File telah berhasil diupload.',
+                    text: 'File pengajuan pensiun telah berhasil diupload dan sedang menunggu persetujuan dari Desa.',
                     type: 'success'
                 });
             }, 1000);
           </script>";
 
-} elseif ($_GET['alert'] == 'UploadGagalPegawai') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadGagalPegawai') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -22,7 +22,7 @@ if (empty($_GET['alert'])) {
                 });
             }, 1000);
           </script>";
-} elseif ($_GET['alert'] == 'UploadGagalDB') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadGagalDB') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -44,13 +44,27 @@ if (empty($_GET['alert'])) {
 
 $idPegawai = $_SESSION['IdPegawai'];
 
-$q = mysqli_query($db, "SELECT TanggalPensiun, IdPegawaiFK, IdFilePengajuanPensiunFK, StatusPensiunDesa, StatusPensiunKecamatan, StatusPensiunKabupaten From master_pegawai p WHERE p.IdPegawaiFK = '$idPegawai'");
+// Query dengan JOIN ke history_mutasi untuk mendapatkan TanggalMutasi dan IdJabatanFK
+$q = mysqli_query($db, "SELECT 
+    p.TanggalPensiun, 
+    p.IdPegawaiFK, 
+    p.IdFilePengajuanPensiunFK, 
+    p.StatusPensiunDesa, 
+    p.StatusPensiunKecamatan, 
+    p.StatusPensiunKabupaten,
+    h.TanggalMutasi,
+    h.IdJabatanFK
+FROM master_pegawai p
+LEFT JOIN history_mutasi h ON p.IdPegawaiFK = h.IdPegawaiFK AND h.Setting = 1
+WHERE p.IdPegawaiFK = '$idPegawai'");
 $data = mysqli_fetch_assoc($q);
 
 $FilePengajuan = $data['IdFilePengajuanPensiunFK'];
 $StatusPensiunDesa = $data['StatusPensiunDesa'];
 $StatusPensiunKecamatan = $data['StatusPensiunKecamatan'];
 $StatusPensiunKabupaten = $data['StatusPensiunKabupaten'];
+$IdJabatanFK = $data['IdJabatanFK'];
+$TanggalMutasi = $data['TanggalMutasi'];
 
 $flagTampilkanUpload = false;
 
@@ -67,45 +81,413 @@ if ($StatusPensiunKabupaten === '0') {
     $flagTampilkanUpload = true;
 }
 
-$tanggalPensiun = $data['TanggalPensiun'];
+// Hitung tanggal pensiun berdasarkan jabatan
+// Jika Kepala Desa (IdJabatanFK = 1), pensiun = TanggalMutasi + 6 tahun
+// Jika bukan Kepala Desa, gunakan TanggalPensiun dari master_pegawai
+if ($IdJabatanFK == 1 && !is_null($TanggalMutasi)) {
+    $tanggalPensiun = date('Y-m-d', strtotime('+6 year', strtotime($TanggalMutasi)));
+} else {
+    $tanggalPensiun = $data['TanggalPensiun'];
+}
 
 $tanggalSekarang = date('Y-m-d');
 
-if ($tanggalPensiun <= $tanggalSekarang && $flagTampilkanUpload) {
-    ?>
+// Hitung tanggal 3 bulan sebelum pensiun
+$tanggal3BulanSebelumPensiun = date('Y-m-d', strtotime('-3 months', strtotime($tanggalPensiun)));
 
+// Tampilkan box ajukan pensiun jika sudah kurang dari 3 bulan sebelum pensiun atau sudah lewat tanggal pensiun
+if ($tanggalSekarang >= $tanggal3BulanSebelumPensiun) {
+    // Tentukan status tracking
+    $step1 = false; // Upload Surat
+    $step2 = false; // Disetujui Desa
+    $step3 = false; // Disetujui Kecamatan
+    $step4 = false; // Disetujui Kabupaten
+    $step5 = false; // Telah Disetujui (Semua)
+    
+    $rejected = false;
+    $rejectedBy = '';
+    $rejectedAt = 0; // 1=Desa, 2=Kecamatan, 3=Kabupaten
+    
+    // Logika pengecekan status ditolak berdasarkan IdFilePengajuanPensiunFK
+    // Jika IdFilePengajuanPensiunFK NULL tapi ada status yang di-set, artinya ditolak
+    if (is_null($FilePengajuan)) {
+        // Cek apakah pernah ditolak (status ada nilai tapi file NULL)
+        if ($StatusPensiunDesa === '0' || $StatusPensiunDesa === 0) {
+            $rejected = true;
+            $rejectedBy = 'Desa';
+            $rejectedAt = 1;
+        } elseif ($StatusPensiunKecamatan === '0' || $StatusPensiunKecamatan === 0) {
+            $rejected = true;
+            $rejectedBy = 'Kecamatan';
+            $rejectedAt = 2;
+        } elseif ($StatusPensiunKabupaten === '0' || $StatusPensiunKabupaten === 0) {
+            $rejected = true;
+            $rejectedBy = 'Kabupaten';
+            $rejectedAt = 3;
+        }
+    } else {
+        // File ada, berarti pernah upload
+        $step1 = true;
+        
+        // Cek status Desa
+        if ($StatusPensiunDesa === '1' || $StatusPensiunDesa === 1) {
+            $step2 = true;
+        }
+        // NULL = masih menunggu
+        
+        // Cek status Kecamatan (hanya jika Desa approve)
+        if ($step2) {
+            if ($StatusPensiunKecamatan === '1' || $StatusPensiunKecamatan === 1) {
+                $step3 = true;
+            }
+        }
+        
+        // Cek status Kabupaten (hanya jika Kecamatan approve)
+        if ($step3) {
+            if ($StatusPensiunKabupaten === '1' || $StatusPensiunKabupaten === 1) {
+                $step4 = true;
+                $step5 = true; // Jika kabupaten setuju, berarti semua setuju
+            }
+        }
+    }
+    ?>
+    
+    <style>
+        .tracking-container {
+            padding: 25px 15px;
+            background: #fff;
+            border-radius: 8px;
+        }
+        
+        .tracking-header {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        
+        .tracking-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+        
+        .tracking-subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .tracking-progress {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 25px 0 15px 0;
+        }
+        
+        .progress-line {
+            position: absolute;
+            top: 15px;
+            left: 5%;
+            right: 5%;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .progress-line-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-line-fill.approved {
+            background: #7c3aed;
+        }
+        
+        .progress-line-fill.rejected {
+            background: #dc3545;
+        }
+        
+        .progress-step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            border: 2px solid #e0e0e0;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .step-circle.active {
+            background: #7c3aed;
+            border-color: #7c3aed;
+        }
+        
+        .step-circle.rejected {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .step-circle i {
+            font-size: 14px;
+            color: #fff;
+        }
+        
+        .step-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .step-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 5px;
+        }
+        
+        .step-sublabel {
+            font-size: 10px;
+            color: #666;
+            margin-top: 2px;
+            min-height: 15px;
+        }
+        
+        .alert-rejected {
+            background: #fee;
+            border: 1px solid #fcc;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            color: #c33;
+            text-align: center;
+            font-size: 13px;
+        }
+        
+        .status-description {
+            background: #f8f9fa;
+            border-left: 4px solid #7c3aed;
+            padding: 10px 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #555;
+        }
+        
+        .status-description.rejected-desc {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        
+        .status-description strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+    </style>
+    
     <div class="col-lg-12">
-        <div class="ibox ">
+        <div class="ibox">
+            <div class="ibox-content tracking-container">
+                <div class="tracking-header">
+                    <div class="tracking-title">STATUS PENGAJUAN PENSIUN</div>
+                    <div class="tracking-subtitle">
+                        <?php 
+                        if ($rejected) {
+                            echo "Pengajuan ditolak oleh " . $rejectedBy;
+                        } elseif ($step5) {
+                            echo "Pengajuan Anda telah disetujui";
+                        } elseif ($step1) {
+                            echo "Pengajuan Anda sedang diproses";
+                        } else {
+                            echo "Silakan upload surat pengajuan pensiun";
+                        }
+                        ?>
+                    </div>
+                </div>
+                
+                <div class="tracking-progress">
+                    <div class="progress-line">
+                        <div class="progress-line-fill <?php echo $rejected ? 'rejected' : 'approved'; ?>" style="width: <?php 
+                            if ($rejected) {
+                                // Progress merah sampai tahap ditolak
+                                if ($rejectedAt == 1) echo '12.5%'; // Ditolak Desa
+                                elseif ($rejectedAt == 2) echo '37.5%'; // Ditolak Kecamatan
+                                elseif ($rejectedAt == 3) echo '62.5%'; // Ditolak Kabupaten
+                            }
+                            elseif ($step5) echo '100%'; // Semua disetujui - biru
+                            elseif ($step4) echo '75%'; // Sampai Kabupaten disetujui - biru
+                            elseif ($step3) echo '50%'; // Sampai Kecamatan disetujui - biru
+                            elseif ($step2) echo '25%'; // Sampai Desa disetujui - biru
+                            elseif ($step1) echo '12.5%'; // Baru upload - biru
+                            else echo '0%'; // Belum ada - tidak ada warna
+                        ?>;"></div>
+                    </div>
+                    
+                    <!-- Step 1: Upload Surat -->
+                    <div class="progress-step">
+                        <div class="step-circle <?php echo ($step1 && !$rejected) ? 'active' : ($rejected ? '' : ''); ?>">
+                            <i class="fa fa-upload"></i>
+                        </div>
+                        <div class="step-label">Upload Surat</div>
+                        <div class="step-label">Pengajuan</div>
+                    </div>
+                    
+                    <!-- Step 2: Disetujui Desa -->
+                    <div class="progress-step">
+                        <div class="step-circle <?php 
+                            if ($rejected && $rejectedAt == 1) {
+                                echo 'rejected';
+                            } elseif ($step2) {
+                                echo 'active';
+                            }
+                        ?>">
+                            <i class="fa <?php echo ($rejected && $rejectedAt == 1) ? 'fa-times' : 'fa-check'; ?>"></i>
+                        </div>
+                        <div class="step-label">Desa</div>
+                        <div class="step-sublabel">
+                            <?php if ($rejected && $rejectedAt == 1) { ?>
+                                <span style="color: #dc3545; font-weight: 600;">Ditolak</span>
+                            <?php } elseif ($step2) { ?>
+                                <span style="color: #7c3aed; font-weight: 600;">Disetujui</span>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Disetujui Kecamatan -->
+                    <div class="progress-step">
+                        <div class="step-circle <?php 
+                            if ($rejected && $rejectedAt == 2) {
+                                echo 'rejected';
+                            } elseif ($step3) {
+                                echo 'active';
+                            }
+                        ?>">
+                            <i class="fa <?php echo ($rejected && $rejectedAt == 2) ? 'fa-times' : 'fa-check'; ?>"></i>
+                        </div>
+                        <div class="step-label">Kecamatan</div>
+                        <div class="step-sublabel">
+                            <?php if ($rejected && $rejectedAt == 2) { ?>
+                                <span style="color: #dc3545; font-weight: 600;">Ditolak</span>
+                            <?php } elseif ($step3) { ?>
+                                <span style="color: #7c3aed; font-weight: 600;">Disetujui</span>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4: Disetujui Kabupaten -->
+                    <div class="progress-step">
+                        <div class="step-circle <?php 
+                            if ($rejected && $rejectedAt == 3) {
+                                echo 'rejected';
+                            } elseif ($step4) {
+                                echo 'active';
+                            }
+                        ?>">
+                            <i class="fa <?php echo ($rejected && $rejectedAt == 3) ? 'fa-times' : 'fa-check'; ?>"></i>
+                        </div>
+                        <div class="step-label">Kabupaten</div>
+                        <div class="step-sublabel">
+                            <?php if ($rejected && $rejectedAt == 3) { ?>
+                                <span style="color: #dc3545; font-weight: 600;">Ditolak</span>
+                            <?php } elseif ($step4) { ?>
+                                <span style="color: #7c3aed; font-weight: 600;">Disetujui</span>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 5: Telah Disetujui -->
+                    <div class="progress-step">
+                        <div class="step-circle <?php echo ($step5 && !$rejected) ? 'active' : ''; ?>">
+                            <i class="fa fa-home"></i>
+                        </div>
+                        <div class="step-label">Telah</div>
+                        <div class="step-label">Disetujui</div>
+                    </div>
+                </div>
+                
+                <?php if ($rejected) { ?>
+                    <div class="status-description rejected-desc">
+                        <strong><i class="fa fa-exclamation-circle"></i> Pengajuan Ditolak</strong>
+                        Pengajuan pensiun Anda telah ditolak.<strong><?php echo $rejectedBy; ?></strong>
+                        Silakan periksa kembali dokumen Anda dan upload ulang surat pengajuan pensiun.
+                    </div>
+                <?php } elseif ($step5) { ?>
+                    <div class="status-description">
+                        <strong><i class="fa fa-check-circle"></i> Pengajuan Disetujui</strong>
+                        Selamat! Pengajuan pensiun Anda telah disetujui oleh Desa, Kecamatan, dan Kabupaten. 
+                        Proses selanjutnya akan ditindaklanjuti oleh admin.
+                    </div>
+                <?php } elseif ($step4) { ?>
+                    <div class="status-description">
+                        <strong><i class="fa fa-clock-o"></i> Menunggu Persetujuan Kabupaten</strong>
+                        Pengajuan Anda telah disetujui oleh Desa dan Kecamatan. Saat ini sedang menunggu persetujuan dari tingkat Kabupaten.
+                    </div>
+                <?php } elseif ($step3) { ?>
+                    <div class="status-description">
+                        <strong><i class="fa fa-clock-o"></i> Menunggu Persetujuan Kecamatan</strong>
+                        Pengajuan Anda telah disetujui oleh Desa. Saat ini sedang menunggu persetujuan dari tingkat Kecamatan.
+                    </div>
+                <?php } elseif ($step2) { ?>
+                    <div class="status-description">
+                        <strong><i class="fa fa-clock-o"></i> Menunggu Persetujuan Kecamatan</strong>
+                        Pengajuan Anda telah disetujui oleh Desa. Saat ini sedang menunggu persetujuan dari tingkat Kecamatan.
+                    </div>
+                <?php } elseif ($step1) { ?>
+                    <div class="status-description">
+                        <strong><i class="fa fa-clock-o"></i> Menunggu Persetujuan Desa</strong>
+                        Surat pengajuan pensiun Anda telah diupload. Saat ini sedang menunggu persetujuan dari tingkat Desa.
+                    </div>
+                <?php } else { ?>
+                    <div class="status-description">
+                        <strong><i class="fa fa-info-circle"></i> Belum Ada Pengajuan</strong>
+                        Anda belum mengupload surat pengajuan pensiun. Silakan klik tombol "Upload File" di bawah untuk memulai proses pengajuan.
+                    </div>
+                <?php } ?>
+            </div>
+
             <div class="ibox-title">
                 <h5>Ajukan Pensiun</h5>
-                <?php
-                if ($StatusPensiunDesa === '0') {
-                    echo "<span class='label label-danger'>*) Pengajuan Pensiun Ditolak Desa</span>";
-                } 
-                if ($StatusPensiunKecamatan === '0') {
-                    echo "<span class='label label-danger'>*) Pengajuan Pensiun Ditolak Kecamatan</span>";
-                }
-                if ($StatusPensiunKabupaten === '0') {
-                    echo "<span class='label label-danger'>*) Pengajuan Pensiun Ditolak Kabupaten</span>";
-                }
-                
-                ?>
             </div>
 
             <div class="ibox-content">
                 <div class="text-left">
-                    <a href="?pg=FileUploadPengajuan">
-                        <button type="button" class="btn btn-white" style="width:150px; text-align:center">
-                            Upload File
-                        </button>
-                    </a>
+                    <?php
+                    // Tombol Lihat File jika sudah upload
+                    if (!is_null($FilePengajuan) && $FilePengajuan != '') {
+                        ?>
+                        <a href="../Module/File/ViewFilePengajuan.php?id=<?php echo $FilePengajuan; ?>" target="_blank">
+                            <button type="button" class="btn btn-primary" style="width:150px; text-align:center">
+                                <i class="fa fa-file-pdf-o"></i> Lihat File
+                            </button>
+                        </a>
+                        <?php
+                    }
+                    
+                    // Tombol Upload jika belum upload atau ditolak
+                    if ($flagTampilkanUpload) {
+                        ?>
+                        <a href="?pg=FileUploadPengajuan">
+                            <button type="button" class="btn btn-white" style="width:150px; text-align:center">
+                                Upload File
+                            </button>
+                        </a>
+                        <?php
+                    }
+                    ?>
                 </div>
             </div>
         </div>
     </div>
     <?php
-} else {
-    echo " ";
 }
 ?>
 

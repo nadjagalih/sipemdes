@@ -27,10 +27,12 @@
                                         history_mutasi.Setting,
                                         history_mutasi.KeteranganJabatan,
                                         master_mutasi.IdMutasi AS MasterId,
-                                        history_mutasi.IdPegawaiFK
+                                        history_mutasi.IdPegawaiFK,
+                                        master_pegawai.IdFilePengajuanPensiunFK
                                         FROM history_mutasi
                                         INNER JOIN master_mutasi ON history_mutasi.JenisMutasi = master_mutasi.IdMutasi
                                         INNER JOIN master_jabatan ON history_mutasi.IdJabatanFK = master_jabatan.IdJabatan
+                                        LEFT JOIN master_pegawai ON history_mutasi.IdPegawaiFK = master_pegawai.IdPegawaiFK
                                         WHERE history_mutasi.IdPegawaiFK = '$IdTemp'
                                         ORDER BY history_mutasi.TanggalMutasi DESC");
             while ($DataView = mysqli_fetch_assoc($QMutasiView)) {
@@ -43,6 +45,7 @@
                 $NomorSK = $DataView['NomorSK'];
                 $SKMutasi = $DataView['FileSKMutasi'];
                 $SetMutasi = $DataView['Setting'];
+                $IdFilePengajuanPensiun = $DataView['IdFilePengajuanPensiunFK'];
             ?>
                 <tr class="gradeX">
                     <td><?php echo $No; ?> </td>
@@ -51,6 +54,10 @@
                     <td><?php echo $TanggalMutasi; ?> </td>
                     <td>Nomor SK : <?php echo $NomorSK; ?>
                         <br>
+                        <?php if ($JenisMutasi == 'Pensiun' && !is_null($IdFilePengajuanPensiun) && $IdFilePengajuanPensiun != '') { ?>
+                            <a target='_BLANK' href='../Module/File/ViewFilePengajuan.php?id=<?php echo $IdFilePengajuanPensiun; ?>'>Lihat File Pengajuan Pensiun</a>
+                            <br>
+                        <?php } ?>
                         <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
                     </td>
 

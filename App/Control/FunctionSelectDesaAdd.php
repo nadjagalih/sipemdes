@@ -1,4 +1,4 @@
-<select name="IdDesa" id="IdDesa" style="width: 100%;" class="select2_desa form-control">
+<select name="IdDesa" id="IdDesa" style="width: 100%;" class="select2_desa form-control" required>
     <option value="">Pilih Desa/Kelurahan</option>
     <?php
     $QueryDesa = mysqli_query($db, "SELECT

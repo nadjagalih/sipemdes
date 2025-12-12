@@ -16,17 +16,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdPegawaiFK'])) {
         $status = 0;
     }
 
-    $update = mysqli_query($db, "UPDATE master_pegawai SET StatusPensiunKabupaten = $status WHERE IdPegawaiFK = '$IdPegawai'");
+    // Jika ditolak, hapus file pengajuan dari database
+    if ($status == 0) {
+        // Ambil IdFilePengajuanPensiunFK terlebih dahulu
+        $queryGetFile = mysqli_query($db, "SELECT IdFilePengajuanPensiunFK FROM master_pegawai WHERE IdPegawaiFK = '$IdPegawai'");
+        $dataFile = mysqli_fetch_assoc($queryGetFile);
+        $idFile = $dataFile['IdFilePengajuanPensiunFK'];
+        
+        // Hapus file dari tabel file jika ada
+        if (!is_null($idFile) && $idFile != '') {
+            mysqli_query($db, "DELETE FROM file WHERE IdFile = '$idFile'");
+        }
+        
+        // Update status dan set IdFilePengajuanPensiunFK menjadi NULL
+        $update = mysqli_query($db, "UPDATE master_pegawai SET StatusPensiunKabupaten = $status, IdFilePengajuanPensiunFK = NULL WHERE IdPegawaiFK = '$IdPegawai'");
+    } else {
+        // Jika disetujui, hanya update status
+        $update = mysqli_query($db, "UPDATE master_pegawai SET StatusPensiunKabupaten = $status WHERE IdPegawaiFK = '$IdPegawai'");
+    }
 
     if ($update) {
         if($status === 1) {
             header("Location: ../../v?pg=AddMutasi&Kode=$IdPegawai&TipeMutasi=3");
         } else {
-            header("Location: ../../v?pg=SAdmin&alert=Ditolak");
+            header("Location: ../../v?pg=ViewMasaPensiun&alert=Ditolak");
         }
         exit();
     } else {
-        header("Location: ../../v?pg=SAdmin&alert=Gagal");
+        header("Location: ../../v?pg=ViewMasaPensiun&alert=Gagal");
         exit();
     }
 } else {

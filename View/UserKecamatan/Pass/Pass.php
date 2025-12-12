@@ -1,33 +1,107 @@
 <?php
-if ($_GET['alert'] == 'Sukses') {
-    echo
-    "<script type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'SUKSES',
-                      text:  'Sukses Ganti Password, Silahkan Login Ulang',
-                      type: 'success',
-                      showConfirmButton: true
-                     },
-                          function(){
-                            window.location.href = '../Auth/SignOut';
-                          }
-                     );
-                    },10);
-        </script>";
-} else
-if ($_GET['alert'] == 'Panjang') {
-    echo
-    "<script type='text/javascript'>
-                    setTimeout(function () {
-                    swal({
-                      title: 'INFORMATION',
-                      text:  'Panjang Minimal Password 5 Karakter',
-                      type: 'warning',
-                      showConfirmButton: true
-                     });
-                    },10);
-        </script>";
+// Mulai output buffering untuk mencegah header error
+ob_start();
+
+// Include CSPHandler untuk nonce support
+require_once __DIR__ . '/../../../Module/Security/CSPHandler.php';
+
+// Set CSP headers dengan nonce
+CSPHandler::setCSPHeaders();
+
+// Generate CSRF token jika belum ada
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// Basic alert handling tanpa header redirect untuk menghindari error
+if (isset($_GET['alert'])) {
+    $alert = $_GET['alert'];
+    $notificationScript = '';
+    
+    if ($alert == 'Sukses') {
+        $notificationScript = "
+            Swal.fire({
+                title: 'SUKSES',
+                text: 'Sukses Ganti Password, Silahkan Login Ulang',
+                icon: 'success',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    window.location.href = '../AuthKecamatan/SignOut';
+                }
+            });
+        ";
+    } elseif ($alert == 'Panjang') {
+        $notificationScript = "
+            Swal.fire({
+                title: 'PERINGATAN',
+                text: 'Panjang Minimal Password 8 Karakter',
+                icon: 'warning',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        ";
+    } elseif ($alert == 'FormatPassword') {
+        $notificationScript = "
+            Swal.fire({
+                title: 'PERINGATAN',
+                text: 'Password harus mengandung minimal: 8 karakter, 1 huruf kapital, dan 1 karakter khusus (!@#$%^&*)',
+                icon: 'warning',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        ";
+    } elseif ($alert == 'CSRFError') {
+        $notificationScript = "
+            Swal.fire({
+                title: 'ERROR',
+                text: 'Token keamanan tidak valid. Silakan coba lagi.',
+                icon: 'error',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        ";
+    } elseif (strpos($alert, 'Gagal') !== false) {
+        $notificationScript = "
+            Swal.fire({
+                title: 'ERROR',
+                text: '" . htmlspecialchars($alert, ENT_QUOTES) . "',
+                icon: 'error',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        ";
+    } else {
+        $notificationScript = "
+            Swal.fire({
+                title: 'INFORMASI',
+                text: '" . htmlspecialchars($alert, ENT_QUOTES) . "',
+                icon: 'info',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        ";
+    }
+    
+    // Output script dengan nonce
+    echo "<script " . CSPHandler::scriptNonce() . ">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tunggu SweetAlert2 ter-load
+            if (typeof Swal !== 'undefined') {
+                " . $notificationScript . "
+            } else {
+                // Fallback jika SweetAlert2 belum ter-load
+                setTimeout(function() {
+                    if (typeof Swal !== 'undefined') {
+                        " . $notificationScript . "
+                    } else {
+                        console.error('SweetAlert2 not loaded');
+                    }
+                }, 500);
+            }
+        });
+    </script>";
 }
 ?>
 
@@ -76,19 +150,29 @@ if ($_GET['alert'] == 'Panjang') {
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <form action="../App/Model/ExcPasswordKec?Act=Pass" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" class="form-control" name="IdUser" id="IdUser" value="<?php echo $_SESSION['IdUser']; ?>">
-                        <div class="form-group row"><label class="col-lg-4 col-form-label">Password Baru</label>
+                    <form action="../App/Model/ExcPasswordKec?Act=Pass" method="POST" enctype="multipart/form-data" id="passwordForm">
+                        <!-- CSRF Protection (hidden untuk compatibility) -->
+                        <input type="hidden" name="csrf_token" value="<?php echo isset($_SESSION['csrf_token']) ? $_SESSION['csrf_token'] : ''; ?>">
+                        
+                        <!-- Hidden User ID -->
+                        <input type="hidden" class="form-control" name="IdUser" id="IdUser" value="<?php echo isset($_SESSION['IdUser']) ? htmlspecialchars($_SESSION['IdUser']) : ''; ?>">
+                        
+                        <!-- Password Baru -->
+                        <div class="form-group row">
+                            <label class="col-lg-4 col-form-label">Password Baru</label>
                             <div class="col-lg-8">
-                                <input type="password" class="form-control" name="PasswordBaru" id="PasswordBaru" placeholder="Password Baru" autocomplete="off" required>
-                                <span class="form-text m-b-none" style="font-style: italic;">*) Minimal Panjang Password 5 Karakter</span>
+                                <div style="position: relative;">
+                                    <input type="password" class="form-control" name="PasswordBaru" id="PasswordBaru" placeholder="Password Baru" autocomplete="off" required minlength="8" style="padding-right: 40px;">
+                                    <span toggle="#PasswordBaru" class="fa fa-eye field-icon toggle-password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #676a6c;"></span>
+                                </div>
+                                <span class="form-text m-b-none" style="font-style: italic;">*) Password harus mengandung minimal: 8 karakter, 1 huruf kapital, dan 1 karakter khusus (!@#$%^&*)</span>
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <div class="col-lg-offset-2 col-lg-10">
                                 <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
-                                <a href="?pg=Pass" class="btn btn-success ">Batal</a>
+                                <a href="?pg=PassKecamatan" class="btn btn-success ">Batal</a>
                             </div>
                         </div>
                     </form>
@@ -97,3 +181,77 @@ if ($_GET['alert'] == 'Panjang') {
         </div>
     </div>
 </div>
+
+<!-- Simple validation script -->
+<script <?php echo CSPHandler::scriptNonce(); ?>>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle password visibility
+    const togglePassword = document.querySelector('.toggle-password');
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const passwordInput = document.querySelector(this.getAttribute('toggle'));
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+    }
+    
+    const form = document.getElementById('passwordForm');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const password = document.getElementById('PasswordBaru').value;
+            
+            // Validasi panjang password
+            if (password.length < 8) {
+                e.preventDefault();
+                showPasswordValidationError('Password minimal 8 karakter');
+                return false;
+            }
+            
+            // Validasi huruf kapital
+            if (!/[A-Z]/.test(password)) {
+                e.preventDefault();
+                showPasswordValidationError('Password harus mengandung minimal 1 huruf kapital (A-Z)');
+                return false;
+            }
+            
+            // Validasi karakter khusus
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                e.preventDefault();
+                showPasswordValidationError('Password harus mengandung minimal 1 karakter khusus (!@#$%^&* dll)');
+                return false;
+            }
+            
+            return true;
+        });
+        
+        // Fungsi untuk menampilkan error validasi
+        function showPasswordValidationError(message) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'PERINGATAN',
+                    text: message,
+                    icon: 'warning',
+                    showConfirmButton: true,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#f39c12'
+                });
+            } else {
+                alert('PERINGATAN\n\n' + message);
+            }
+        }
+    }
+});
+</script>
+
+<?php
+// Flush output buffer
+ob_end_flush();
+?>

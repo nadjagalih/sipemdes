@@ -1,4 +1,7 @@
 <?php
+// Include security configuration
+require_once "../Module/Security/Security.php";
+
 include "../App/Control/FunctionAwardDetail.php";
 ?>
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -105,7 +108,7 @@ include "../App/Control/FunctionAwardDetail.php";
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalAddKategori">
                             <i class="fa fa-plus"></i> Tambah Kategori
                         </button>
-                        <button type="button" class="btn btn-danger" onclick="confirmDeleteAward('<?php echo $IdAward; ?>', '<?php echo addslashes($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>')">
+                        <button type="button" class="btn btn-danger delete-award-btn" data-award-id="<?php echo $IdAward; ?>" data-award-name="<?php echo htmlspecialchars($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>">
                             <i class="fa fa-trash"></i> Hapus Penghargaan
                         </button>
                     </div>
@@ -426,6 +429,7 @@ include "../App/Control/FunctionAwardDetail.php";
             <form action="../App/Model/ExcKategoriAward.php?Act=Add" method="POST">
                 <div class="modal-body">
                     <input type="hidden" name="IdAward" value="<?php echo $IdAward; ?>">
+                    <?php echo CSRFProtection::getTokenField(); ?>
                     
                     <div class="form-group">
                         <label>Nama Kategori <span class="text-danger">*</span></label>
@@ -463,6 +467,7 @@ include "../App/Control/FunctionAwardDetail.php";
             <form action="../App/Model/ExcKategoriAward.php?Act=Edit" method="POST">
                 <div class="modal-body">
                     <input type="hidden" name="IdKategoriAward" id="editIdKategoriAward">
+                    <?php echo CSRFProtection::getTokenField(); ?>
                     
                     <div class="form-group">
                         <label>Nama Kategori <span class="text-danger">*</span></label>
@@ -514,7 +519,7 @@ include "../App/Control/FunctionAwardDetail.php";
                         <div class="input-group">
                             <input type="text" id="updatePosisiLinkKarya" class="form-control" readonly>
                             <span class="input-group-btn">
-                                <button type="button" class="btn btn-success" onclick="window.open(document.getElementById('updatePosisiLinkKarya').value, '_blank')" 
+                                <button type="button" class="btn btn-success btn-lihat-karya" 
                                         id="btnLihatKarya" style="display: none;">
                                     <i class="fa fa-external-link"></i> Lihat
                                 </button>
@@ -555,7 +560,7 @@ include "../App/Control/FunctionAwardDetail.php";
                     Penghargaan yang sudah dihapus tidak dapat dikembalikan.
                 </p>
                 <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button type="button" class="btn" style="background: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;" onclick="closeDeleteModal()">
+                    <button type="button" class="btn btn-cancel-delete" style="background: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;">
                         Batal
                     </button>
                     <button type="button" class="btn" style="background: linear-gradient(135deg, #f44336, #d32f2f); color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600;" id="confirmDeleteBtn">
@@ -567,7 +572,13 @@ include "../App/Control/FunctionAwardDetail.php";
     </div>
 </div>
 
-<script>
+                <!-- Hidden form used for secure POST delete of kategori -->
+                <form id="deleteKategoriForm" action="../App/Model/ExcKategoriAward.php?Act=Delete" method="POST" style="display:none;">
+                    <?php echo CSRFProtection::getTokenField(); ?>
+                    <input type="hidden" name="IdKategoriAward" id="deleteKategoriId">
+                </form>
+
+<script nonce="<?php echo CSPHandler::getNonce(); ?>">
 function editKategori(id) {
     $.get('../App/Model/ExcKategoriAward.php?Act=GetKategoriData&Kode=' + id, function(data) {
         if (data.error) {
@@ -607,15 +618,6 @@ function updatePosisi(id, namaPeserta, namaKarya, posisi, linkKarya) {
     $('#modalUpdatePosisi').modal('show');
 }
 
-function lihatKarya() {
-    var linkKarya = $('#updatePosisiLinkKarya').val();
-    if (linkKarya && linkKarya.trim() !== '' && linkKarya !== 'Tidak ada link') {
-        window.open(linkKarya, '_blank');
-    } else {
-        alert('Link karya tidak tersedia');
-    }
-}
-
 function confirmDelete(url, message) {
     if (confirm(message)) {
         window.location.href = url;
@@ -636,12 +638,41 @@ function confirmDeleteAward(id, nama) {
     });
 }
 
-// Function untuk close delete modal
-function closeDeleteModal() {
-    $('#modalConfirmDelete').modal('hide');
-}
-
 $(document).ready(function() {
+    // Event listener untuk delete award button (CSP-compliant)
+    $(document).on('click', '.delete-award-btn', function(e) {
+        e.preventDefault();
+        
+        var awardId = $(this).data('award-id');
+        var awardName = $(this).data('award-name');
+        
+        console.log('Delete clicked for:', awardId, awardName);
+        
+        // Call confirm delete function
+        confirmDeleteAward(awardId, awardName);
+        
+        return false;
+    });
+    
+    // Event listener untuk tombol Batal di modal delete (CSP-compliant)
+    $(document).on('click', '.btn-cancel-delete', function(e) {
+        e.preventDefault();
+        $('#modalConfirmDelete').modal('hide');
+        return false;
+    });
+    
+    // Event listener untuk tombol Lihat Karya (CSP-compliant)
+    $(document).on('click', '.btn-lihat-karya', function(e) {
+        e.preventDefault();
+        var linkKarya = $('#updatePosisiLinkKarya').val();
+        if (linkKarya && linkKarya.trim() !== '' && linkKarya !== 'Tidak ada link') {
+            window.open(linkKarya, '_blank');
+        } else {
+            alert('Link karya tidak tersedia');
+        }
+        return false;
+    });
+    
     // Add hover effects to kategori items - sama seperti AwardView.php
     $(document).on('mouseenter', '.kategori-item', function() {
         $(this).css({
@@ -668,5 +699,53 @@ $(document).ready(function() {
     // Fix overflow untuk dropdown
     $('.ibox').css('overflow', 'visible');
     $('.ibox-content').css('overflow', 'visible');
+    
+    // Delegated handler for edit and delete links (CSP-compliant)
+    $(document).on('click', '.edit-kategori', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        if (id) editKategori(id);
+        return false;
+    });
+
+    $(document).on('click', '.delete-kategori', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var name = $(this).data('name');
+        if (id) confirmDeleteKategori(id, name);
+        return false;
+    });
 });
+</script>
+
+<script <?php echo CSPHandler::scriptNonce(); ?>>
+// Use SweetAlert2 for delete confirmation and POST form submission (CSRF protected)
+function confirmDeleteKategori(id, name) {
+    var title = 'Hapus Kategori';
+    var text = 'Kategori "' + name + '" akan dihapus permanen. Semua peserta dalam kategori ini juga akan ikut terhapus.';
+
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                $('#deleteKategoriId').val(id);
+                document.getElementById('deleteKategoriForm').submit();
+            }
+        });
+    } else {
+        // Fallback to native confirm if Swal not available
+        if (confirm(text)) {
+            $('#deleteKategoriId').val(id);
+            document.getElementById('deleteKategoriForm').submit();
+        }
+    }
+}
 </script>

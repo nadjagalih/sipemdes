@@ -33,9 +33,18 @@ if (isset($_GET['Kode'])) {
 
     $IdMutasi = $DataMutasi['IdMutasi'];
 
+    // Fix for TanggalMutasi date parsing
     $TglSKMutasi = $DataMutasi['TanggalMutasi'];
-    $exp = explode('-', $TglSKMutasi);
-    $TanggalSKMutasi = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+    if (!empty($TglSKMutasi)) {
+        $exp = explode('-', $TglSKMutasi);
+        if (count($exp) >= 3) {
+            $TanggalSKMutasi = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+        } else {
+            $TanggalSKMutasi = $TglSKMutasi; // Use original if format is unexpected
+        }
+    } else {
+        $TanggalSKMutasi = '';
+    }
 
     $NomerSK = $DataMutasi['NomorSK'];
     $JenisMutasi = $DataMutasi['JenisMutasi'];
@@ -43,9 +52,18 @@ if (isset($_GET['Kode'])) {
     $IdJabatan = $DataMutasi['IdJabatan'];
     $Jabatan = $DataMutasi['Jabatan'];
 
+    // Fix for TanggalTMT date parsing
     $TglTMT = $DataMutasi['TanggalTMT'];
-    $exp1 = explode("-", $TglTMT);
-    $TanggalTMT = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+    if (!empty($TglTMT)) {
+        $exp1 = explode("-", $TglTMT);
+        if (count($exp1) >= 3) {
+            $TanggalTMT = $exp1[2] . "-" . $exp1[1] . "-" . $exp1[0];
+        } else {
+            $TanggalTMT = $TglTMT; // Use original if format is unexpected
+        }
+    } else {
+        $TanggalTMT = '';
+    }
 
     $FileSK = $DataMutasi['FileSKMutasi'];
     $Keterangan = $DataMutasi['KeteranganJabatan'];

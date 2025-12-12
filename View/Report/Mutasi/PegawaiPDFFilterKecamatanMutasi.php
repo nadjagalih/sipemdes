@@ -1,11 +1,17 @@
-<script type="text/javascript">
+<script <?php echo CSPHandler::scriptNonce(); ?> type="text/javascript">
     $(document).ready(function() {
         $.ajax({
             type: 'POST',
-            url: "Report/Pegawai/GetKecamatan.php",
+            url: "Report/Mutasi/GetKecamatan.php",
             cache: false,
             success: function(msg) {
                 $("#Kecamatan").html(msg);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading kecamatan:", error);
+                console.error("Status:", status);
+                console.error("Response:", xhr.responseText);
+                $("#Kecamatan").html("<option value=''>Error loading data</option>");
             }
         });
     });

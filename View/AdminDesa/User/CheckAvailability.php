@@ -1,6 +1,9 @@
 <?php
-session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+// Start session only if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 require_once "../../../Module/Config/Env.php";
 
@@ -20,7 +23,10 @@ if (!empty($_POST["UserNama"])) {
         </div>
         <div class="form-group row"><label class="col-lg-4 col-form-label">Hak Akses</label>
             <div class="col-lg-8">
-                <?php include "../../../App/Control/FunctionSelectAksesAdminDesa.php"; ?>
+                <?php 
+                $EditIdUser = ''; // Define variable for new user (empty for add mode)
+                include "../../../App/Control/FunctionSelectAksesAdminDesa.php"; 
+                ?>
             </div>
         </div>
 

@@ -1,45 +1,23 @@
 <?php
-// Build query with filters
-$whereConditions = array("1=1");
-
-if (isset($_GET['status']) && !empty($_GET['status'])) {
-    $status = sql_injeksi($_GET['status']);
-    $whereConditions[] = "ma.StatusAktif = '$status'";
-}
-
-if (isset($_GET['tahun']) && !empty($_GET['tahun'])) {
-    $tahun = sql_injeksi($_GET['tahun']);
-    $whereConditions[] = "ma.TahunPenghargaan = '$tahun'";
-}
-
-if (isset($_GET['search']) && !empty($_GET['search'])) {
-    $search = sql_injeksi($_GET['search']);
-    $whereConditions[] = "ma.JenisPenghargaan LIKE '%$search%'";
-}
-
-$whereClause = implode(" AND ", $whereConditions);
-
+// Query untuk mengambil semua award tanpa filter
 $QueryAward = mysqli_query($db, "SELECT 
     ma.IdAward,
     ma.JenisPenghargaan,
     ma.TahunPenghargaan,
     ma.StatusAktif,
-    ma.Deskripsi,
     ma.TanggalInput,
     ma.MasaAktifMulai,
     ma.MasaAktifSelesai
     FROM master_award_desa ma
-    WHERE $whereClause
     ORDER BY ma.TahunPenghargaan DESC, ma.TanggalInput DESC");
 
 $no = 1;
-if (mysqli_num_rows($QueryAward) > 0) {
+if ($QueryAward && mysqli_num_rows($QueryAward) > 0) {
     while ($DataAward = mysqli_fetch_assoc($QueryAward)) {
         $IdAward = $DataAward['IdAward'];
         $JenisPenghargaan = $DataAward['JenisPenghargaan'];
         $TahunPenghargaan = $DataAward['TahunPenghargaan'];
         $StatusAktif = $DataAward['StatusAktif'];
-        $Deskripsi = $DataAward['Deskripsi'];
         $TanggalInput = date('d M Y', strtotime($DataAward['TanggalInput']));
         $MasaAktifMulai = $DataAward['MasaAktifMulai'];
         $MasaAktifSelesai = $DataAward['MasaAktifSelesai'];
@@ -73,16 +51,10 @@ if (mysqli_num_rows($QueryAward) > 0) {
                 $masaAktifText .= ' (Berlangsung)';
             } elseif ($today < $MasaAktifMulai) {
                 $masaAktifText .= ' (Belum Dimulai)';
-            } else {
-                // Hapus teks "Sudah Berakhir" sesuai permintaan user
-                // $masaAktifText .= ' (Sudah Berakhir)';
             }
         } else {
             $masaAktifText = 'Belum ditentukan';
         }
-        
-        // Format deskripsi yang panjang
-        $deskripsiShort = !empty($Deskripsi) ? (strlen($Deskripsi) > 60 ? substr($Deskripsi, 0, 60).'...' : $Deskripsi) : '';
 ?>
         <div class="award-item" style="border-bottom: none; padding: 25px; background: white; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e9ecef; position: relative; transition: all 0.3s ease;">
             <div class="row">
@@ -90,6 +62,9 @@ if (mysqli_num_rows($QueryAward) > 0) {
                     <div>
                         <h4 style="margin: 0 0 10px 0; color: #007bff; font-weight: 700; font-size: 18px;">
                             <?php echo $JenisPenghargaan; ?>
+                            <span style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; margin-left: 10px;">
+                                Tahun <?php echo $TahunPenghargaan; ?>
+                            </span>
                         </h4>
                         <p style="margin: 0 0 5px 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
                             <i class="fa fa-building" style="margin-right: 8px; color: #999;"></i> Pemerintah Kabupaten Trenggalek
@@ -97,11 +72,8 @@ if (mysqli_num_rows($QueryAward) > 0) {
                         <p style="margin: 0 0 5px 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
                             <i class="fa fa-calendar" style="margin-right: 8px; color: #999;"></i> Dibuat: <?php echo $TanggalInput; ?>
                         </p>
-                        <p style="margin: 0 0 5px 0; color: #495057; font-size: 14px; line-height: 1.4;">
+                        <p style="margin: 0; color: #495057; font-size: 14px; line-height: 1.4;">
                             <i class="fa fa-clock-o" style="margin-right: 8px; color: #495057;"></i> Masa Aktif: <?php echo $masaAktifText; ?>
-                        </p>
-                        <p style="margin: 0; color: #6c757d; font-size: 14px; line-height: 1.4;">
-                            <?php echo $deskripsiShort; ?>
                         </p>
                     </div>
                 </div>
@@ -128,7 +100,7 @@ if (mysqli_num_rows($QueryAward) > 0) {
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a href="#" onclick="confirmDeleteAward('<?php echo $IdAward; ?>', '<?php echo addslashes($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>')">
+                                <a href="#" class="delete-award-btn" data-award-id="<?php echo $IdAward; ?>" data-award-name="<?php echo htmlspecialchars($JenisPenghargaan . ' ' . $TahunPenghargaan); ?>">
                                     <i class="fa fa-trash text-danger"></i> Hapus
                                 </a>
                             </li>
@@ -140,6 +112,14 @@ if (mysqli_num_rows($QueryAward) > 0) {
 <?php 
         $no++;
     }
+} elseif ($QueryAward === false) {
+?>
+    <div class="text-center" style="padding: 60px 0;">
+        <i class="fa fa-exclamation-triangle" style="font-size: 48px; color: #f8ac59;"></i>
+        <h3 style="color: #676a6c; margin-top: 20px;">Error Database</h3>
+        <p style="color: #999;">Terjadi kesalahan saat mengambil data: <?php echo mysqli_error($db); ?></p>
+    </div>
+<?php 
 } else {
 ?>
     <div class="text-center" style="padding: 60px 0;">

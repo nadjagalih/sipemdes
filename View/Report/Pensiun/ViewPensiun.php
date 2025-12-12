@@ -1,7 +1,10 @@
 <?php
+// Include CSP Handler untuk nonce support
+require_once __DIR__ . '/../../../Module/Security/CSPHandler.php';
+
 if (empty($_GET['alert'])) {
     echo "";
-} elseif ($_GET['alert'] == 'UploadSukses') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadSukses') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -12,7 +15,7 @@ if (empty($_GET['alert'])) {
             }, 1000);
           </script>";
 
-} elseif ($_GET['alert'] == 'UploadGagalPegawai') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadGagalPegawai') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -22,7 +25,7 @@ if (empty($_GET['alert'])) {
                 });
             }, 1000);
           </script>";
-} elseif ($_GET['alert'] == 'UploadGagalDB') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadGagalDB') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -32,7 +35,7 @@ if (empty($_GET['alert'])) {
                 });
             }, 1000);
           </script>";
-} elseif ($_GET['alert'] == 'UploadGagal') {
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'UploadGagal') {
     echo "<script type='text/javascript'>
             setTimeout(function () {
                 swal({
@@ -53,63 +56,16 @@ if (empty($_GET['alert'])) {
 </div>
 
 <div class="wrapper wrapper-content animated fadeInRight">
-
-    <div class="col-lg-12">
-        <div class="ibox ">
-            <div class="ibox-title">
-                <h5>Filter Data Pensiun</h5>
-                <div class="ibox-tools">
-                    <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
-                    </a>
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-wrench"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#" class="dropdown-item">Config option 1</a>
-                        </li>
-                        <li><a href="#" class="dropdown-item">Config option 2</a>
-                        </li>
-                    </ul>
-                    <a class="close-link">
-                        <i class="fa fa-times"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="ibox-content">
-
-                <div class="text-left">
-                    <a href="?pg=PensiunFilterKecamatan">
-                        <button type="button" class="btn btn-white" style="width:150px; text-align:center">
-                            Filter Kecamatan
-                        </button>
-                    </a>
-                    <a href="?pg=PensiunFilterDesa">
-                        <button type="button" class="btn btn-white" style="width:150px; text-align:center">
-                            Filter Desa
-                        </button>
-                    </a>
-                    <a href="?pg=PensiunPDFFilterKecamatan">
-                        <button type="button" class="btn btn-white" style="width:150px; text-align:center">
-                            PDF Kecamatan
-                        </button>
-                    </a>
-                    <a href="?pg=PensiunPDFFilterDesa">
-                        <button type="button" class="btn btn-white" style="width:150px; text-align:center">
-                            PDF Desa
-                        </button>
-                    </a>
-                    <a href="Report/Pdf/PdfPensiunFilterKabupaten" target="_BLANK">
-                        <button type="button" class="btn btn-white" style="width:150px; text-align:center">
-                            PDF Kabupaten
-                        </button>
-                    </a>
-                </div>
-            </div>
-        </div>
+    <!-- Hidden elements for custom filters -->
+    <div style="display: none;">
+        <select id="kecamatanFilter">
+            <option value="">Filter Kecamatan</option>
+        </select>
+        <select id="desaFilter">
+            <option value="">Filter Desa</option>
+        </select>
+        <input type="search" id="customSearch" placeholder="Search:">
     </div>
-
 
     <div class="col-lg-12">
         <div class="ibox ">
@@ -136,7 +92,7 @@ if (empty($_GET['alert'])) {
 
             <div class="ibox-content">
                 <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
+                    <table class="table table-striped table-bordered table-hover" id="pensiunTable">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -187,7 +143,8 @@ if (empty($_GET['alert'])) {
                                             history_mutasi.IdJabatanFK,
                                             master_jabatan.IdJabatan,
                                             master_jabatan.Jabatan,
-                                            history_mutasi.Setting
+                                            history_mutasi.Setting,
+                                            master_pegawai.IdFilePengajuanPensiunFK
                                         FROM
                                             master_pegawai
                                             LEFT JOIN
@@ -284,6 +241,7 @@ if (empty($_GET['alert'])) {
 
                                 $NomorSK = $DataPegawai['NomorSK'];
                                 $SKMutasi = $DataPegawai['FileSKMutasi'];
+                                $IdFilePengajuanPensiun = $DataPegawai['IdFilePengajuanPensiunFK'];
                                 ?>
 
                                 <tr class="gradeX">
@@ -330,6 +288,9 @@ if (empty($_GET['alert'])) {
                                     </td>
                                     <td>
                                         <?php echo $NomorSK; ?><br>
+                                        <?php if (!is_null($IdFilePengajuanPensiun) && $IdFilePengajuanPensiun != '') { ?>
+                                            <a target='_BLANK' href='../Module/File/ViewFilePengajuan.php?id=<?php echo $IdFilePengajuanPensiun; ?>'>Lihat File Pengajuan Pensiun</a><br>
+                                        <?php } ?>
                                         <a target='_BLANK'
                                             href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File
                                             SK</a>
@@ -351,3 +312,216 @@ if (empty($_GET['alert'])) {
         </div>
     </div>
 </div>
+
+<!-- JavaScript untuk DataTables dengan filter dropdown -->
+<script <?php echo CSPHandler::scriptNonce(); ?>>
+$(document).ready(function() {
+    console.log('Initializing DataTable with custom filters...');
+    
+    var kecamatanMap = {};
+    var desaMap = {};
+    
+    // Load Kecamatan data via AJAX
+    $.ajax({
+        type: 'POST',
+        url: "Report/Mutasi/GetKecamatan.php",
+        cache: false,
+        success: function(msg) {
+            $("#kecamatanFilter").html(msg);
+            $("#kecamatanFilter option").each(function() {
+                if ($(this).val() !== '') {
+                    kecamatanMap[$(this).val()] = $(this).text();
+                }
+            });
+            console.log('Kecamatan loaded:', Object.keys(kecamatanMap).length);
+        },
+        error: function(xhr, status, error) {
+            console.error("Error loading kecamatan:", error);
+            $("#kecamatanFilter").html("<option value=''>Error loading data</option>");
+        }
+    });
+    
+    // Handle Kecamatan change to load Desa
+    $(document).on('change', '#kecamatanFilter', function() {
+        var kecamatanId = $(this).val();
+        console.log('Loading desa for kecamatan ID:', kecamatanId);
+        
+        $('#desaFilter').html('<option value="">Filter Desa</option>');
+        $('#desaFilterMoved').html('<option value="">Filter Desa</option>');
+        desaMap = {};
+        
+        if (kecamatanId && kecamatanId !== '') {
+            $.ajax({
+                type: 'POST',
+                url: "Report/Mutasi/GetDesa.php",
+                data: { Kecamatan: kecamatanId },
+                cache: false,
+                success: function(msg) {
+                    $("#desaFilter").html(msg);
+                    $("#desaFilterMoved").html(msg);
+                    $("#desaFilter option").each(function() {
+                        if ($(this).val() !== '') {
+                            desaMap[$(this).val()] = $(this).text();
+                        }
+                    });
+                    console.log('Desa loaded:', Object.keys(desaMap).length);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading desa:", error);
+                    $("#desaFilter").html("<option value=''>Error loading data</option>");
+                    $("#desaFilterMoved").html("<option value=''>Error loading data</option>");
+                }
+            });
+        }
+    });
+    
+    if ($.fn.DataTable.isDataTable('#pensiunTable')) {
+        console.log('DataTable already exists, destroying...');
+        $('#pensiunTable').DataTable().destroy();
+    }
+    
+    var table = $('#pensiunTable').DataTable({
+        "dom": '<"row"<"col-sm-6"B><"col-sm-6"<"custom-filters">>>rt<"bottom"ip><"clear">',
+        "pageLength": 50,
+        "searching": true,
+        "paging": true,
+        "info": true,
+        "lengthChange": true,
+        "destroy": true,
+        "columnDefs": [
+            {
+                "targets": 0,
+                "searchable": false,
+                "orderable": false,
+                "render": function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            }
+        ],
+        "buttons": [
+            {
+                extend: 'copy',
+                text: '<i class="fa fa-copy"></i> Copy',
+                className: 'btn btn-outline btn-primary'
+            },
+            {
+                extend: 'csv',
+                text: '<i class="fa fa-file-text-o"></i> CSV',
+                className: 'btn btn-outline btn-success'
+            },
+            {
+                extend: 'excel',
+                text: '<i class="fa fa-file-excel-o"></i> Excel',
+                className: 'btn btn-outline btn-success'
+            },
+            {
+                text: '<i class="fa fa-file-pdf-o"></i> PDF',
+                className: 'btn btn-outline btn-danger',
+                action: function (e, dt, node, config) {
+                    var kecamatanId = $('#kecamatanFilter').val();
+                    var desaId = $('#desaFilter').val();
+                    
+                    if (desaId && desaId !== '') {
+                        var pdfUrl = 'Report/Pdf/PdfPensiunFilterDesa?Kecamatan=' + 
+                            encodeURIComponent(kecamatanId) + '&Desa=' + encodeURIComponent(desaId) + '&Proses=Proses';
+                        window.open(pdfUrl, '_blank');
+                    } else if (kecamatanId && kecamatanId !== '') {
+                        var pdfUrl = 'Report/Pdf/PdfPensiunFilterKecamatan?Kecamatan=' + 
+                            encodeURIComponent(kecamatanId) + '&Proses=Proses';
+                        window.open(pdfUrl, '_blank');
+                    } else {
+                        window.open('Report/Pdf/PdfPensiunFilterKabupaten', '_blank');
+                    }
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fa fa-print"></i> Print',
+                className: 'btn btn-outline btn-primary'
+            }
+        ],
+        "language": {
+            "search": "",
+            "searchPlaceholder": "Search...",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "infoEmpty": "Showing 0 to 0 of 0 entries",
+            "infoFiltered": "(filtered from _MAX_ total entries)",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        }
+    });
+
+    setTimeout(function() {
+        var filterHtml = '<div style="text-align: right; padding-top: 5px;">' +
+            '<select class="form-control input-sm" style="display: inline-block; width: 150px; margin-right: 10px;" id="kecamatanFilterMoved">' +
+            $('#kecamatanFilter').html() +
+            '</select>' +
+            '<select class="form-control input-sm" style="display: inline-block; width: 150px; margin-right: 10px;" id="desaFilterMoved">' +
+            $('#desaFilter').html() +
+            '</select>' +
+            '<input type="search" class="form-control input-sm" placeholder="Search:" style="display: inline-block; width: 200px;" id="customSearchMoved">' +
+            '</div>';
+        
+        $('.custom-filters').html(filterHtml);
+        
+        $('#kecamatanFilterMoved').val($('#kecamatanFilter').val());
+        $('#desaFilterMoved').val($('#desaFilter').val());
+        $('#customSearchMoved').val($('#customSearch').val());
+        
+        console.log('Filters moved to custom container');
+        
+        $('#kecamatanFilterMoved').on('change', function() {
+            var kecamatanId = $(this).val();
+            console.log('Kecamatan changed (moved dropdown):', kecamatanId);
+            
+            $('#kecamatanFilter').val(kecamatanId).trigger('change');
+            
+            // Reset desa filter when kecamatan changes
+            $('#desaFilterMoved').val('');
+            
+            if (kecamatanId === '') {
+                table.column(8).search('').draw();
+            } else {
+                var kecamatanName = kecamatanMap[kecamatanId] || '';
+                console.log('Filtering by kecamatan name:', kecamatanName);
+                table.column(8).search(kecamatanName).draw();
+            }
+        });
+        
+        $('#desaFilterMoved').on('change', function() {
+            var desaId = $(this).val();
+            var kecamatanId = $('#kecamatanFilter').val();
+            console.log('Desa changed (moved dropdown):', desaId);
+            
+            $('#desaFilter').val(desaId);
+            
+            if (desaId === '') {
+                // If no desa selected, filter by kecamatan only
+                if (kecamatanId === '') {
+                    table.column(8).search('').draw();
+                } else {
+                    var kecamatanName = kecamatanMap[kecamatanId] || '';
+                    table.column(8).search(kecamatanName).draw();
+                }
+            } else {
+                // Filter by both desa and kecamatan
+                var desaName = desaMap[desaId] || '';
+                var kecamatanName = kecamatanMap[kecamatanId] || '';
+                var searchTerm = desaName + '.*' + kecamatanName;
+                console.log('Filtering by desa + kecamatan:', searchTerm);
+                table.column(8).search(searchTerm, true, false).draw();
+            }
+        });
+    }, 500);
+
+    $(document).on('keyup', '#customSearchMoved', function() {
+        console.log('Search input:', this.value);
+        table.search(this.value).draw();
+    });
+});
+</script>

@@ -1,58 +1,47 @@
 <?php
 // Setting Profile Admin Desa - View dan Process
 ob_start(); // Start output buffering
-session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 // Include files
 include_once "../App/Control/FunctionSettingProfileAdminDesa.php";
+require_once "../Module/Security/CSPHandler.php";
 
-// Alert Handler seperti di PegawaiViewAll.php
+// Enhanced Alert Handler dengan SweetAlert2 dan CSP-compliant
+$alertType = '';
+$alertTitle = '';
+$alertMessage = '';
+$alertIcon = '';
+
 if (isset($_GET['alert'])) {
-    if ($_GET['alert'] == 'Edit') {
-        echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Berhasil!',
-                    text: 'Data Profile Desa Berhasil Diperbarui',
-                    type: 'success',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
-    } elseif ($_GET['alert'] == 'Gagal') {
-        echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Gagal!',
-                    text: 'Gagal Memperbarui Data Profile Desa',
-                    type: 'error',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
-    } elseif ($_GET['alert'] == 'ErrorTelepon') {
-        echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Nomor Telepon Harus Diisi',
-                    type: 'warning',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
-    } elseif ($_GET['alert'] == 'ErrorKoordinat') {
-        echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Peringatan!',
-                    text: 'Silakan Klik pada Peta untuk Menentukan Koordinat',
-                    type: 'warning',
-                    showConfirmButton: true
-                });
-            },10);
-        </script>";
+    switch ($_GET['alert']) {
+        case 'Edit':
+            $alertType = 'EditProfile';
+            $alertTitle = 'Berhasil!';
+            $alertMessage = 'Data Profile Desa Berhasil Diperbarui';
+            $alertIcon = 'success';
+            break;
+        case 'Gagal':
+            $alertType = 'ErrorProfile';
+            $alertTitle = 'Gagal!';
+            $alertMessage = 'Gagal Memperbarui Data Profile Desa';
+            $alertIcon = 'error';
+            break;
+        case 'ErrorTelepon':
+            $alertType = 'ErrorTelepon';
+            $alertTitle = 'Peringatan!';
+            $alertMessage = 'Nomor Telepon Harus Diisi';
+            $alertIcon = 'warning';
+            break;
+        case 'ErrorKoordinat':
+            $alertType = 'ErrorKoordinat';
+            $alertTitle = 'Peringatan!';
+            $alertMessage = 'Silakan Klik pada Peta untuk Menentukan Koordinat';
+            $alertIcon = 'warning';
+            break;
     }
 }
 
@@ -69,15 +58,15 @@ if (isset($_GET['alert'])) {
 
 <!-- Bootstrap CSS -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="../Assets/css/local-fonts.css" rel="stylesheet">
 <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- SweetAlert -->
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<!-- SweetAlert2 (Modern version with CSP support) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
     /* Menggunakan struktur CSS yang sama dengan UserAdd.php */
@@ -572,7 +561,7 @@ if (isset($_GET['alert'])) {
 </div>
 
 <!-- Map Script -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         // Koordinat default (Indonesia/Jawa)
         var defaultLat = <?php echo !empty($currentLatitude) ? $currentLatitude : '-8.055'; ?>;
@@ -868,7 +857,7 @@ if (isset($_GET['alert'])) {
 </script>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Force pace loading to complete after page is fully loaded
     window.addEventListener('load', function() {
         // Wait a bit for all scripts to finish
@@ -920,5 +909,47 @@ if (isset($_GET['alert'])) {
                 notifBar.style.display = 'none';
             }
         }
+        
+        // CSP-compliant notification system for SettingProfile
+        <?php if (isset($alertType) && isset($alertTitle) && isset($alertMessage) && isset($alertIcon)): ?>
+            // Check if alert parameters are set and not empty
+            if ('<?php echo $alertType; ?>' && '<?php echo $alertMessage; ?>') {
+                console.log('SettingProfile Alert detected:', {
+                    type: '<?php echo $alertType; ?>',
+                    title: '<?php echo addslashes($alertTitle); ?>',
+                    message: '<?php echo addslashes($alertMessage); ?>',
+                    icon: '<?php echo $alertIcon; ?>'
+                });
+                
+                // Wait for SweetAlert2 to be fully loaded
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '<?php echo addslashes($alertTitle); ?>',
+                        text: '<?php echo addslashes($alertMessage); ?>',
+                        icon: '<?php echo $alertIcon; ?>',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#007bff',
+                        timer: 5000,
+                        timerProgressBar: true,
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
+                    }).then((result) => {
+                        // Redirect to clean URL after notification (remove alert parameter)
+                        if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                            window.history.replaceState({}, document.title, '?pg=SettingProfileAdminDesa');
+                        }
+                    });
+                } else {
+                    console.warn('SweetAlert2 not loaded, using fallback alert');
+                    alert('<?php echo addslashes($alertTitle); ?>\n\n<?php echo addslashes($alertMessage); ?>');
+                    // Redirect after fallback alert
+                    window.history.replaceState({}, document.title, '?pg=SettingProfileAdminDesa');
+                }
+            }
+        <?php endif; ?>
     });
 </script>

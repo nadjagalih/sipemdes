@@ -1,3 +1,7 @@
+<?php
+// Include CSP Handler untuk nonce support
+require_once __DIR__ . '/../../../Module/Security/CSPHandler.php';
+?>
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
         <h2>Data Kepala Desa & Perangkat Desa Berdasarkan Kriteria Umur </h2>
@@ -59,11 +63,6 @@
                             Sampai <div class="col-lg-1"><input type="text" name="UmurAkhir" id="UmurAkhir" class="form-control" placeholder="Akhir" autocomplete="off" required onkeypress="return hanyaAngka(event)"></div>
                         </div>
                         <button class="btn btn-outline btn-primary" type="submit" name="Cari" id="Cari">Cari</button>
-                        <a href="?pg=CustomUmurPDFFilterKecamatan">
-                            <button type="button" class="btn btn-outline btn-success" style="width:150px; text-align:center">
-                                PDF Kecamatan
-                            </button>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -108,10 +107,24 @@
                                 </div>
                             </div>
 
+                            <!-- Hidden elements for custom filters -->
+                            <div style="display: none;">
+                                <select id="kecamatanFilter_1">
+                                    <option value="">Filter Kecamatan</option>
+                                    <?php
+                                    $QueryKec = mysqli_query($db, "SELECT * FROM master_kecamatan ORDER BY Kecamatan ASC");
+                                    while ($DataKec = mysqli_fetch_assoc($QueryKec)) {
+                                        echo '<option value="' . $DataKec['IdKecamatan'] . '">' . $DataKec['Kecamatan'] . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                                <input type="search" id="customSearch_1" placeholder="Search:">
+                            </div>
+
                             <form action="?pg=ViewCustomUmur" method="post" enctype="multipart/form-data">
                                 <div class="ibox-content">
                                     <div class="table-responsive">
-                                        <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
+                                        <table class="table table-striped table-bordered table-hover" id="tabelUmur_1">
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
@@ -250,12 +263,12 @@
                                                     $Lingkungan = $DataPegawai['Lingkungan'];
                                                     $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
                                                     $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-                                                    $Komunitas = $LingkunganBPD['NamaDesa'];
+                                                    $Komunitas = isset($LingkunganBPD['NamaDesa']) ? $LingkunganBPD['NamaDesa'] : '';
 
                                                     $KecamatanBPD = $DataPegawai['Kec'];
                                                     $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
                                                     $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-                                                    $KomunitasKec = $KecamatanBPD['Kecamatan'];
+                                                    $KomunitasKec = isset($KecamatanBPD['Kecamatan']) ? $KecamatanBPD['Kecamatan'] : '';
 
                                                     $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
                                                     $Setting = $DataPegawai['Setting'];
@@ -290,7 +303,7 @@
                                                             <?php
                                                             $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
                                                             $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-                                                            $JenisKelamin = $DataJenKel['Keterangan'];
+                                                            $JenisKelamin = isset($DataJenKel['Keterangan']) ? $DataJenKel['Keterangan'] : '-';
                                                             echo $JenisKelamin;
                                                             ?>
                                                         </td>
@@ -314,7 +327,7 @@
                                                         INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
                                                         WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
                                                             $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-                                                            $Pendidikan = $DataPendidikan['JenisPendidikan'];
+                                                            $Pendidikan = isset($DataPendidikan['JenisPendidikan']) ? $DataPendidikan['JenisPendidikan'] : '-';
                                                             echo $Pendidikan;
                                                             ?>
                                                         </td>
@@ -364,10 +377,24 @@
                                 </div>
                             </div>
 
+                            <!-- Hidden elements for custom filters -->
+                            <div style="display: none;">
+                                <select id="kecamatanFilter_2">
+                                    <option value="">Filter Kecamatan</option>
+                                    <?php
+                                    $QueryKec2 = mysqli_query($db, "SELECT * FROM master_kecamatan ORDER BY Kecamatan ASC");
+                                    while ($DataKec2 = mysqli_fetch_assoc($QueryKec2)) {
+                                        echo '<option value="' . $DataKec2['IdKecamatan'] . '">' . $DataKec2['Kecamatan'] . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                                <input type="search" id="customSearch_2" placeholder="Search:">
+                            </div>
+
                             <form action="?pg=ViewCustomUmur" method="post" enctype="multipart/form-data">
                                 <div class="ibox-content">
                                     <div class="table-responsive">
-                                        <table class="table table-striped table-bordered table-hover dataTables-kecamatan">
+                                        <table class="table table-striped table-bordered table-hover" id="tabelUmur_2">
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
@@ -506,12 +533,12 @@
                                                     $Lingkungan = $DataPegawai['Lingkungan'];
                                                     $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
                                                     $LingkunganBPD = mysqli_fetch_assoc($AmbilDesa);
-                                                    $Komunitas = $LingkunganBPD['NamaDesa'];
+                                                    $Komunitas = isset($LingkunganBPD['NamaDesa']) ? $LingkunganBPD['NamaDesa'] : '';
 
                                                     $KecamatanBPD = $DataPegawai['Kec'];
                                                     $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanBPD' ");
                                                     $KecamatanBPD = mysqli_fetch_assoc($AmbilKecamatan);
-                                                    $KomunitasKec = $KecamatanBPD['Kecamatan'];
+                                                    $KomunitasKec = isset($KecamatanBPD['Kecamatan']) ? $KecamatanBPD['Kecamatan'] : '';
 
                                                     $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
                                                     $Setting = $DataPegawai['Setting'];
@@ -546,7 +573,7 @@
                                                             <?php
                                                             $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
                                                             $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-                                                            $JenisKelamin = $DataJenKel['Keterangan'];
+                                                            $JenisKelamin = isset($DataJenKel['Keterangan']) ? $DataJenKel['Keterangan'] : '-';
                                                             echo $JenisKelamin;
                                                             ?>
                                                         </td>
@@ -570,7 +597,7 @@
                                                         INNER JOIN master_pendidikan ON history_pendidikan.IdPendidikanFK = master_pendidikan.IdPendidikan
                                                         WHERE history_pendidikan.IdPegawaiFK = '$IdPegawaiFK' AND  history_pendidikan.Setting=1 ");
                                                             $DataPendidikan = mysqli_fetch_assoc($QPendidikan);
-                                                            $Pendidikan = $DataPendidikan['JenisPendidikan'];
+                                                            $Pendidikan = isset($DataPendidikan['JenisPendidikan']) ? $DataPendidikan['JenisPendidikan'] : '-';
                                                             echo $Pendidikan;
                                                             ?>
                                                         </td>
@@ -602,3 +629,254 @@
         ?>
     </form>
 </div>
+
+<script <?php echo CSPHandler::scriptNonce(); ?>>
+$(document).ready(function() {
+    console.log('Initializing DataTables with custom filters...');
+    
+    var kecamatanMap_1 = {};
+    var kecamatanMap_2 = {};
+    
+    // Load Kecamatan data for table 1
+    $("#kecamatanFilter_1 option").each(function() {
+        if ($(this).val() !== '') {
+            kecamatanMap_1[$(this).val()] = $(this).text();
+        }
+    });
+    
+    // Load Kecamatan data for table 2
+    $("#kecamatanFilter_2 option").each(function() {
+        if ($(this).val() !== '') {
+            kecamatanMap_2[$(this).val()] = $(this).text();
+        }
+    });
+    
+    // Initialize DataTable for Kepala Desa (table 1) - only if table exists
+    if ($('#tabelUmur_1').length > 0) {
+        console.log('Table 1 found, initializing...');
+        
+        if ($.fn.DataTable.isDataTable('#tabelUmur_1')) {
+            $('#tabelUmur_1').DataTable().destroy();
+        }
+        
+        var table1 = $('#tabelUmur_1').DataTable({
+        "dom": '<"row"<"col-sm-6"B><"col-sm-6"<"custom-filters-1">>>rt<"bottom"ip><"clear">',
+        "pageLength": 50,
+        "searching": true,
+        "paging": true,
+        "info": true,
+        "lengthChange": true,
+        "destroy": true,
+        "columnDefs": [
+            {
+                "targets": 0,
+                "searchable": false,
+                "orderable": false,
+                "render": function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            }
+        ],
+        "buttons": [
+            {
+                extend: 'copy',
+                text: '<i class="fa fa-copy"></i> Copy',
+                className: 'btn btn-outline btn-primary'
+            },
+            {
+                extend: 'csv',
+                text: '<i class="fa fa-file-text-o"></i> CSV',
+                className: 'btn btn-outline btn-success'
+            },
+            {
+                extend: 'excel',
+                text: '<i class="fa fa-file-excel-o"></i> Excel',
+                className: 'btn btn-outline btn-success'
+            },
+            {
+                text: '<i class="fa fa-file-pdf-o"></i> PDF',
+                className: 'btn btn-outline btn-danger',
+                action: function (e, dt, node, config) {
+                    var kecamatanId = $('#kecamatanFilter_1').val();
+                    var umurAwal = '<?php echo isset($UmurAwal) ? $UmurAwal : ""; ?>';
+                    var umurAkhir = '<?php echo isset($UmurAkhir) ? $UmurAkhir : ""; ?>';
+                    
+                    if (!kecamatanId || kecamatanId === '') {
+                        alert('Silakan pilih Filter Kecamatan terlebih dahulu');
+                        return;
+                    }
+                    
+                    var pdfUrl = 'Report/Custom/PdfCustomUmurKecamatan?Kecamatan=' + 
+                        encodeURIComponent(kecamatanId) + '&Jabatan=1&UmurAwal=' + 
+                        encodeURIComponent(umurAwal) + '&UmurAkhir=' + encodeURIComponent(umurAkhir) + '&ExportPDF=';
+                    window.open(pdfUrl, '_blank');
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fa fa-print"></i> Print',
+                className: 'btn btn-outline btn-primary'
+            }
+        ],
+        "language": {
+            "search": "",
+            "searchPlaceholder": "Search...",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "infoEmpty": "Showing 0 to 0 of 0 entries",
+            "infoFiltered": "(filtered from _MAX_ total entries)",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        }
+    });
+
+    setTimeout(function() {
+        var filterHtml1 = '<div style="text-align: right; padding-top: 5px;">' +
+            '<select class="form-control input-sm" style="display: inline-block; width: 150px; margin-right: 10px;" id="kecamatanFilterMoved_1">' +
+            $('#kecamatanFilter_1').html() +
+            '</select>' +
+            '<input type="search" class="form-control input-sm" placeholder="Search:" style="display: inline-block; width: 200px;" id="customSearchMoved_1">' +
+            '</div>';
+        
+        $('.custom-filters-1').html(filterHtml1);
+        
+        // Filter by Kecamatan for table 1
+        $('#kecamatanFilterMoved_1').on('change', function() {
+            var kecamatanId = $(this).val();
+            $('#kecamatanFilter_1').val(kecamatanId);
+            
+            if (kecamatanId === '') {
+                table1.column(9).search('').draw();
+            } else {
+                var kecamatanName = kecamatanMap_1[kecamatanId] || '';
+                table1.column(9).search(kecamatanName).draw();
+            }
+        });
+        
+        // Custom search for table 1
+        $('#customSearchMoved_1').on('keyup', function() {
+            table1.search(this.value).draw();
+        });
+    }, 500);
+    
+    } // End if table 1 exists
+    
+    // Initialize DataTable for Perangkat Desa (table 2) - only if table exists
+    if ($('#tabelUmur_2').length > 0) {
+        console.log('Table 2 found, initializing...');
+        
+        if ($.fn.DataTable.isDataTable('#tabelUmur_2')) {
+            $('#tabelUmur_2').DataTable().destroy();
+        }
+        
+        var table2 = $('#tabelUmur_2').DataTable({
+        "dom": '<"row"<"col-sm-6"B><"col-sm-6"<"custom-filters-2">>>rt<"bottom"ip><"clear">',
+        "pageLength": 50,
+        "searching": true,
+        "paging": true,
+        "info": true,
+        "lengthChange": true,
+        "destroy": true,
+        "columnDefs": [
+            {
+                "targets": 0,
+                "searchable": false,
+                "orderable": false,
+                "render": function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            }
+        ],
+        "buttons": [
+            {
+                extend: 'copy',
+                text: '<i class="fa fa-copy"></i> Copy',
+                className: 'btn btn-outline btn-primary'
+            },
+            {
+                extend: 'csv',
+                text: '<i class="fa fa-file-text-o"></i> CSV',
+                className: 'btn btn-outline btn-success'
+            },
+            {
+                extend: 'excel',
+                text: '<i class="fa fa-file-excel-o"></i> Excel',
+                className: 'btn btn-outline btn-success'
+            },
+            {
+                text: '<i class="fa fa-file-pdf-o"></i> PDF',
+                className: 'btn btn-outline btn-danger',
+                action: function (e, dt, node, config) {
+                    var kecamatanId = $('#kecamatanFilter_2').val();
+                    var umurAwal = '<?php echo isset($UmurAwal) ? $UmurAwal : ""; ?>';
+                    var umurAkhir = '<?php echo isset($UmurAkhir) ? $UmurAkhir : ""; ?>';
+                    
+                    if (!kecamatanId || kecamatanId === '') {
+                        alert('Silakan pilih Filter Kecamatan terlebih dahulu');
+                        return;
+                    }
+                    
+                    var pdfUrl = 'Report/Custom/PdfCustomUmurKecamatan?Kecamatan=' + 
+                        encodeURIComponent(kecamatanId) + '&Jabatan=2&UmurAwal=' + 
+                        encodeURIComponent(umurAwal) + '&UmurAkhir=' + encodeURIComponent(umurAkhir) + '&ExportPDF=';
+                    window.open(pdfUrl, '_blank');
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fa fa-print"></i> Print',
+                className: 'btn btn-outline btn-primary'
+            }
+        ],
+        "language": {
+            "search": "",
+            "searchPlaceholder": "Search...",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "infoEmpty": "Showing 0 to 0 of 0 entries",
+            "infoFiltered": "(filtered from _MAX_ total entries)",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        }
+    });
+
+    setTimeout(function() {
+        var filterHtml2 = '<div style="text-align: right; padding-top: 5px;">' +
+            '<select class="form-control input-sm" style="display: inline-block; width: 150px; margin-right: 10px;" id="kecamatanFilterMoved_2">' +
+            $('#kecamatanFilter_2').html() +
+            '</select>' +
+            '<input type="search" class="form-control input-sm" placeholder="Search:" style="display: inline-block; width: 200px;" id="customSearchMoved_2">' +
+            '</div>';
+        
+        $('.custom-filters-2').html(filterHtml2);
+        
+        // Filter by Kecamatan for table 2
+        $('#kecamatanFilterMoved_2').on('change', function() {
+            var kecamatanId = $(this).val();
+            $('#kecamatanFilter_2').val(kecamatanId);
+            
+            if (kecamatanId === '') {
+                table2.column(9).search('').draw();
+            } else {
+                var kecamatanName = kecamatanMap_2[kecamatanId] || '';
+                table2.column(9).search(kecamatanName).draw();
+            }
+        });
+        
+        // Custom search for table 2
+        $('#customSearchMoved_2').on('keyup', function() {
+            table2.search(this.value).draw();
+        });
+    }, 500);
+    
+    } // End if table 2 exists
+});
+</script>

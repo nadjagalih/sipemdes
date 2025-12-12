@@ -101,7 +101,7 @@ if (isset($_GET['Kode'])) {
                                             <td><?php echo $TanggalMutasi; ?> </td>
                                             <td>Nomor SK : <?php echo $NomorSK; ?>
                                                 <br>
-                                                <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
+                                                <a target='_BLANK' href='../Module/Variabel/ViewFileBLOB?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
                                             </td>
 
                                             <td>
@@ -118,7 +118,7 @@ if (isset($_GET['Kode'])) {
                                                     <button type="button" class="btn btn-outline btn-default"><i class="fa fa-edit"></i></button>
                                                     <button type="button" class="btn btn-outline btn-default"><i class="fa fa-book"></i></button>
                                                     <!-- <button type="button" class="btn btn-outline btn-default"><i class="fa fa-eraser"></i></button> -->
-                                                    <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $IdMutasi; ?> ?');">
+                                                    <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus jabatan NON-AKTIF dengan ID: <?php echo $IdMutasi; ?>?');">
                                                         <button class="btn btn-outline btn-danger  btn-md" data-toggle="tooltip" title="Delete"><i class="fa fa-eraser"></i></button>
                                                     </a>
                                                 <?php } elseif ($SetMutasi == 1) { ?>
@@ -128,7 +128,7 @@ if (isset($_GET['Kode'])) {
                                                     <a href="?pg=EditMutasiSK&Kode=<?php echo $IdMutasi; ?>">
                                                         <button class="btn btn-outline btn-success btn-md" data-toggle="tooltip" title="Upload SK"><i class="fa fa-book"></i></button>
                                                     </a>
-                                                    <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $IdMutasi; ?> ?');">
+                                                    <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus jabatan AKTIF dengan ID: <?php echo $IdMutasi; ?>? \n\nJika dihapus, jabatan NON-AKTIF terbaru akan otomatis diaktifkan.');">
                                                         <button class="btn btn-outline btn-danger  btn-md" data-toggle="tooltip" title="Delete"><i class="fa fa-eraser"></i></button>
                                                     </a>
                                                 <?php } ?>
@@ -141,10 +141,13 @@ if (isset($_GET['Kode'])) {
                         </div>
                     </div>
                     <?php  } else {
+                    $JenMutasi = 0; // Inisialisasi variabel
                     $CekMutasi = mysqli_query($db, "SELECT * FROM history_mutasi WHERE IdPegawaiFK = '$IdTemp' ");
-                    while ($Result = mysqli_fetch_assoc($CekMutasi)) {
-                        $IdPeg = $Result['IdPegawaiFK'];
-                        $JenMutasi = $Result['JenisMutasi'];
+                    if ($CekMutasi && mysqli_num_rows($CekMutasi) > 0) {
+                        while ($Result = mysqli_fetch_assoc($CekMutasi)) {
+                            $IdPeg = isset($Result['IdPegawaiFK']) ? $Result['IdPegawaiFK'] : '';
+                            $JenMutasi = isset($Result['JenisMutasi']) ? $Result['JenisMutasi'] : 0;
+                        }
                     }
 
                     if ($JenMutasi == 3 or $JenMutasi == 4 or $JenMutasi == 5) { ?>
@@ -213,7 +216,7 @@ if (isset($_GET['Kode'])) {
                                                 <td><?php echo $TanggalMutasi; ?> </td>
                                                 <td>Nomor SK : <?php echo $NomorSK; ?>
                                                     <br>
-                                                    <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
+                                                    <a target='_BLANK' href='../Module/Variabel/ViewFileBLOB?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
                                                 </td>
 
                                                 <td>
@@ -237,7 +240,7 @@ if (isset($_GET['Kode'])) {
                                                         <a href="?pg=EditMutasiSK&Kode=<?php echo $IdMutasi; ?>">
                                                             <button class="btn btn-outline btn-success btn-md" data-toggle="tooltip" title="Upload SK"><i class="fa fa-book"></i></button>
                                                         </a>
-                                                        <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $IdMutasi; ?> ?');">
+                                                        <a href="../App/Model/ExcHistoryMutasi?Act=Delete&Kode=<?php echo $IdMutasi; ?>" onclick="return confirm('Anda yakin ingin menghapus jabatan AKTIF dengan ID: <?php echo $IdMutasi; ?>? \n\nJika dihapus, jabatan NON-AKTIF terbaru akan otomatis diaktifkan.');">
                                                             <button class="btn btn-outline btn-danger  btn-md" data-toggle="tooltip" title="Delete"><i class="fa fa-eraser"></i></button>
                                                         </a>
                                                     <?php } ?>

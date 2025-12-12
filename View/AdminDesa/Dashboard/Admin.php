@@ -1,8 +1,14 @@
 <?php
-if (empty($_GET['alert'])) {
-    echo "";
-} elseif ($_GET['alert'] == 'Sukses') {
-    echo "<script type='text/javascript'>
+// Include security handler for CSP nonce
+require_once "../Module/Security/CSPHandler.php";
+
+// Use CSPHandler nonce for script tags
+$nonce = CSPHandler::getNonce();
+
+$alertScript = '';
+if (!empty($_GET['alert'])) {
+    if ($_GET['alert'] == 'Sukses') {
+        $alertScript = "
             setTimeout(function () {
                 swal({
                     title: 'Sukses Ajukan SK Pensiun',
@@ -10,9 +16,9 @@ if (empty($_GET['alert'])) {
                     type: 'success'
                 });
             }, 100);
-          </script>";
-} elseif ($_GET['alert'] == 'Gagal') {
-    echo "<script type='text/javascript'>
+        ";
+    } elseif ($_GET['alert'] == 'Gagal') {
+        $alertScript = "
             setTimeout(function () {
                 swal({
                     title: 'Gagal Ajukan SK Pensiun',
@@ -20,7 +26,8 @@ if (empty($_GET['alert'])) {
                     type: 'warning'
                 });
             }, 100);
-          </script>";
+        ";
+    }
 }
 
 include "../App/Control/FunctionProfileDinasView.php";
@@ -202,9 +209,7 @@ if (!$QKepDesa) {
     error_log("Kepala Desa Query Error: " . mysqli_error($db));
 }
 
-// Log query hasil
-echo "<!-- Kepala Desa Query: " . ($QKepDesa ? mysqli_num_rows($QKepDesa) : 0) . " rows found -->";
-echo "<!-- Query: " . $kepdes_sql . " -->";
+// Log query hasil - debug code removed for production
 
 // Cek apakah query berhasil dan ada hasil
 if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
@@ -249,10 +254,9 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
 }
 ?>
 
-
 <!-- Purple Theme Assets -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="../Assets/css/local-fonts.css" rel="stylesheet">
 <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
 
 <!-- Leaflet CSS -->
@@ -826,6 +830,11 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
         animation: pulse 2s infinite;
     }
     
+    /* Close notification button hover effect */
+    .close-notification-btn:hover {
+        background: rgba(255,255,255,0.2) !important;
+    }
+    
     @keyframes pulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.05); }
@@ -833,7 +842,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
     }
 </style>
 
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         // Add mini-navbar class by default
         document.body.classList.add('mini-navbar');
@@ -955,7 +964,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                     </div>
                 </div>
                 <div class="notification-actions" style="display: flex; align-items: center; gap: 10px;">
-                    <button onclick="closeNotificationBar()" style="
+                    <button class="close-notification-btn" style="
                         background: none;
                         border: none;
                         color: white;
@@ -968,9 +977,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        transition: all 0.3s ease;
-                    " onmouseover="this.style.background='rgba(255,255,255,0.2)'" 
-                       onmouseout="this.style.background='none'">
+                        transition: all 0.3s ease;">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -1237,11 +1244,17 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
 </div>
 
 
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     // Purple theme color palette
     const purpleColors = ['#6f42c1', '#1bcfb4', '#fd397a', '#ffb822', '#0084ff', '#17a2b8', '#28a745'];
     
-    Highcharts.chart('StatistikPendidikan', {
+    function createStatistikPendidikan() {
+        if (typeof Highcharts === 'undefined') {
+            console.error('Highcharts not loaded for StatistikPendidikan');
+            return;
+        }
+        
+        Highcharts.chart('StatistikPendidikan', {
         chart: {
             type: 'pie',
             backgroundColor: 'transparent',
@@ -1381,10 +1394,22 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             <?php } ?>
         ]}]
     });
+    }
+    
+    // Initialize chart when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(createStatistikPendidikan, 500);
+    });
 </script>
 
-<script type="text/javascript">
-    Highcharts.chart('StatistikJabatan', {
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
+    function createStatistikJabatan() {
+        if (typeof Highcharts === 'undefined') {
+            console.error('Highcharts not loaded for StatistikJabatan');
+            return;
+        }
+        
+        Highcharts.chart('StatistikJabatan', {
         chart: {
             type: 'column',
             style: {
@@ -1535,10 +1560,22 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             <?php } ?>
         ]
     });
+    }
+    
+    // Initialize chart when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(createStatistikJabatan, 1000);
+    });
 </script>
 
-<script type="text/javascript">
-    Highcharts.chart('StatistikBPD', {
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
+    function createStatistikBPD() {
+        if (typeof Highcharts === 'undefined') {
+            console.error('Highcharts not loaded for StatistikBPD');
+            return;
+        }
+        
+        Highcharts.chart('StatistikBPD', {
         chart: {
             type: 'column',
             style: {
@@ -1696,10 +1733,16 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             <?php } ?>
         ]
     });
+    }
+    
+    // Initialize chart when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(createStatistikBPD, 1500);
+    });
 </script>
 
 <!-- Leaflet Map Script -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Initialize the map after the page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Koordinat dari database atau default jika belum diset
@@ -1799,7 +1842,7 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
 </script>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Force pace loading to complete after page is fully loaded
     window.addEventListener('load', function() {
         // Wait a bit for all scripts to finish
@@ -1868,6 +1911,12 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
     
     // Check apakah notification bar dengan konten yang sama sudah di-close dan belum expired
     document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener for close notification button
+        const closeBtn = document.querySelector('.close-notification-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeNotificationBar);
+        }
+        
         const notifBar = document.querySelector('.notification-bar');
         if (notifBar) {
             const isPersistent = notifBar.getAttribute('data-persistent') === 'true';
@@ -1948,4 +1997,9 @@ if($QKepDesa && mysqli_num_rows($QKepDesa) > 0) {
             sessionStorage.removeItem('awardBarTempClosed');
         }
     });
+    
+    // Execute alert script if available
+    <?php if (!empty($alertScript)): ?>
+    <?php echo $alertScript; ?>
+    <?php endif; ?>
 </script>

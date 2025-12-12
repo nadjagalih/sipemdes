@@ -164,7 +164,8 @@
                                     history_mutasi.IdJabatanFK,
                                     master_jabatan.IdJabatan,
                                     master_jabatan.Jabatan,
-                                    history_mutasi.Setting
+                                    history_mutasi.Setting,
+                                    master_pegawai.IdFilePengajuanPensiunFK
                                 FROM
                                     master_pegawai
                                     LEFT JOIN
@@ -261,6 +262,7 @@
 
                                 $NomorSK = $DataPegawai['NomorSK'];
                                 $SKMutasi = $DataPegawai['FileSKMutasi'];
+                                $IdFilePengajuanPensiun = $DataPegawai['IdFilePengajuanPensiunFK'];
                             ?>
 
                                 <tr class="gradeX">
@@ -305,6 +307,9 @@
                                     </td>
                                     <td>
                                         <?php echo $NomorSK; ?><br>
+                                        <?php if (!is_null($IdFilePengajuanPensiun) && $IdFilePengajuanPensiun != '') { ?>
+                                            <a target='_BLANK' href='../Module/File/ViewFilePengajuan.php?id=<?php echo $IdFilePengajuanPensiun; ?>'>Lihat File Pengajuan Pensiun</a><br>
+                                        <?php } ?>
                                         <a target='_BLANK' href='../Module/Variabel/Download?File=<?php echo $SKMutasi; ?>'>Lihat File SK</a>
                                     </td>
 

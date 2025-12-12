@@ -114,11 +114,11 @@
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Telp</label>
-                                    <div class="col-lg-8"><input type="text" name="Telp" id="Telp" value="<?php echo $Telp; ?>" placeholder="Masukkan No Telp" class="form-control" autocomplete="off">
+                                    <div class="col-lg-8"><input type="text" name="Telp" id="Telp" value="<?php echo isset($Telp) ? htmlspecialchars($Telp) : ''; ?>" placeholder="Masukkan No Telp" class="form-control" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Email</label>
-                                    <div class="col-lg-8"><input type="email" name="Email" id="Email" value="<?php echo $Email; ?>" placeholder="contoh@gmail.com" class="form-control" autocomplete="off">
+                                    <div class="col-lg-8"><input type="email" name="Email" id="Email" value="<?php echo isset($Email) ? htmlspecialchars($Email) : ''; ?>" placeholder="email@domain.com" class="form-control" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Foto Saat Ini</label>

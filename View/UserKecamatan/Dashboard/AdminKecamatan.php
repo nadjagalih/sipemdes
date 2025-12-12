@@ -1,11 +1,14 @@
 <?php
+// Include CSP Handler for nonce
+require_once "../Module/Security/CSPHandler.php";
+
 // ===============================================
 // ALERT NOTIFICATIONS
 // ===============================================
 if (empty($_GET['alert'])) {
     echo "";
-} elseif ($_GET['alert'] == 'Sukses') {
-    echo "<script type='text/javascript'>
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Sukses') {
+    echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Sukses Ajukan SK Pensiun',
@@ -14,8 +17,8 @@ if (empty($_GET['alert'])) {
                 });
             }, 100);
           </script>";
-} elseif ($_GET['alert'] == 'Gagal') {
-    echo "<script type='text/javascript'>
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
+    echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Gagal Ajukan SK Pensiun',
@@ -177,12 +180,12 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 
 <!-- Purple Theme Assets -->
 <link href="../Assets/argon/argon.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="../Assets/css/local-fonts.css" rel="stylesheet">
 <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
 
 <!-- Leaflet CSS for Map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script <?php echo CSPHandler::scriptNonce(); ?> src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
     :root {
@@ -677,7 +680,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
     }
 </style>
 
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         // Add mini-navbar class by default
         document.body.classList.add('mini-navbar');
@@ -1265,7 +1268,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 <!-- =============================================== -->
 
 <!-- Chart 1: Grafik Perangkat Desa per Kecamatan -->
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('GrafikDesaV', {
         chart: {
             type: 'column',
@@ -1295,7 +1298,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
             }
         },
         title: {
-            text: '<strong>Grafik Data Kades & Perangkat Desa Kecamatan <?php echo $NamaKecamatan; ?></strong>',
+            text: '<strong>Grafik Data Kades & Perangkat Desa Kecamatan <?php echo addslashes(htmlspecialchars($NamaKecamatan, ENT_QUOTES, 'UTF-8')); ?></strong>',
             style: {
                 color: '#111827',
                 fontSize: '16px'
@@ -1395,7 +1398,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
                 $NamaDesa = $DataPerangkat['NamaDesa'];
                 $Jumlah = $DataPerangkat['JmlPerangkat'];
             ?> {
-                    name: '<?php echo $NamaDesa; ?>',
+                    name: '<?php echo addslashes(htmlspecialchars($NamaDesa, ENT_QUOTES, 'UTF-8')); ?>',
                     data: [<?php echo $Jumlah; ?>]
                 },
             <?php } ?>
@@ -1404,7 +1407,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Chart 2: Statistik Pendidikan (Pie Chart) -->
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     // Purple theme color palette
     const purpleColors = ['#6f42c1', '#1bcfb4', '#fd397a', '#ffb822', '#0084ff', '#17a2b8', '#28a745'];
 
@@ -1541,7 +1544,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
                     $Pendidikan = $DataPendidikan['JenisPendidikan'];
                     $JumlahPendidikan = $DataPendidikan['JmlPendidikan'];
                 ?> {
-                        name: '<?php echo $Pendidikan; ?>',
+                        name: '<?php echo addslashes(htmlspecialchars($Pendidikan, ENT_QUOTES, 'UTF-8')); ?>',
                         y: <?php echo $JumlahPendidikan; ?>,
                         sliced: false,
                         selected: false
@@ -1553,7 +1556,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Chart 3: Statistik Jabatan (Column Chart) -->
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('StatistikJabatan', {
         chart: {
             type: 'column',
@@ -1705,7 +1708,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
                 $Jabatan = $DataJabatan['Jabatan'];
                 $JmlJabatan = $DataJabatan['JmlJabatan'];
             ?> {
-                    name: '<?php echo $Jabatan; ?>',
+                    name: '<?php echo addslashes(htmlspecialchars($Jabatan, ENT_QUOTES, 'UTF-8')); ?>',
                     data: [<?php echo $JmlJabatan; ?>]
                 },
             <?php } ?>
@@ -1714,7 +1717,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Chart 4: Statistik BPD per Desa (Column Chart) -->
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('GrafikDesaVBPD', {
         chart: {
             type: 'column',
@@ -1861,7 +1864,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
                 $NamaDesaBPD = $DataBPDDesa['NamaDesa'];
                 $JumlahBPD = $DataBPDDesa['JmlBPD'];
             ?> {
-                    name: '<?php echo $NamaDesaBPD; ?>',
+                    name: '<?php echo addslashes(htmlspecialchars($NamaDesaBPD, ENT_QUOTES, 'UTF-8')); ?>',
                     data: [<?php echo $JumlahBPD; ?>]
                 },
             <?php } ?>
@@ -1870,7 +1873,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Leaflet Map Script -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Initialize the map after the page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Koordinat dari database atau default jika belum diset
@@ -1901,16 +1904,16 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
         var popupContent = `
             <div style="text-align: center; min-width: 220px; font-family: 'Ubuntu', sans-serif;">
                 <div style="background: linear-gradient(135deg, #6f42c1, #5a34a3); color: white; margin: 8px 10px 15px 8px; padding: 15px; border-radius: 8px 8px 0 0;">
-                    <h5 style="margin: 0; font-weight: 600;"><i class="fas fa-home"></i> <?php echo htmlspecialchars($NamaDesaHeader); ?></h5>
+                    <h5 style="margin: 0; font-weight: 600;"><i class="fas fa-home"></i> <?php echo htmlspecialchars($NamaKecamatanHeader); ?></h5>
                 </div>
                 
                 <div style="padding: 0 5px;">
                     <p style="margin: 5px 0; font-size: 13px; color: #666;"><i class="fas fa-map"></i> Kec. <?php echo htmlspecialchars($NamaKecamatanHeader); ?></p>
                     <p style="margin: 5px 0; font-size: 13px; color: #666;"><i class="fas fa-building"></i> Kab. <?php echo htmlspecialchars($Kabupaten); ?></p>
                     
-                    <?php if (!empty($alamatDesa)): ?>
+                    <?php if (!empty($AlamatKecamatan)): ?>
                     <p style="margin: 8px 0; font-size: 12px; color: #555; font-style: italic; line-height: 1.4;">
-                        <i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($alamatDesa); ?>
+                        <i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($AlamatKecamatan); ?>
                     </p>
                     <?php endif; ?>
                     
@@ -1970,7 +1973,7 @@ if ($QJKP && mysqli_num_rows($QJKP) > 0) {
 </script>
 
 <!-- Script untuk mengatasi masalah pace loading yang tidak selesai -->
-<script>
+<script <?php echo CSPHandler::scriptNonce(); ?>>
     // Force pace loading to complete after page is fully loaded
     window.addEventListener('load', function() {
         // Wait a bit for all scripts to finish

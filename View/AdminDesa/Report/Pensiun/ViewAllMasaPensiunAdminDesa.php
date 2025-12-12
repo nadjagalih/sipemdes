@@ -142,6 +142,8 @@ $IdDesa = $_SESSION['IdDesa'];
                                             master_jabatan.Jabatan,
                                             history_mutasi.TanggalMutasi,
                                             master_pegawai.StatusPensiunDesa,
+                                            master_pegawai.StatusPensiunKecamatan,
+                                            master_pegawai.StatusPensiunKabupaten,
                                             master_pegawai.IdFilePengajuanPensiunFK
                                         FROM
                                             master_pegawai
@@ -252,6 +254,8 @@ $IdDesa = $_SESSION['IdDesa'];
                                 $Setting = $DataPegawai['Setting'];
 
                                 $StatusPensiunDesa = $DataPegawai['StatusPensiunDesa'];
+                                $StatusPensiunKecamatan = $DataPegawai['StatusPensiunKecamatan'];
+                                $StatusPensiunKabupaten = $DataPegawai['StatusPensiunKabupaten'];
                                 $IdFilePengajuanPensiunFK = $DataPegawai['IdFilePengajuanPensiunFK'];
 
                                 $highlight = '';
@@ -309,26 +313,39 @@ $IdDesa = $_SESSION['IdDesa'];
                                     </td>
                                     <td>
                                         <?php
-                                        if ($TglSekarang1 >= $TanggalPensiun && $Setting == 1) {
-                                            ?>
-                                            <?php
-                                            if (!is_null($IdFilePengajuanPensiunFK)) {
-                                                $qFile = mysqli_query($db, "SELECT * FROM file WHERE IdFile = '$IdFilePengajuanPensiunFK'");
-                                                $dataFile = mysqli_fetch_assoc($qFile);
+                                        // Hitung tanggal 3 bulan sebelum pensiun
+                                        $tanggal3BulanSebelumPensiun = date('Y-m-d', strtotime('-3 months', strtotime($TanggalPensiun)));
+                                        
+                                        // Tampilkan approval jika kurang dari 3 bulan sebelum pensiun
+                                        if ($TglSekarang1 >= $tanggal3BulanSebelumPensiun && $Setting == 1) {
+                                            // Tampilkan tombol Lihat File jika ada file dan tidak ditolak
+                                            if (!is_null($IdFilePengajuanPensiunFK) && $IdFilePengajuanPensiunFK != '' && 
+                                                $StatusPensiunDesa !== '0' && 
+                                                $StatusPensiunKecamatan !== '0' && 
+                                                $StatusPensiunKabupaten !== '0') {
                                                 ?>
                                                 <a href="../Module/File/ViewFilePengajuan.php?id=<?= $IdFilePengajuanPensiunFK ?>"
                                                     target="_blank" class="btn btn-xs btn-info" style="margin-bottom:5px;">
                                                     Lihat File Pengajuan
-                                                </a>
-                                                <?php
-                                            } else {
-                                                ?>
-                                                <a href="#"><span class="label label-danger float-left">PENSIUN BELUM
-                                                        MENGAJUKAN</span></a>
+                                                </a><br>
                                                 <?php
                                             }
-
-                                            if ($StatusPensiunDesa === '1') {
+                                            
+                                            // Prioritas tampilan: Kabupaten > Kecamatan > Desa
+                                            // Tampilkan status tertinggi/terakhir saja
+                                            if ($StatusPensiunKabupaten === '1') {
+                                                echo "<span class='label label-success'>Disetujui Kabupaten</span>";
+                                            } elseif ($StatusPensiunKabupaten === '0') {
+                                                echo "<span class='label label-danger'>Ditolak Kabupaten</span>";
+                                            } 
+                                            // Jika belum ada status Kabupaten, cek Kecamatan
+                                            elseif ($StatusPensiunKecamatan === '1') {
+                                                echo "<span class='label label-success'>Disetujui Kecamatan</span>";
+                                            } elseif ($StatusPensiunKecamatan === '0') {
+                                                echo "<span class='label label-danger'>Ditolak Kecamatan</span>";
+                                            } 
+                                            // Jika belum ada status Kecamatan, tampilkan status Desa
+                                            elseif ($StatusPensiunDesa === '1') {
                                                 echo "<span class='label label-success'>Disetujui Desa</span>";
                                             } elseif ($StatusPensiunDesa === '0') {
                                                 echo "<span class='label label-danger'>Ditolak Desa</span>";
@@ -343,7 +360,7 @@ $IdDesa = $_SESSION['IdDesa'];
                                                 </form>
                                                 <?php
                                             } else {
-                                                echo "<span class='label label-warning'>Menunggu Pengajuan</span>";
+                                                echo "<span class='label label-danger'>Belum Mengajukan Pensiun</span>";
                                             }
                                         } else {
                                             echo "BELUM PENSIUN";

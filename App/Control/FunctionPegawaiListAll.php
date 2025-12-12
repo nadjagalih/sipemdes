@@ -1,5 +1,22 @@
 <?php
-$Nomor = 1;
+// Pagination setup
+$limit = 50; // Record per halaman
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Query untuk menghitung total data
+$queryCount = mysqli_query($db, "SELECT COUNT(*) as total
+FROM master_pegawai
+LEFT JOIN master_desa ON master_pegawai.IdDesaFK = master_desa.IdDesa
+LEFT JOIN master_kecamatan ON master_desa.IdKecamatanFK = master_kecamatan.IdKecamatan
+LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = master_setting_profile_dinas.IdKabupatenProfile
+WHERE master_pegawai.Setting <> 0");
+
+$countResult = mysqli_fetch_assoc($queryCount);
+$totalRecords = $countResult['total'];
+$totalPages = ceil($totalRecords / $limit);
+
+$Nomor = $offset + 1;
 $QueryPegawai = mysqli_query($db, "SELECT
 master_pegawai.IdPegawaiFK,
 master_pegawai.Foto,
@@ -30,15 +47,27 @@ LEFT JOIN master_setting_profile_dinas ON master_kecamatan.IdKabupatenFK = maste
 WHERE master_pegawai.Setting <> 0
 ORDER BY
 master_kecamatan.IdKecamatan ASC,
-master_desa.NamaDesa ASC");
+master_desa.NamaDesa ASC
+LIMIT $limit OFFSET $offset");
 while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $IdPegawaiFK = $DataPegawai['IdPegawaiFK'];
     $Foto = $DataPegawai['Foto'];
     $NIK = $DataPegawai['NIK'];
     $Nama = $DataPegawai['Nama'];
     $TanggalLahir = $DataPegawai['TanggalLahir'];
-    $exp = explode('-', $TanggalLahir);
-    $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+    
+    // Cek dan format tanggal lahir
+    if (!empty($TanggalLahir) && $TanggalLahir != '0000-00-00') {
+        $exp = explode('-', $TanggalLahir);
+        if (count($exp) >= 3) {
+            $ViewTglLahir = $exp[2] . "-" . $exp[1] . "-" . $exp[0];
+        } else {
+            $ViewTglLahir = $TanggalLahir; // Gunakan format asli jika tidak bisa di-parse
+        }
+    } else {
+        $ViewTglLahir = "Tidak Diset";
+    }
+    
     $JenKel = $DataPegawai['JenKel'];
     $NamaDesa = $DataPegawai['NamaDesa'];
     $Kecamatan = $DataPegawai['Kecamatan'];
@@ -50,14 +79,14 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
     $Lingkungan = $DataPegawai['Lingkungan'];
     $AmbilDesa = mysqli_query($db, "SELECT * FROM master_desa WHERE IdDesa = '$Lingkungan' ");
     $LingkunganPeg = mysqli_fetch_assoc($AmbilDesa);
-    $Komunitas = $LingkunganPeg['NamaDesa'];
+    $Komunitas = ($LingkunganPeg && isset($LingkunganPeg['NamaDesa'])) ? $LingkunganPeg['NamaDesa'] : 'Data Tidak Ditemukan';
 
     $KecamatanPeg = $DataPegawai['Kec'];
     $AmbilKecamatan = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$KecamatanPeg' ");
-    $KecamatanPeg = mysqli_fetch_assoc($AmbilKecamatan);
-    $KomunitasKec = $KecamatanPeg['Kecamatan'];
+    $KecamatanPegData = mysqli_fetch_assoc($AmbilKecamatan);
+    $KomunitasKec = ($KecamatanPegData && isset($KecamatanPegData['Kecamatan'])) ? $KecamatanPegData['Kecamatan'] : 'Data Tidak Ditemukan';
 
-    $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec
+    $Address = $Alamat . " RT." . $RT . "/RW." . $RW . " " . $Komunitas . " Kecamatan " . $KomunitasKec;
 ?>
     <tr class="gradeX">
         <td>
@@ -88,7 +117,7 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
             <?php
             $QueryJenKel = mysqli_query($db, "SELECT * FROM master_jenkel WHERE IdJenKel = '$JenKel' ");
             $DataJenKel = mysqli_fetch_assoc($QueryJenKel);
-            $JenisKelamin = $DataJenKel['Keterangan'];
+            $JenisKelamin = ($DataJenKel && isset($DataJenKel['Keterangan'])) ? $DataJenKel['Keterangan'] : 'Tidak Diset';
             echo $JenisKelamin;
             ?>
         </td>
@@ -116,7 +145,7 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
                     master_pegawai.IdPegawaiFK = main_user.IdPegawai
                 WHERE master_pegawai.IdPegawaiFK = '$IdPegawaiFK' ");
                 $DataCekPegawaiLevel = mysqli_fetch_assoc($QCekPegawaiLevel);
-                $DetailLevel = $DataCekPegawaiLevel['IdLevelUserFK'];
+                $DetailLevel = ($DataCekPegawaiLevel && isset($DataCekPegawaiLevel['IdLevelUserFK'])) ? $DataCekPegawaiLevel['IdLevelUserFK'] : 0;
                 // $DetailLevelPeg = $DataCekPegawaiLevel['IdPegawaiFK'];
 
                 if ($DetailLevel == 2) {
@@ -139,3 +168,43 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
 <?php $Nomor++;
 }
 ?>
+
+<!-- Pagination -->
+<tr>
+    <td colspan="9">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="dataTables_info">
+                    Menampilkan <?php echo $offset + 1; ?> sampai <?php echo min($offset + $limit, $totalRecords); ?> dari <?php echo $totalRecords; ?> data
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="dataTables_paginate">
+                    <ul class="pagination justify-content-end">
+                        <?php if ($page > 1): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?pg=PegawaiViewAll&page=<?php echo $page - 1; ?>">Previous</a>
+                            </li>
+                        <?php endif; ?>
+
+                        <?php
+                        $start = max(1, $page - 2);
+                        $end = min($totalPages, $page + 2);
+                        
+                        for ($i = $start; $i <= $end; $i++): ?>
+                            <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                                <a class="page-link" href="?pg=PegawaiViewAll&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <?php if ($page < $totalPages): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?pg=PegawaiViewAll&page=<?php echo $page + 1; ?>">Next</a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </td>
+</tr>

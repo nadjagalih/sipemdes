@@ -9,7 +9,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
 } else {
-    if ($_GET['Act'] == 'Save') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Save') {
         if (isset($_POST['Save'])) {
 
             $ViewTanggal = date('YmdHis');
@@ -61,11 +61,17 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($FileSize <= $FileMaxUpload) {
                 if (in_array($FileExtention, $AllowExtention) == true) {
-                    // OLD File Upload
-                    // FileSK($FileUpload);
-
-                    // NEW BLOB
-                    $FileContent = addslashes(file_get_contents($LokasiFile));
+                    // Baca konten file dulu sebelum dipindah
+                    $FileContent = file_get_contents($LokasiFile);
+                    if ($FileContent === false) {
+                        error_log("Failed to read uploaded file: " . $LokasiFile);
+                        header("location:../../View/v?pg=ViewMutasi&alert=FileError");
+                        exit();
+                    }
+                    $FileContentEscaped = mysqli_real_escape_string($db, $FileContent);
+                    
+                    // Simpan file fisik ke folder (ini akan memindahkan file dari tmp)
+                    FileSK($FileUpload);
 
                     //CARI ID PEGAWAI DENGAN SETTING 1
                     $Cek = mysqli_query($db, "SELECT IdPegawaiFK, Setting FROM history_mutasi WHERE IdPegawaiFK = '$IdPegawaiFK' AND Setting = 1 ");
@@ -75,13 +81,15 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                     $Koreksi = mysqli_query($db, "UPDATE history_mutasi SET Setting = 0
                     WHERE IdPegawaiFK = '$IdPegawaiFKCek' ");
 
-                    // OLD File Upload
-                    // $Save = mysqli_query($db, "INSERT INTO history_mutasi(IdMutasi,IdPegawaiFK,JenisMutasi,NomorSK,TanggalMutasi,FileSKMutasi,IdJabatanFK,KeteranganJabatan,Setting)
-                    // VALUE('$IdMutasi','$IdPegawaiFK','$JenisMutasi','$NomerSK','$TanggalMutasi','$FileUpload','$Jabatan','$Keterangan','$Setting')");
-
-                    // NEW BLOB
+                    // Simpan ke database dengan file fisik dan BLOB
                     $Save = mysqli_query($db, "INSERT INTO history_mutasi (IdMutasi, IdPegawaiFK, JenisMutasi, NomorSK, TanggalMutasi, FileSKMutasi, FileSKMutasiBlob, IdJabatanFK, KeteranganJabatan, Setting)
-                    VALUE ('$IdMutasi', '$IdPegawaiFK', '$JenisMutasi', '$NomerSK', '$TanggalMutasi', '$FileUpload', '$FileContent', '$Jabatan', '$Keterangan', '$Setting')");
+                    VALUES ('$IdMutasi', '$IdPegawaiFK', '$JenisMutasi', '$NomerSK', '$TanggalMutasi', '$FileUpload', '$FileContentEscaped', '$Jabatan', '$Keterangan', '$Setting')");
+                    
+                    if (!$Save) {
+                        error_log("MySQL Error: " . mysqli_error($db));
+                        header("location:../../View/v?pg=ViewMutasi&alert=DatabaseError");
+                        exit();
+                    }
 
                     //OFF KAN PEGAWAI DAN USER JIKA MUTASI KELUAR PENSIUN MENINGGAL KODE 3 4 5
                     if ($JenisMutasi == 3 or $JenisMutasi == 4 or $JenisMutasi == 5) {
@@ -140,15 +148,18 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
                     if ($Save) {
                         header("location:../../View/v?pg=ViewMutasi&alert=Save");
+                        exit();
                     }
                 } elseif (in_array($FileExtention, $AllowExtention) == false) {
                     header("location:../../View/v?pg=ViewMutasi&alert=Cek");
+                    exit();
                 }
             } else {
                 header("location:../../View/v?pg=ViewMutasi&alert=FileMax");
+                exit();
             }
         }
-    } elseif ($_GET['Act'] == 'Edit') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
 
             $IdPegawaiFK = sql_injeksi($_POST['IdPegawaiFK']);
@@ -250,9 +261,10 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($Edit) {
                 header("location:../../View/v?pg=ViewMutasi&alert=Edit");
+                exit();
             }
         }
-    } elseif ($_GET['Act'] == 'EditSK') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'EditSK') {
         if (isset($_POST['EditSK'])) {
             $IdMutasi = sql_injeksi($_POST['IdMutasi']);
 
@@ -272,13 +284,19 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($FileSize <= $FileMaxUpload) {
                 if (in_array($FileExtention, $AllowExtention) == true) {
-                    // FileSK($FileUpload);
-                    // $Edit = mysqli_query($db, "UPDATE history_mutasi SET FileSKMutasi = '$FileUpload'
-                    //     WHERE IdMutasi ='$IdMutasi' ");
-
-                    // NEW BLOB FILE
+                    // Baca konten file dulu sebelum dipindah
                     $FileContent = file_get_contents($_FILES['FUpload']['tmp_name']);
+                    if ($FileContent === false) {
+                        error_log("Failed to read uploaded file");
+                        header("location:../../View/v?pg=ViewMutasi&alert=FileError");
+                        exit();
+                    }
                     $FileContentEscaped = mysqli_real_escape_string($db, $FileContent);
+                    
+                    // Simpan file fisik ke folder (ini akan memindahkan file dari tmp)
+                    FileSK($FileUpload);
+                    
+                    // Update database dengan file fisik dan BLOB
                     $Edit = mysqli_query($db, "UPDATE history_mutasi SET FileSKMutasi = '$FileUpload',
                         FileSKMutasiBlob = '$FileContentEscaped'
                         WHERE IdMutasi ='$IdMutasi' ");
@@ -291,6 +309,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
                     if ($Edit) {
                         header("location:../../View/v?pg=ViewMutasi&alert=Edit");
+                        exit();
                     }
                 } elseif (in_array($FileExtention, $AllowExtention) == false) {
                     header("location:../../View/v?pg=ViewMutasi&alert=Cek");
@@ -299,22 +318,47 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
                 header("location:../../View/v?pg=ViewMutasi&alert=FileMax");
             }
         }
-    } elseif ($_GET['Act'] == 'Delete') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'Delete') {
         if (isset($_GET['Kode'])) {
             $IdMutasi = sql_injeksi(($_GET['Kode']));
 
+            // Ambil data mutasi yang akan dihapus untuk cek apakah aktif
             $PilihData = mysqli_query($db, "SELECT * FROM history_mutasi WHERE IdMutasi = '$IdMutasi' ");
             $DataPilih = mysqli_fetch_assoc($PilihData);
             $NamaFileLama = $DataPilih['FileSKMutasi'];
+            $IdPegawaiFK = $DataPilih['IdPegawaiFK'];
+            $SettingAktif = $DataPilih['Setting'];
 
+            // Hapus data mutasi
             $Delete = mysqli_query($db, "DELETE FROM history_mutasi WHERE IdMutasi = '$IdMutasi' ");
             unlink("../../Vendor/Media/FileSK/" . $NamaFileLama);
 
+            // Jika data yang dihapus adalah jabatan aktif (Setting = 1)
+            if ($Delete && $SettingAktif == 1) {
+                // Cari jabatan non-aktif terbaru berdasarkan tanggal mutasi untuk pegawai yang sama
+                $CariNonAktif = mysqli_query($db, "SELECT IdMutasi FROM history_mutasi 
+                                                  WHERE IdPegawaiFK = '$IdPegawaiFK' 
+                                                  AND Setting = 0 
+                                                  ORDER BY TanggalMutasi DESC 
+                                                  LIMIT 1");
+                
+                if (mysqli_num_rows($CariNonAktif) > 0) {
+                    $DataNonAktif = mysqli_fetch_assoc($CariNonAktif);
+                    $IdMutasiNonAktif = $DataNonAktif['IdMutasi'];
+                    
+                    // Aktifkan jabatan non-aktif terbaru
+                    $AktifkanJabatan = mysqli_query($db, "UPDATE history_mutasi 
+                                                         SET Setting = 1 
+                                                         WHERE IdMutasi = '$IdMutasiNonAktif'");
+                }
+            }
+
             if ($Delete) {
                 header("location:../../View/v?pg=ViewMutasi&alert=Delete");
+                exit();
             }
         }
-    } elseif ($_GET['Act'] == 'SettingOn') {
+    } elseif (isset($_GET['Act']) && $_GET['Act'] == 'SettingOn') {
         if (isset($_GET['Kode'])) {
             $IdTemp = sql_injeksi(($_GET['Kode']));
 
@@ -340,6 +384,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
 
             if ($SettingAktif) {
                 header("location:../../View/v?pg=ViewMutasi&alert=Setting");
+                exit();
             }
         }
     }

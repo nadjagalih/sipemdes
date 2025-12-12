@@ -1,11 +1,31 @@
 <?php
-session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+// Include security configuration
+require_once "../../Module/Security/Security.php";
 
-require_once "../../Module/Config/Env.php";
+// Set CORS headers for AJAX requests
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+header('Content-Type: text/html; charset=UTF-8');
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
+// Start session only if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
+// Use absolute path for database connection
+require_once __DIR__ . "/../../Module/Config/Env.php";
 
 if (!empty($_POST["UserNama"])) {
-    $Result = mysqli_query($db, "SELECT * FROM main_user_kecamatan WHERE NameAkses LIKE '" . $_POST["UserNama"] . "'");
+    // Escape input to prevent SQL injection
+    $userNama = mysqli_real_escape_string($db, $_POST["UserNama"]);
+    $Result = mysqli_query($db, "SELECT * FROM main_user_kecamatan WHERE NameAkses LIKE '$userNama'");
     $row = mysqli_fetch_row($Result);
     if ($row > 0) {
         echo "<span class='status-no-sukses'> <b>Username Sudah Terpakai, Silahkan Cari Yang Lain !!!!</b></span>";
@@ -20,7 +40,10 @@ if (!empty($_POST["UserNama"])) {
         </div>
         <div class="form-group row"><label class="col-lg-4 col-form-label">Hak Akses</label>
             <div class="col-lg-8">
-                <?php include "../../App/Control/FunctionSelectAksesKecamatan.php"; ?>
+                <?php 
+                $EditIdUser = ''; // Define variable for new user (empty for add mode)
+                include "../../App/Control/FunctionSelectAksesKecamatan.php"; 
+                ?>
             </div>
         </div>
         <!-- <div class="form-group row"><label class="col-lg-4 col-form-label">NIK</label>
@@ -43,7 +66,10 @@ if (!empty($_POST["UserNama"])) {
 
         <div class="form-group row"><label class="col-lg-4 col-form-label">Kecamatan</label>
             <div class="col-lg-8">
-                <?php include "../../App/Control/FunctionSelectKecamatanKec.php"; ?>
+                <?php 
+                $EditIdKecamatanFK = ''; // Define variable for new user (empty for add mode)
+                include "../../App/Control/FunctionSelectKecamatanKec.php"; 
+                ?>
             </div>
         </div>
 

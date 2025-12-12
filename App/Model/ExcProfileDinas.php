@@ -8,7 +8,7 @@ if (empty($_SESSION['NameUser']) && empty($_SESSION['PassUser'])) {
     $logout_redirect_url = "../../Auth/SignIn?alert=SignOutTime";
     header("location: $logout_redirect_url");
 } else {
-    if ($_GET['Act'] == 'Edit') {
+    if (isset($_GET['Act']) && $_GET['Act'] == 'Edit') {
         if (isset($_POST['Edit'])) {
 
             $IdKabupatenEdit = sql_injeksi($_POST['IdKabupaten']);

@@ -59,7 +59,7 @@
                                         <span style="font-style: italic; color:black;">Contoh : 16-01-1980</span>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="Save" id="Save">Save</button>
+                                <button class="btn btn-primary" type="submit" name="Save" id="SavePendidikan">Save</button>
                                 <a href="?pg=PegawaiDetailAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>&tab=tab-1" class="btn btn-success">Batal</a>
                             </div>
                         </div>
@@ -160,8 +160,13 @@
                                    class="btn btn-warning btn-sm" title="Edit Data">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
-                                <a href="#" onclick="confirmDeletePendidikan('<?php echo $IdPendidikanV; ?>', '<?php echo htmlspecialchars($NamaSekolah); ?>', '<?php echo htmlspecialchars($JenjangPendidikan); ?>', '<?php echo $IdTemp; ?>')" 
-                                   class="btn btn-danger btn-sm" title="Hapus Data">
+                                <a href="#" 
+                                   class="btn btn-danger btn-sm btn-delete-pendidikan" 
+                                   title="Hapus Data"
+                                   data-id="<?php echo htmlspecialchars($IdPendidikanV); ?>"
+                                   data-sekolah="<?php echo htmlspecialchars($NamaSekolah); ?>"
+                                   data-tingkat="<?php echo htmlspecialchars($JenjangPendidikan); ?>"
+                                   data-pegawai="<?php echo htmlspecialchars($IdTemp); ?>">
                                     <i class="fa fa-trash"></i> Hapus
                                 </a>
                                 <?php if ($Setting == 0) { ?>
@@ -188,22 +193,209 @@
     </table>
 </div>
 
-<script>
-function confirmDeletePendidikan(idPendidikan, namaSekolah, tingkatPendidikan, idPegawai) {
-    swal({
-        title: 'Konfirmasi Hapus',
-        text: 'Apakah Anda yakin ingin menghapus data pendidikan "' + tingkatPendidikan + ' - ' + namaSekolah + '"?',
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Hapus!',
-        cancelButtonText: 'Batal'
-    }, function(isConfirm) {
-        if (isConfirm) {
-            // Redirect to delete action with pegawai ID for proper redirect
-            window.location.href = '../App/Model/ExcPegawaiPendidikanAdminDesa?Act=Delete&Kode=' + idPendidikan + '&IdPegawai=' + idPegawai + '&tab=tab-1';
+<?php
+// Generate CSP nonce for inline script with enhanced security
+$nonce = '';
+$nonceAttr = '';
+
+// Enhanced CSP nonce generation with fallback
+if (class_exists('CSPHandler')) {
+    try {
+        $nonce = CSPHandler::scriptNonce();
+        $nonceAttr = $nonce;
+    } catch (Exception $e) {
+        error_log("CSPHandler error: " . $e->getMessage());
+        $nonceAttr = ''; // Fallback tanpa nonce
+    }
+} else {
+    // Manual nonce generation sebagai fallback
+    if (function_exists('random_bytes')) {
+        $manualNonce = base64_encode(random_bytes(16));
+        $nonceAttr = 'nonce="' . $manualNonce . '"';
+        error_log("Manual nonce generated: " . $manualNonce);
+    } else {
+        error_log("CSPHandler not available and random_bytes not supported");
+        $nonceAttr = ''; // Fallback tanpa nonce
+    }
+}
+
+// Log untuk debugging
+error_log("CSP nonce for FunctionProfilePendidikan: " . $nonceAttr);
+?>
+
+<script <?php echo $nonceAttr; ?>>
+// Enhanced CSP-compliant script with comprehensive error handling
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('FunctionProfilePendidikan script loaded with CSP nonce');
+    console.log('SweetAlert2 available:', typeof Swal !== 'undefined');
+    console.log('jQuery available:', typeof $ !== 'undefined');
+    
+    // Delay untuk memastikan semua library sudah load
+    setTimeout(function() {
+        console.log('Setting up CSP-compliant delete event handlers...');
+        
+        // Native JavaScript Event Delegation (CSP-compliant)
+        document.addEventListener('click', function(e) {
+            console.log('Document click detected, target:', e.target);
+            
+            var deleteBtn = e.target.closest('.btn-delete-pendidikan');
+            if (deleteBtn) {
+                console.log('Delete button found:', deleteBtn);
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var idPendidikan = deleteBtn.getAttribute('data-id');
+                var namaSekolah = deleteBtn.getAttribute('data-sekolah');
+                var tingkatPendidikan = deleteBtn.getAttribute('data-tingkat');
+                var idPegawai = deleteBtn.getAttribute('data-pegawai');
+                
+                console.log('=== CSP-COMPLIANT DELETE BUTTON CLICKED ===');
+                console.log('Delete button element:', deleteBtn);
+                console.log('Data attributes:', {
+                    id: idPendidikan,
+                    sekolah: namaSekolah,
+                    tingkat: tingkatPendidikan,
+                    pegawai: idPegawai
+                });
+                
+                confirmDeletePendidikan(idPendidikan, namaSekolah, tingkatPendidikan, idPegawai);
+                return false;
+            }
+        });
+        
+        // jQuery event delegation sebagai backup (jika jQuery tersedia)
+        if (typeof $ !== 'undefined') {
+            $(document).off('click.deletePendidikan').on('click.deletePendidikan', '.btn-delete-pendidikan', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('jQuery delete event triggered (CSP-compliant)');
+                
+                var idPendidikan = $(this).data('id');
+                var namaSekolah = $(this).data('sekolah');
+                var tingkatPendidikan = $(this).data('tingkat');
+                var idPegawai = $(this).data('pegawai');
+                
+                console.log('jQuery data:', {
+                    id: idPendidikan,
+                    sekolah: namaSekolah,
+                    tingkat: tingkatPendidikan,
+                    pegawai: idPegawai
+                });
+                
+                confirmDeletePendidikan(idPendidikan, namaSekolah, tingkatPendidikan, idPegawai);
+                return false;
+            });
         }
+        
+    }, 1000); // Delay 1 detik untuk memastikan DataTables sudah selesai
+});
+
+// CSP-compliant confirmation function
+function confirmDeletePendidikan(idPendidikan, namaSekolah, tingkatPendidikan, idPegawai) {
+    console.log('=== CSP-COMPLIANT DELETE CONFIRMATION TRIGGERED ===');
+    console.log('Parameters:', {
+        idPendidikan: idPendidikan,
+        namaSekolah: namaSekolah, 
+        tingkatPendidikan: tingkatPendidikan,
+        idPegawai: idPegawai
     });
+    console.log('SweetAlert2 check:', typeof Swal !== 'undefined');
+    
+    if (typeof Swal !== 'undefined') {
+        console.log('Showing CSP-compliant SweetAlert2 confirmation...');
+        
+        // CSP-compliant SweetAlert2 configuration
+        Swal.fire({
+            title: 'Konfirmasi Hapus',
+            html: 'Apakah Anda yakin ingin menghapus data pendidikan:<br><strong>' + 
+                  escapeHtml(tingkatPendidikan) + ' - ' + escapeHtml(namaSekolah) + '</strong>?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            customClass: {
+                container: 'my-swal'
+            },
+            zIndex: 10000
+        }).then((result) => {
+            console.log('SweetAlert2 result:', result);
+            
+            if (result.isConfirmed) {
+                console.log('Delete confirmed by user');
+                
+                // Show loading dengan CSP-compliant configuration
+                Swal.fire({
+                    title: 'Menghapus...',
+                    text: 'Mohon tunggu sebentar',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Build delete URL dengan proper encoding
+                var deleteUrl = '../App/Model/ExcPegawaiPendidikanAdminDesa?Act=Delete&Kode=' + 
+                               encodeURIComponent(idPendidikan) + 
+                               '&IdPegawai=' + encodeURIComponent(idPegawai) + 
+                               '&tab=tab-1';
+                
+                console.log('Redirecting to:', deleteUrl);
+                
+                // Redirect after short delay
+                setTimeout(function() {
+                    window.location.href = deleteUrl;
+                }, 500);
+                
+            } else if (result.isDismissed) {
+                console.log('Delete cancelled by user');
+            }
+        }).catch((error) => {
+            console.error('SweetAlert2 error (possible CSP issue):', error);
+            // CSP-safe fallback confirmation
+            if (confirm('SweetAlert2 error (CSP?). Apakah Anda yakin ingin menghapus data pendidikan "' + 
+                       tingkatPendidikan + ' - ' + namaSekolah + '"?')) {
+                var deleteUrl = '../App/Model/ExcPegawaiPendidikanAdminDesa?Act=Delete&Kode=' + 
+                               encodeURIComponent(idPendidikan) + 
+                               '&IdPegawai=' + encodeURIComponent(idPegawai) + 
+                               '&tab=tab-1';
+                window.location.href = deleteUrl;
+            }
+        });
+        
+    } else {
+        console.log('SweetAlert2 not available (possible CSP block), using native confirm');
+        // CSP-safe fallback untuk browser yang tidak support SweetAlert2
+        if (confirm('Apakah Anda yakin ingin menghapus data pendidikan "' + 
+                   tingkatPendidikan + ' - ' + namaSekolah + '"?')) {
+            console.log('Delete confirmed via native confirm');
+            var deleteUrl = '../App/Model/ExcPegawaiPendidikanAdminDesa?Act=Delete&Kode=' + 
+                           encodeURIComponent(idPendidikan) + 
+                           '&IdPegawai=' + encodeURIComponent(idPegawai) + 
+                           '&tab=tab-1';
+            console.log('Redirecting to:', deleteUrl);
+            window.location.href = deleteUrl;
+        } else {
+            console.log('Delete cancelled via native confirm');
+        }
+    }
+}
+
+// CSP-compliant HTML escaping function
+function escapeHtml(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 </script>

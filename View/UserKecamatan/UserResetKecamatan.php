@@ -48,6 +48,7 @@ include "../App/Control/FunctionUserEditKecamatan.php";
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcUserKecamatan?Act=Reset" method="POST" enctype="multipart/form-data">
+                        <?php echo CSRFProtection::getTokenField(); ?>
                         <input type="hidden" name="IdUser" id="IdUser" value="<?php echo $EditIdUser; ?>">
                         <div class="form-group row"><label class="col-lg-4 col-form-label">Username</label>
                             <div class="col-lg-8">

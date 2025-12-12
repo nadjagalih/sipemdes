@@ -1,43 +1,52 @@
 <?php
-if (empty($_GET['alert'])) {
-    echo "";
-} elseif ($_GET['alert'] == 'UploadSukses') {
-    echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Upload Berhasil',
-                    text: 'File telah berhasil diupload.',
-                    type: 'success'
-                });
-            }, 100);
-          </script>";
-} elseif ($_GET['alert'] == 'FileMax') {
-    echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Upload gagal',
-                    text: 'File melebihi 5 MB.',
-                    type: 'warning'
-                });
-            }, 100);
-          </script>";
-} elseif ($_GET['alert'] == 'FileExt') {
-    echo "<script type='text/javascript'>
-            setTimeout(function () {
-                swal({
-                    title: 'Upload gagal',
-                    text: 'Tipe File Tidak Didukung (hanya file pdf).',
-                    type: 'warning'
-                });
-            }, 100);
-          </script>";
+// Only show delete notifications here; upload success is handled in FileUpload.php
+$alert = isset($_GET['alert']) ? $_GET['alert'] : '';
+if (!empty($alert) && in_array($alert, ['DeleteSuccess', 'DeleteError', 'InvalidID'])) {
+    // Prepare CSP nonce if available
+    $nonceAttr = '';
+    if (class_exists('CSPHandler')) {
+        try {
+            $nonceAttr = CSPHandler::scriptNonce();
+        } catch (Exception $e) {
+            // fallback to empty
+            $nonceAttr = '';
+        }
+    }
+
+    if ($alert == 'DeleteSuccess') {
+        $title = 'Hapus Berhasil';
+        $text = 'File telah berhasil dihapus.';
+        $icon = 'success';
+    } elseif ($alert == 'DeleteError') {
+        $title = 'Hapus Gagal';
+        $text = 'Terjadi kesalahan saat menghapus file.';
+        $icon = 'error';
+    } else { // InvalidID
+        $title = 'ID Tidak Valid';
+        $text = 'ID file yang dipilih tidak valid.';
+        $icon = 'warning';
+    }
+
+    echo "<script " . $nonceAttr . " type='text/javascript'>\n";
+    echo "  document.addEventListener('DOMContentLoaded', function() {\n";
+    echo "    if (typeof Swal !== 'undefined') {\n";
+    echo "      Swal.fire({ title: '" . addslashes($title) . "', text: '" . addslashes($text) . "', icon: '" . $icon . "', confirmButtonText: 'OK' });\n";
+    echo "    } else {\n";
+    echo "      alert('" . addslashes($title . ' - ' . $text) . "');\n";
+    echo "    }\n";
+    echo "  });\n";
+    echo "</script>";
 }
 
-$IdKecamatan = $_SESSION['IdKecamatan'];
+$IdKecamatan = $_SESSION['IdKecamatan'] ?? '';
 
-$QHeader = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$IdKecamatan'");
-$DataHeader = mysqli_fetch_assoc($QHeader);
-$NamaKecamatanHeader = $DataHeader['Kecamatan'];
+if (!empty($IdKecamatan)) {
+    $QHeader = mysqli_query($db, "SELECT * FROM master_kecamatan WHERE IdKecamatan = '$IdKecamatan'");
+    $DataHeader = mysqli_fetch_assoc($QHeader);
+    $NamaKecamatanHeader = ($DataHeader && isset($DataHeader['Kecamatan'])) ? $DataHeader['Kecamatan'] : 'Data Tidak Ditemukan';
+} else {
+    $NamaKecamatanHeader = 'Session Tidak Valid';
+}
 
 ?>
 
@@ -116,27 +125,36 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                 <th>No</th>
                                 <th>Nama File</th>
                                 <th>Kategori</th>
-                                <th>File</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             $downloadDir = '../';
-                            $IdKecamatan = $_SESSION['IdKecamatan'];
+                            $IdKecamatan = $_SESSION['IdKecamatan'] ?? '';
                             $Nomor = 1;
                             $q = mysqli_query($db, "SELECT f.*, k.KategoriFile 
                                     FROM file f
                                     JOIN master_file_kategori k ON f.IdFileKategoriFK = k.IdFileKategori
                                     WHERE f.IdLevelFileFK = '1'
                                     ORDER BY f.IdFile DESC");
-                            while ($row = mysqli_fetch_assoc($q)) {
-                                echo "<tr>
-                                        <td>{$Nomor}</td>
-                                        <td>{$row['Nama']}</td>
-                                        <td>{$row['KategoriFile']}</td>
-                                        <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
-                                    </tr>";
-                                $Nomor++;
+                            if ($q) {
+                                while ($row = mysqli_fetch_assoc($q)) {
+                                    echo "<tr>
+                                            <td>{$Nomor}</td>
+                                            <td>{$row['Nama']}</td>
+                                            <td>{$row['KategoriFile']}</td>
+                                            <td>
+                                                <a href='{$downloadDir}Module/File/View.php?id={$row['IdFile']}' target='_blank' class='btn btn-info btn-sm'>
+                                                    <i class='fa fa-eye'></i> Lihat File
+                                                </a>
+                                                <a href='File/DeleteFile.php?id={$row['IdFile']}' class='btn btn-danger btn-sm delete-file-btn' data-filename='{$row['Nama']}'>
+                                                    <i class='fa fa-trash'></i> Hapus
+                                                </a>
+                                            </td>
+                                        </tr>";
+                                    $Nomor++;
+                                }
                             }
                             ?>
                         </tbody>
@@ -178,28 +196,37 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                 <th>Nama File</th>
                                 <th>Kategori</th>
                                 <th>Kecamatan</th>
-                                <th>File</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             $downloadDir = '../';
-                            $IdKecamatan = $_SESSION['IdKecamatan'];
+                            $IdKecamatan = $_SESSION['IdKecamatan'] ?? '';
                             $Nomor = 1;
                             $q = mysqli_query($db, "SELECT f.*, k.KategoriFile, kc.Kecamatan
                                     FROM file f
                                     JOIN master_file_kategori k ON f.IdFileKategoriFK = k.IdFileKategori
                                     JOIN master_kecamatan kc ON f.IdKecamatanFK = kc.IdKecamatan
                                     ORDER BY f.IdFile DESC");
-                            while ($row = mysqli_fetch_assoc($q)) {
-                                echo "<tr>
-                                        <td>{$Nomor}</td>
-                                        <td>{$row['Nama']}</td>
-                                        <td>{$row['KategoriFile']}</td>
-                                        <td>{$row['Kecamatan']}</td>
-                                        <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
-                                    </tr>";
-                                $Nomor++;
+                            if ($q) {
+                                while ($row = mysqli_fetch_assoc($q)) {
+                                    echo "<tr>
+                                            <td>{$Nomor}</td>
+                                            <td>{$row['Nama']}</td>
+                                            <td>{$row['KategoriFile']}</td>
+                                            <td>{$row['Kecamatan']}</td>
+                                            <td>
+                                                <a href='{$downloadDir}Module/File/View.php?id={$row['IdFile']}' target='_blank' class='btn btn-info btn-sm'>
+                                                    <i class='fa fa-eye'></i> Lihat File
+                                                </a>
+                                                <a href='File/DeleteFile.php?id={$row['IdFile']}' class='btn btn-danger btn-sm delete-file-btn' data-filename='{$row['Nama']}'>
+                                                    <i class='fa fa-trash'></i> Hapus
+                                                </a>
+                                            </td>
+                                        </tr>";
+                                    $Nomor++;
+                                }
                             }
                             ?>
                         </tbody>
@@ -242,13 +269,13 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                 <th>Kategori</th>
                                 <th>Kecamatan</th>
                                 <th>Desa</th>
-                                <th>File</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             $downloadDir = '../';
-                            $IdKecamatan = $_SESSION['IdKecamatan'];
+                            $IdKecamatan = $_SESSION['IdKecamatan'] ?? '';
                             $Nomor = 1;
                             $q = mysqli_query($db, "SELECT f.*, k.KategoriFile, d.NamaDesa, kc.Kecamatan
                                     FROM file f
@@ -256,16 +283,25 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
                                     JOIN master_desa d ON f.IdDesaFK = d.IdDesa
                                     JOIN master_kecamatan kc ON d.IdKecamatanFK = kc.IdKecamatan
                                     ORDER BY f.IdFile DESC");
-                            while ($row = mysqli_fetch_assoc($q)) {
+                            if ($q) {
+                                while ($row = mysqli_fetch_assoc($q)) {
                                 echo "<tr>
                                         <td>{$Nomor}</td>
                                         <td>{$row['Nama']}</td>
                                         <td>{$row['KategoriFile']}</td>
                                         <td>{$row['Kecamatan']}</td>
                                         <td>{$row['NamaDesa']}</td>
-                                        <td><a href='{$downloadDir}Module/File/Download.php?id={$row['IdFile']}' target='_blank'>Download</a></td>
+                                        <td>
+                                            <a href='{$downloadDir}Module/File/View.php?id={$row['IdFile']}' target='_blank' class='btn btn-info btn-sm'>
+                                                <i class='fa fa-eye'></i> Lihat File
+                                            </a>
+                                            <a href='File/DeleteFile.php?id={$row['IdFile']}' class='btn btn-danger btn-sm delete-file-btn' data-filename='{$row['Nama']}'>
+                                                <i class='fa fa-trash'></i> Hapus
+                                            </a>
+                                        </td>
                                     </tr>";
                                 $Nomor++;
+                            }
                             }
                             ?>
                         </tbody>
@@ -276,3 +312,31 @@ $NamaKecamatanHeader = $DataHeader['Kecamatan'];
     </div>
 
 </div>
+
+<script>
+$(document).ready(function() {
+    // Handle delete file button clicks
+    $('.delete-file-btn').on('click', function(e) {
+        e.preventDefault();
+        
+        const deleteUrl = $(this).attr('href');
+        const filename = $(this).data('filename');
+        
+        swal({
+            title: 'Konfirmasi Hapus',
+            text: `Apakah Anda yakin ingin menghapus file "${filename}"?`,
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.value) {
+                // If confirmed, redirect to delete URL
+                window.location.href = deleteUrl;
+            }
+        });
+    });
+});
+</script>

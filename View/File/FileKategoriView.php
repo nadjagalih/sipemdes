@@ -1,52 +1,68 @@
 <?php
-if ($_GET['alert'] == 'Edit') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Dikoreksi',
-                type: 'success',
-                showConfirmButton: true
-            });
-        },1000);
-    </script>";
-} elseif ($_GET['alert'] == 'Save') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Disimpan',
-                type: 'success',
-                showConfirmButton: true
-            });
-        },1000);
-    </script>";
-} elseif ($_GET['alert'] == 'Delete') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Berhasil Dihapus',
-                type: 'warning',
-                showConfirmButton: true
-            });
-        },1000);
-    </script>";
-} elseif ($_GET['alert'] == 'Cek') {
-    echo
-        "<script type='text/javascript'>
-        setTimeout(function () {
-            swal({
-                title: '',
-                text:  'Data Tidak Bisa Dihapus, Karena Sudah Terpakai Di Master File',
-                type: 'warning',
-                showConfirmButton: true
-            });
-        },1000);
-    </script>";
+// Notifikasi SweetAlert - CSPHandler sudah di-include di v.php
+if (isset($_GET['alert'])) {
+    $alertType = $_GET['alert'];
+    $alertConfig = [];
+    
+    switch($alertType) {
+        case 'AddKategori':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Kategori File Berhasil Ditambahkan', 'type' => 'success'];
+            break;
+        case 'EditKategori':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Kategori File Berhasil Diperbarui', 'type' => 'success'];
+            break;
+        case 'DeleteKategori':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Kategori File Berhasil Dihapus', 'type' => 'success'];
+            break;
+        case 'Edit':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Kategori File Berhasil Diperbarui', 'type' => 'success'];
+            break;
+        case 'Save':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Kategori File Berhasil Ditambahkan', 'type' => 'success'];
+            break;
+        case 'Delete':
+            $alertConfig = ['title' => 'Berhasil!', 'text' => 'Kategori File Berhasil Dihapus', 'type' => 'success'];
+            break;
+        case 'Cek':
+            $alertConfig = ['title' => 'Peringatan!', 'text' => 'Data Tidak Bisa Dihapus, Karena Sudah Terpakai Di Master File', 'type' => 'warning'];
+            break;
+        case 'Error':
+            $alertConfig = ['title' => 'Error!', 'text' => 'Terjadi kesalahan saat memproses data', 'type' => 'error'];
+            break;
+        case 'NotFound':
+            $alertConfig = ['title' => 'Peringatan!', 'text' => 'Data yang dicari tidak ditemukan', 'type' => 'warning'];
+            break;
+        case 'Duplicate':
+            $alertConfig = ['title' => 'Peringatan!', 'text' => 'Kategori File sudah ada', 'type' => 'warning'];
+            break;
+    }
+    
+    if (!empty($alertConfig)) {
+        echo "<script " . CSPHandler::scriptNonce() . ">
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '" . addslashes($alertConfig['title']) . "',
+                        text: '" . addslashes($alertConfig['text']) . "',
+                        icon: '" . $alertConfig['type'] . "',
+                        confirmButtonText: 'OK'
+                    });
+                } else if (typeof swal !== 'undefined') {
+                    swal({
+                        title: '" . addslashes($alertConfig['title']) . "',
+                        text: '" . addslashes($alertConfig['text']) . "',
+                        type: '" . $alertConfig['type'] . "',
+                        showConfirmButton: true,
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    alert('" . addslashes($alertConfig['title']) . "\\n" . addslashes($alertConfig['text']) . "');
+                }
+            }, 500);
+        });
+        </script>";
+    }
 }
 ?>
 

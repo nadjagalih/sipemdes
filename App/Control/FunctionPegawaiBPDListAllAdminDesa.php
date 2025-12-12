@@ -143,9 +143,9 @@ while ($DataPegawai = mysqli_fetch_assoc($QueryPegawai)) {
                     <a href="?pg=PegawaiBPDEditAdminDesa&Kode=<?php echo $IdPegawaiFK; ?>">
                         <button class="btn btn-outline btn-success btn-xs" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></button>
                     </a>
-                    <a href="../App/Model/ExcPegawaiBPDAdminDesa?Act=Delete&Kode=<?php echo $IdPegawaiFK; ?>" onclick="return confirm('Anda yakin ingin menghapus : <?php echo $Nama; ?> ?');">
-                        <button class="btn btn-outline btn-danger btn-xs" data-toggle="tooltip" title="Hapus Data"><i class="fa fa-eraser"></i></button>
-                    </a>
+                    <button class="btn btn-outline btn-danger btn-xs delete-btn" data-toggle="tooltip" title="Hapus Data" data-id="<?php echo $IdPegawaiFK; ?>" data-nama="<?php echo htmlspecialchars($Nama, ENT_QUOTES); ?>">
+                        <i class="fa fa-eraser"></i>
+                    </button>
                 </div>
             <?php } ?>
         </td>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 include '../../../../Module/Config/Env.php';
 
@@ -179,16 +179,28 @@ if (isset($_GET['Desa'])) {
         $content .=
             '<tr>
                 <td align="center">' . $Nomor . '</td>';
+        
+        // Cek apakah foto ada dan file benar-benar exist
         if (empty($Foto)) {
             $content .=
                 '<td align="center">
                         <img src="../../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
                     </td>';
         } else {
-            $content .=
-                '<td align="center">
-                        <img src="../../../../Vendor/Media/Pegawai/' . $Foto . '" width="65" height="auto" align="center">
-                </td>';
+            // Cek apakah file foto benar-benar ada
+            $fotoPath = __DIR__ . '/../../../../Vendor/Media/Pegawai/' . $Foto;
+            if (file_exists($fotoPath)) {
+                $content .=
+                    '<td align="center">
+                            <img src="../../../../Vendor/Media/Pegawai/' . htmlspecialchars($Foto) . '" width="65" height="auto" align="center">
+                    </td>';
+            } else {
+                // Jika file tidak ada, gunakan no-image.jpg
+                $content .=
+                    '<td align="center">
+                            <img src="../../../../Vendor/Media/Pegawai/no-image.jpg" width="65" height="auto" align="center">
+                    </td>';
+            }
         }
         $content .= '<td>' . $NIK . '</td>
                       <td width="300"><strong><font size="12">' . $Nama . '</font></strong><br>' . $Jabatan . '<br><br>' . $Address . '</td>

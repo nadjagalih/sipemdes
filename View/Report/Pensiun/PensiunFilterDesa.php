@@ -1,27 +1,40 @@
-<script type="text/javascript">
+<?php
+require_once "../Module/Security/CSPHandler.php";
+?>
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     $(document).ready(function() {
-        $.ajax({
-            type: 'POST',
-            url: "Report/Pensiun/GetKecamatan.php",
-            cache: false,
-            success: function(msg) {
-                $("#Kecamatan").html(msg);
-            }
-        });
-
+        console.log("Document ready - PensiunFilterDesa");
+        
         $("#Kecamatan").change(function() {
             var Kecamatan = $("#Kecamatan").val();
-            $.ajax({
-                type: 'POST',
-                url: "Report/Pensiun/GetDesa.php",
-                data: {
-                    Kecamatan: Kecamatan
-                },
-                cache: false,
-                success: function(msg) {
-                    $("#Desa").html(msg);
-                }
-            });
+            console.log("Kecamatan changed to: " + Kecamatan);
+            
+            if(Kecamatan != '' && Kecamatan != null) {
+                console.log("Loading Desa for Kecamatan: " + Kecamatan);
+                $("#Desa").html('<option value="">Loading desa...</option>');
+                
+                $.ajax({
+                    type: 'POST',
+                    url: "Report/Pensiun/GetDesa.php",
+                    data: {
+                        Kecamatan: Kecamatan
+                    },
+                    cache: false,
+                    success: function(msg) {
+                        console.log("AJAX Success - Desa loaded");
+                        console.log("Response:", msg);
+                        $("#Desa").html(msg);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("AJAX Error:", error);
+                        console.log("Response:", xhr.responseText);
+                        $("#Desa").html('<option value="">Error loading desa</option>');
+                    }
+                });
+            } else {
+                console.log("Kecamatan empty, resetting Desa");
+                $("#Desa").html('<option value="">Filter Desa</option>');
+            }
         });
     });
 </script>
@@ -58,6 +71,14 @@
                                 <div class="col-lg-6">
                                     <select name="Kecamatan" id="Kecamatan" style="width: 100%;" class="select2_kecamatan form-control" required>
                                         <option value="">Filter Kecamatan</option>
+                                        <?php
+                                        $QueryKecamatanList = mysqli_query($db, "SELECT * FROM master_kecamatan ORDER BY Kecamatan ASC");
+                                        while ($RowKecamatanList = mysqli_fetch_assoc($QueryKecamatanList)) {
+                                            $IdKecamatanList = isset($RowKecamatanList['IdKecamatan']) ? $RowKecamatanList['IdKecamatan'] : '';
+                                            $NamaKecamatanList = isset($RowKecamatanList['Kecamatan']) ? $RowKecamatanList['Kecamatan'] : '';
+                                        ?>
+                                            <option value="<?php echo htmlspecialchars($IdKecamatanList); ?>"><?php echo htmlspecialchars($NamaKecamatanList); ?></option>
+                                        <?php } ?>
                                     </select>
                                 </div>
                             </div>

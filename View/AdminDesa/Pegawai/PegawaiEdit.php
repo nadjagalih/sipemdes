@@ -1,4 +1,11 @@
-<?php include "../App/Control/FunctionPegawaiEdit.php"; ?>
+<?php 
+include "../App/Control/FunctionPegawaiEdit.php"; 
+
+// Generate CSRF token if not exists
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
@@ -16,6 +23,9 @@
                 </div>
                 <div class="ibox-content">
                     <form action="../App/Model/ExcPegawaiAdminDesa?Act=Edit" method="POST" enctype="multipart/form-data">
+                        <!-- CSRF Protection -->
+                        <input type="hidden" name="csrf_token" value="<?php echo isset($_SESSION['csrf_token']) ? $_SESSION['csrf_token'] : ''; ?>">
+                        
                         <div class="row">
                             <div class="col-lg-6">
                                 <input type="hidden" name="IdPegawaiFK" id="IdPegawaiFK" value="<?php echo $IdPegawaiFK; ?>" class="form-control" readonly>
@@ -122,7 +132,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group row"><label class="col-lg-3 col-form-label">Email</label>
-                                    <div class="col-lg-8"><input type="email" name="Email" id="Email" value="<?php echo $Email; ?>" placeholder="contoh@gmail.com" class="form-control" autocomplete="off">
+                                    <div class="col-lg-8"><input type="email" name="Email" id="Email" value="<?php echo $Email; ?>" placeholder="user@example.com" class="form-control" autocomplete="off">
                                     </div>
                                 </div>
 

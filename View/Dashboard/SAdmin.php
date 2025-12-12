@@ -1,8 +1,11 @@
 <?php
+// Include CSP Handler for nonce
+require_once "../Module/Security/CSPHandler.php";
+
 if (empty($_GET['alert'])) {
     echo "";
-} elseif ($_GET['alert'] == 'Ditolak') {
-    echo "<script type='text/javascript'>
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Ditolak') {
+    echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Pengajuan Ditolak',
@@ -12,8 +15,8 @@ if (empty($_GET['alert'])) {
             }, 1000);
           </script>";
 
-} elseif ($_GET['alert'] == 'Gagal') {
-    echo "<script type='text/javascript'>
+} elseif (isset($_GET['alert']) && $_GET['alert'] == 'Gagal') {
+    echo "<script type='text/javascript' " . CSPHandler::scriptNonce() . ">
             setTimeout(function () {
                 swal({
                     title: 'Gagal',
@@ -127,7 +130,7 @@ $TglSaatIni = date('d-m-Y');
 </div>
 
 
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('StatistikPerangkat', {
         chart: {
             type: 'column'
@@ -194,7 +197,7 @@ $TglSaatIni = date('d-m-Y');
     });
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('StatistikJabatan', {
         chart: {
             type: 'column'
@@ -257,7 +260,7 @@ $TglSaatIni = date('d-m-Y');
 </script>
 
 
-<script type="text/javascript">
+<script type="text/javascript" <?php echo CSPHandler::scriptNonce(); ?>>
     Highcharts.chart('StatistikBPD', {
         chart: {
             type: 'column'
